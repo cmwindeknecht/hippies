@@ -3,12 +3,15 @@ using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour
 {
+    [SerializeField] private GameObject _TestBullet;
     private Rigidbody2D _RigidBody;
 
     private InputAction _MoveInputAction;
     //private InputAction _JumpInputAction;
+    private InputAction _AttackInputAction;
 
-    private Vector2 _MoveValue;
+    private Vector2 _MoveValue = Vector2.zero;
+    private Vector2 _Direction = Vector2.zero;
     private Vector2 _LinearVelocity = Vector2.zero;
     private bool _ShouldZeroOut = true; // Plan is to make this false when knockback/environment modifies velocity
     private readonly float _BaseSpeed = 6f;
@@ -17,11 +20,23 @@ public class PlayerController : MonoBehaviour
     {
         _RigidBody = GetComponent<Rigidbody2D>();
         _MoveInputAction = InputSystem.actions.FindAction("Move");
+        _AttackInputAction = InputSystem.actions.FindAction("Attack");
+
+        _AttackInputAction.started += _AttackInputAction_started;
+    }
+
+    private void Update()
+    {
+        _MoveValue = _MoveInputAction.ReadValue<Vector2>();
+        if (_MoveValue != Vector2.zero)
+        {
+            _Direction = _MoveValue;
+        }
     }
 
     private void FixedUpdate()
     {
-        _MoveValue = _MoveInputAction.ReadValue<Vector2>();
+        
         //Debug.Log($"_MoveValue {_MoveValue}");
 
         GetInputVelocity();
@@ -35,6 +50,17 @@ public class PlayerController : MonoBehaviour
         //{
         //    _RigidBody.AddForce(transform.up * GetMovementSpeed(), ForceMode2D.Impulse);
         //}
+    }
+
+    // TODO This shit should be in an attack controller or maybe on weapons something.  Need to do shit like fire rate of gun and stuff, shouldn't be on the controller.  Controller should just be movement
+    //          An argument for it being on the weapon is
+    //              1) the weapon will know its bullet type
+    //              2) the project needs to fire from the weapon position
+    private void _AttackInputAction_started(InputAction.CallbackContext obj)
+    {
+        GameObject gameObject = Instantiate(_TestBullet, transform.position + new Vector3(_Direction.x, _Direction.y), Quaternion.identity);
+        TestBullet projectile = gameObject.GetComponent<TestBullet>();
+        projectile.Fly(_Direction);
     }
 
     private void SetRotation()
