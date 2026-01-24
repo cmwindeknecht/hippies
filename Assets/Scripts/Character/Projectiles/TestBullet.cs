@@ -3,7 +3,6 @@ using UnityEngine;
 public class TestBullet : MonoBehaviour
 {
     private Rigidbody2D _RigidBody;
-    private float maxDistance; // Should be on an SO 
 
     private void Awake()
     {
@@ -12,12 +11,17 @@ public class TestBullet : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (!collision.CompareTag("Player"))
+        if (collision.CompareTag("Player"))
         {
-            Destroy(gameObject);
+            return;
         }
-        
-        // TODO should check if its an enemy / destroyable / etc and do shit
+
+        Destroy(gameObject);
+
+        if (collision.TryGetComponent<EnemyController>(out EnemyController enemy))
+        {
+            enemy.TakeDamage(3f);
+        }
     }
 
     public void Fly(Vector2 direction)
