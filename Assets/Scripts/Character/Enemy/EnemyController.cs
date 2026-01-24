@@ -6,8 +6,9 @@ public class EnemyController : MonoBehaviour
     private Rigidbody2D _RigidBody;
 
     // TODO EnemySO shit
-    private float health = 5f;
+    private float _Health = 5f;
     private float _BaseSpeed = 5f;
+    private float _ViewDistance = 10f; 
 
     private void Awake()
     {
@@ -20,8 +21,18 @@ public class EnemyController : MonoBehaviour
         {
             return;
         }
-        
-        _RigidBody.linearVelocity = (_Player.gameObject.transform.position - gameObject.transform.position).normalized * GetMovementSpeed();
+
+        Vector3 playerDirection = (_Player.transform.position - transform.position).normalized;
+        LayerMask playerLayerMask = LayerMask.GetMask("Player", "Collision");
+        RaycastHit2D hit = Physics2D.Raycast(transform.position, playerDirection, _ViewDistance, playerLayerMask);
+
+        Color lineColor = hit && hit.collider.CompareTag("Player") ? Color.green : Color.red;
+        Debug.DrawRay(transform.position, playerDirection * _ViewDistance, lineColor);
+
+        if (hit && hit.collider.CompareTag("Player"))
+        {
+            _RigidBody.linearVelocity = (_Player.gameObject.transform.position - gameObject.transform.position).normalized * GetMovementSpeed();
+        }
     }
 
     public void Setup(Player player)
@@ -31,9 +42,9 @@ public class EnemyController : MonoBehaviour
 
     public void TakeDamage(float damage)
     {
-        health -= damage;
+        _Health -= damage;
 
-        if (health < 0)
+        if (_Health < 0)
         {
             Destroy(gameObject);
         }
