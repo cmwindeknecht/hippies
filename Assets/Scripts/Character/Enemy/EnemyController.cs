@@ -31,15 +31,16 @@ public class EnemyController : MonoBehaviour
         LayerMask playerLayerMask = LayerMask.GetMask("Player", "Collision");
         RaycastHit2D hit = Physics2D.Raycast(transform.position, playerDirection, _MaxViewDistance, playerLayerMask);
 
-        Color lineColor = hit && hit.collider.CompareTag("Player") ? Color.green : Color.red;
+        bool canSeePlayer = hit && hit.collider.CompareTag("Player");
+        Color lineColor = canSeePlayer ? Color.green : Color.red;
         Debug.DrawRay(transform.position, playerDirection * _MaxViewDistance, lineColor);
 
         // If it sees the player / there are no collisions in between, start chasing
-        if (hit && hit.collider.CompareTag("Player"))
+        if (canSeePlayer)
         {
             _ChasePlayer = true;
         }
-        // If the enemy loses sight but they are reasonably close, continue chasing
+        // If the enemy loses sight, keep chasing unless too far away
         else if (_ChasePlayer && Utilities.GetDistanceBetween(_Player.transform.position, transform.position) > _OutOfSightChaseDistance)
         {
             _ChasePlayer = false;
@@ -48,11 +49,38 @@ public class EnemyController : MonoBehaviour
         // Either chase the player or return to the spawn position
         if (_ChasePlayer)
         {
-            _RigidBody.linearVelocity = (_Player.transform.position - transform.position).normalized * GetMovementSpeed();
+            // No collision --- go straight to player
+            if (canSeePlayer)
+            {
+                _RigidBody.linearVelocity = (_Player.transform.position - transform.position).normalized * GetMovementSpeed();
+            }
+            //// Has collision --- try and go around
+            //else
+            //{
+            //    LayerMask collisionLayerMask = LayerMask.GetMask("Collision");
+            //    Vector3 noCollisionDirection = (_Player.transform.position - transform.position).normalized;
+            //    while (Utilities.GetDistanceBetween(_Player.transform.position, transform.position) < _OutOfSightChaseDistance)
+            //    {
+            //        noCollisionDirection = (noCollisionDirection - new Vector3(1,1,0)).normalized;
+            //        RaycastHit2D collisionHit = Physics2D.Raycast(transform.position, noCollisionDirection, _MaxViewDistance, collisionLayerMask);
+            //        bool collisionInView = hit && hit.collider.CompareTag("Collision");
+            //        if (!collisionInView)
+            //        {
+            //            _RigidBody.linearVelocity = (noCollisionDirection - transform.position).normalized * GetMovementSpeed();
+            //        }
+
+            //        noCollisionDirection = (noCollisionDirection - new Vector3(-2, -2, 0)).normalized;
+            //        collisionHit = Physics2D.Raycast(transform.position, noCollisionDirection, _MaxViewDistance, collisionLayerMask);
+            //        collisionInView = hit && hit.collider.CompareTag("Collision");
+            //        if (!collisionInView)
+            //        {
+            //            _RigidBody.linearVelocity = (noCollisionDirection - transform.position).normalized * GetMovementSpeed();
+            //        }
+            //    }
+            //}
         }
         else if (!Utilities.IsSameVectorPosition(transform.position, _SpawnPosition))
         {
-            Debug.Log($"NOT SAME VECTOR POSITION --- spawn {_SpawnPosition} gameobject {transform.position}");
             _ChasePlayer = false;
             _RigidBody.linearVelocity = (_SpawnPosition - transform.position).normalized * GetMovementSpeed();
         }
