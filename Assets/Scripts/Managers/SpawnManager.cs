@@ -33,15 +33,14 @@ public class SpawnManager : MonoBehaviour
     {
         Debug.Log($"SpawnManager: Scene changed from {arg0} to {arg1}");
         ClearEnemies();
-        SpawnManager.Instance.SpawnEnemiesForScene(arg1);
+        SpawnEnemiesForScene(arg1);
     }
 
     public void SpawnEnemiesForScene(Scene scene)
     {
         // TODO have a database and what not for spawning enemies, this is just for testing
         for (int i = 0; i < 10; i++) {
-            Debug.Log($"Spawning Enemy at (6, {i}, 0)!");
-            GameObject gameObject = Instantiate(_EnemyPrefab, new Vector3(6, i, 0), Quaternion.identity);
+            GameObject gameObject = Instantiate(_EnemyPrefab, new Vector3(6, i*2, 0), Quaternion.identity);
             Enemy enemy = gameObject.GetComponent<Enemy>();
             RegisterEnemy(enemy);
         }
