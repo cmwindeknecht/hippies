@@ -18,6 +18,8 @@ public class PlayerController : MonoBehaviour
 
     private Vector2 _MoveValue = Vector2.zero;
     private Vector2 _AttackValue = Vector2.zero;
+    private Vector2 _LastMoveInput = Vector2.zero;
+    private Vector2 _LastAttackInput = Vector2.zero;
     private Vector2 _FacingDirection = Vector2.zero;
     private Vector2 _LinearVelocity = Vector2.zero;
 
@@ -33,27 +35,35 @@ public class PlayerController : MonoBehaviour
         _AttackInputAction = InputSystem.actions.FindAction("Attack");
     }
 
-    private void Update()
+    void Update()
     {
         _MoveValue = _MoveInputAction.ReadValue<Vector2>();
         _AttackValue = _AttackInputAction.ReadValue<Vector2>();
 
+        UpdateFacingDirection();
+
+        _LastMoveInput = _MoveValue;
+        _LastAttackInput = _AttackValue;
+    }
+
+    private void UpdateFacingDirection()
+    {
         if (_AttackValue == Vector2.zero)
         {
             _CanFireSingleShot = true;
         }
 
-        if (_AttackValue != Vector2.zero)
+        if (_AttackValue != Vector2.zero && _LastAttackInput == Vector2.zero)
         {
             _FacingDirection = _AttackValue;
-
             if (_CanFireSingleShot)
             {
                 _CanFireSingleShot = false;
                 Attack();
             }
         }
-        else if (_MoveValue != Vector2.zero)
+
+        if (_MoveValue != Vector2.zero && _LastMoveInput == Vector2.zero)
         {
             _FacingDirection = _MoveValue;
         }
