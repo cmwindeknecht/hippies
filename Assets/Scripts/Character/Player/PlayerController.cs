@@ -71,13 +71,10 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        
-        //Debug.Log($"_MoveValue {_MoveValue}");
-
         GetInputVelocity();
-        _RigidBody.linearVelocity = _LinearVelocity;
-        //Debug.Log($"Velocity {_RigidBody.linearVelocity}");
+        // TODO factor in knockback and whatever else
 
+        MovePlayer();
         SetRotation();
 
         // Not going to have a jump (I think --- maybe?) but leaving this here for sneak or whatever
@@ -150,5 +147,10 @@ public class PlayerController : MonoBehaviour
             rotation = Mathf.Round(angle / 45f) * 45f;
         }
         return rotation;
+    }
+
+    private void MovePlayer()
+    {
+        _RigidBody.linearVelocity = _LinearVelocity;
     }
 }
