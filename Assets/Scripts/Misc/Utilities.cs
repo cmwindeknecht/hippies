@@ -16,6 +16,11 @@ public static class Utilities
         return Vector2.Distance(positionA, positionB);
     }
 
+    public static float GetDistanceBetween(Vector3Int positionA, Vector3Int positionB)
+    {
+        return Vector3Int.Distance(positionA, positionB);
+    }
+
     public static bool TestRandomChance(float chancePercent)
     {
         return Random.Range(0f, 100f) < chancePercent;
@@ -34,6 +39,11 @@ public static class Utilities
     public static float RoundToHundredths(float toRound)
     {
         return Mathf.Round(toRound * 100f) / 100f;
+    }
+
+    public static int RountToInt(float toRound)
+    {
+        return Mathf.RoundToInt(toRound);
     }
 
     public static async UniTask FadeInUIElement(Graphic uiElement, float holdSeconds = .25f, float fadeSeconds = 1f)
