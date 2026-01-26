@@ -40,7 +40,8 @@ public class SpawnManager : MonoBehaviour
     {
         // TODO have a database and what not for spawning enemies, this is just for testing
         for (int i = 0; i < 10; i++) {
-            GameObject gameObject = Instantiate(_EnemyPrefab, new Vector3(6, i*2, 0), Quaternion.identity);
+            GameObject gameObject = Instantiate(_EnemyPrefab, new Vector3(6.5f, (i*2) +.5f, 0), Quaternion.identity);
+            gameObject.name += "-#" + i;
             Enemy enemy = gameObject.GetComponent<Enemy>();
             RegisterEnemy(enemy);
         }

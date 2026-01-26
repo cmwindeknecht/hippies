@@ -16,6 +16,11 @@ public static class Utilities
         return Vector2.Distance(positionA, positionB);
     }
 
+    public static float GetDistanceBetween(Vector3 positionA, Vector3 positionB)
+    {
+        return Vector3.Distance(positionA, positionB);
+    }
+
     public static float GetDistanceBetween(Vector3Int positionA, Vector3Int positionB)
     {
         return Vector3Int.Distance(positionA, positionB);
