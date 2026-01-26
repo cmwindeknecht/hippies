@@ -3,7 +3,7 @@ using UnityEngine;
 public class MagicAttack : Weapon
 {
     // TODO TBD
-    public override bool Attack(Vector3 targetPosition)
+    public override bool Attack()
     {
         throw new System.NotImplementedException();
     }

@@ -7,7 +7,7 @@ public abstract class Weapon
     public WeaponSO WeaponSO { get; private set; }
     protected bool CanAttack = true;
 
-    public abstract bool Attack(Vector3 targetPosition);
+    public abstract bool Attack();
 
     public virtual void Initialize(WeaponSO weaponSO)
     {
@@ -17,7 +17,6 @@ public abstract class Weapon
     protected async UniTaskVoid AttackCooldown()
     {
         // Trigger animation / cooldown here (TODO pass in the animation to the function whenever I figure that shit out)
-        CanAttack = false;
         await UniTask.WaitForSeconds(WeaponSO.AttackRate);
         CanAttack = true;
     }

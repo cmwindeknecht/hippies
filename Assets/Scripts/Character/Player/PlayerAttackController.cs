@@ -6,6 +6,8 @@ public class PlayerAttackController : MonoBehaviour
 
     private Weapon _EquippedWeapon;
 
+    [SerializeField] private GameObject _MeleeHitboxPrefab;
+
     void Awake()
     {
         _Inventory = GetComponent<PlayerInventory>();
@@ -52,11 +54,11 @@ public class PlayerAttackController : MonoBehaviour
     {
         if (_EquippedWeapon is RangedWeapon)
         {
-            if (_EquippedWeapon.Attack(targetPosition))
+            if (_EquippedWeapon.Attack())
             {
                 RangedWeaponSO rangedWeaponSO = _EquippedWeapon.WeaponSO as RangedWeaponSO;
                 Projectile projectileInstance = Instantiate(rangedWeaponSO.ProjectilePrefab, transform.position, Quaternion.identity);
-                projectileInstance.Initialize(targetPosition, Random.Range(rangedWeaponSO.DamageMin, rangedWeaponSO.DamageMax + 1));
+                projectileInstance.Initialize(targetPosition.normalized, Random.Range(rangedWeaponSO.DamageMin, rangedWeaponSO.DamageMax + 1));
                 return true;
             }
             return false;
@@ -64,12 +66,22 @@ public class PlayerAttackController : MonoBehaviour
 
         if (_EquippedWeapon is MeleeWeapon)
         {
-            return _EquippedWeapon.Attack(targetPosition);
+            if (_EquippedWeapon.Attack())
+            {
+                MeleeWeaponSO melee = _EquippedWeapon.WeaponSO as MeleeWeaponSO;
+                Vector3 attackDir = new Vector3(targetPosition.x, targetPosition.y, 0).normalized;
+                GameObject gameObject = Instantiate(_MeleeHitboxPrefab, transform.position, Quaternion.identity);
+                MeleeHitBox hitbox = gameObject.GetComponent<MeleeHitBox>();
+                hitbox.Initialize(transform.position, attackDir, melee.Reach, melee.AttackRate);
+
+                return true;
+            }
+            return false;
         }
 
         if (_EquippedWeapon is MagicAttack)
         {
-            return _EquippedWeapon.Attack(targetPosition);
+            return _EquippedWeapon.Attack();
         }
 
         throw new System.Exception($"Unknown attack type for weapon type {_EquippedWeapon.WeaponSO.Name}");
