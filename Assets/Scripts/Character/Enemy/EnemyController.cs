@@ -7,6 +7,7 @@ public class EnemyController : MonoBehaviour
 {
     private Player _Player;
     private Rigidbody2D _RigidBody;
+    private Vector3 _RigidBodyPosition => new(_RigidBody.position.x, _RigidBody.position.y, 0);
 
     private Vector3 _SpawnPosition = Vector3.zero;
     private bool _ShouldChasePlayer = false;
@@ -22,10 +23,15 @@ public class EnemyController : MonoBehaviour
     private int _CurrentPathIndex;
     private bool _IsFollowingPath;
 
+    public void Setup(Player player)
+    {
+        _Player = player;
+    }
+
     private void Awake()
     {
         _RigidBody = GetComponent<Rigidbody2D>();
-        _SpawnPosition = transform.position;
+        _SpawnPosition = _RigidBody.position;
     }
 
     private void Update()
@@ -34,124 +40,125 @@ public class EnemyController : MonoBehaviour
         {
             return;
         }
-        
-        Vector3 playerDirection = (_Player.transform.position - transform.position).normalized;
+
+        SimpleChasePlayer();
+    }
+
+    private void SimpleChasePlayer()
+    {
+        if (_Player == null)
+        {
+            return;
+        }
+
+        Vector3 playerDirection = (_Player.transform.position - _RigidBodyPosition).normalized;
         LayerMask playerLayerMask = LayerMask.GetMask("Player", "Collision");
-        RaycastHit2D hit = Physics2D.Raycast(transform.position, playerDirection, _MaxViewDistance, playerLayerMask);
+        RaycastHit2D playerHit = Physics2D.Raycast(_RigidBodyPosition, playerDirection, _MaxViewDistance, playerLayerMask);
+        bool canSeePlayer = playerHit && playerHit.collider.CompareTag("Player");
 
-        bool canSeePlayer = hit && hit.collider.CompareTag("Player");
-        Color lineColor = canSeePlayer ? Color.green : Color.red;
-        Debug.DrawRay(transform.position, playerDirection * _MaxViewDistance, lineColor);
-
-        // If it sees the player / there are no collisions in between, start chasing
+        // Scenario 1: Can see the player, chase them immediately
         if (canSeePlayer)
         {
             _ShouldChasePlayer = true;
+            GoToPlayer();
         }
-        // If the enemy loses sight, stop only if the player is too far away
-        else if (_ShouldChasePlayer && Utilities.GetDistanceBetween(_Player.transform.position, transform.position) > _OutOfSightChaseDistance)
+        else if (_ShouldChasePlayer)
         {
-            _ShouldChasePlayer = false;
-        }
-
-        // Either chase the player or return to the spawn position
-        if (_ShouldChasePlayer)
-        {
-            // No collision --- go straight to player
-            if (canSeePlayer)
+            // Scenario 3: Saw the player, no longer sees and is too far away to chase, pathfind back to spawn position
+            if (Utilities.GetDistanceBetween(_Player.transform.position, _RigidBodyPosition) > _OutOfSightChaseDistance)
             {
-                _RigidBody.linearVelocity = (_Player.transform.position - transform.position).normalized * GetMovementSpeed();
+                _ShouldChasePlayer = false;
+                FollowPath(_SpawnPosition);
             }
-            // Get a path from the pathfinder
+            // Scenario 2: Saw the player, no longer sees but is close enough to chase
             else
             {
-                if (!_IsFollowingPath || !Utilities.IsSameVectorPosition(_CurrentPath[^1], _Player.transform.position, 1f))
-                {
-                    _CurrentPath = Pathfinder.GetPath(transform.position, _Player.transform.position);
-                    Debug.Log($"Getting new path !_IsFollowingPath {!_IsFollowingPath} || !Utilities.IsSameVectorPosition(_CurrentPath[_CurrentPath.Count - 1], _Player.transform.position, 1f) {!Utilities.IsSameVectorPosition(_CurrentPath[^1], _Player.transform.position, 1f)} _CurrentPath[^1] {_CurrentPath[^1]} _Player.transform.position {_Player.transform.position}");
-
-                    if (_CurrentPath.Count <= 1)
-                    {
-                        _IsFollowingPath = false;
-                        _RigidBody.linearVelocity = Vector2.zero;
-                        throw new System.Exception("SETTING _IsFollowingPath FALSE --- SOMEHOW NO PATH TO PLAYER FOR ENEMY");
-                    }
-
-                    _CurrentPathIndex = 1;
-                    _IsFollowingPath = true;
-
-                    for (int i = 1; i < _CurrentPath.Count; i++)
-                    {
-                        Debug.DrawLine(_CurrentPath[i - 1], _CurrentPath[i], Color.blue);
-                    }
-                }
-
-                // Safety clamp
-                if (_CurrentPathIndex >= _CurrentPath.Count)
-                {
-                    Debug.Log($"SETTING _IsFollowingPath FALSE --- _CurrentPathIndex {_CurrentPathIndex} >= _CurrentPath.Count {_CurrentPath.Count}");
-                    _IsFollowingPath = false;
-                    _RigidBody.linearVelocity = Vector2.zero;
-                    return;
-                }
-
-                Vector3 target = _CurrentPath[_CurrentPathIndex];
-                Vector3 toTarget = target - transform.position;
-
-                // Waypoint reached
-                if (Utilities.IsSameVectorPosition(_CurrentPath[_CurrentPathIndex], transform.position))
-                {
-                    
-                    _CurrentPathIndex++;
-                    Debug.Log($"Advancing path index to {_CurrentPathIndex}");
-                    _RigidBody.position = target;
-
-                    // Stop if path complete
-                    if (_CurrentPathIndex >= _CurrentPath.Count)
-                    {
-                        Debug.Log($"SETTING _IsFollowingPath FALSE (AGAIN?) --- _CurrentPathIndex {_CurrentPathIndex} >= _CurrentPath.Count {_CurrentPath.Count}");
-                        _IsFollowingPath = false;
-                        _RigidBody.linearVelocity = Vector2.zero;
-                    }
-
-                    return;
-                }
-
-                // Move toward current waypoint
-                Vector2 desiredVelocity = toTarget.normalized * GetMovementSpeed();
-
-                // If we're colliding, slide along the surface
-                if (_RigidBody.IsTouchingLayers(LayerMask.GetMask("Collision")))
-                {
-                    ContactPoint2D[] contacts = new ContactPoint2D[4];
-                    int count = _RigidBody.GetContacts(contacts);
-
-                    for (int i = 0; i < count; i++)
-                    {
-                        Vector2 normal = contacts[i].normal;
-
-                        // Remove component pushing into the surface
-                        float intoSurface = Vector2.Dot(desiredVelocity, normal);
-                        if (intoSurface < 0f)
-                        {
-                            desiredVelocity -= normal * intoSurface;
-                        }
-                    }
-                }
-
-                _RigidBody.linearVelocity = desiredVelocity;
+                FollowPath(_Player.transform.position);
             }
         }
-        else if (!Utilities.IsSameVectorPosition(transform.position, _SpawnPosition))
+        // Scenario 4: Can't see, too far away, return to spawn point if none of the above
+        else if (!Utilities.IsSameVectorPosition(_RigidBodyPosition, _SpawnPosition, .1f))
         {
-            _ShouldChasePlayer = false;
-            _RigidBody.linearVelocity = (_SpawnPosition - transform.position).normalized * GetMovementSpeed();
+            FollowPath(_SpawnPosition);
         }
     }
 
-    public void Setup(Player player)
+    private void GoToPlayer()
     {
-        _Player = player;
+        _RigidBody.linearVelocity = (_Player.transform.position - _RigidBodyPosition).normalized * GetMovementSpeed();
+    }
+
+    private void FollowPath(Vector3 finalTarget)
+    {
+        if (!_IsFollowingPath || !Utilities.IsSameVectorPosition(_CurrentPath[^1], finalTarget, 1f))
+        {
+            _CurrentPath = Pathfinder.GetPath(_RigidBodyPosition, finalTarget);
+            if (_CurrentPath.Count == 0)
+            {
+                StopMovement();
+                throw new System.Exception($"SETTING _IsFollowingPath FALSE --- NO PATH --- Current Position {_RigidBodyPosition} Final Target Position {finalTarget}");
+            }
+
+            _CurrentPathIndex = 1;
+            _IsFollowingPath = true;
+
+            //for (int i = 1; i < _CurrentPath.Count; i++)
+            //{
+            //    Debug.DrawLine(_CurrentPath[i - 1], _CurrentPath[i], Color.blue);
+            //}
+        }
+
+        if (_CurrentPathIndex >= _CurrentPath.Count)
+        {
+            StopMovement();
+            return;
+        }
+
+        Vector3 target = _CurrentPath[_CurrentPathIndex];
+        Vector3 toTarget = target - _RigidBodyPosition;
+
+        if (Utilities.IsSameVectorPosition(_CurrentPath[_CurrentPathIndex], _RigidBodyPosition))
+        {
+            _CurrentPathIndex++;
+
+            if (_CurrentPathIndex >= _CurrentPath.Count)
+            {
+                Debug.Log($"PATH COMPLETE --- _CurrentPathIndex {_CurrentPathIndex} >= _CurrentPath.Count {_CurrentPath.Count}");
+                StopMovement();
+            }
+
+            return;
+        }
+
+        // Move toward current waypoint
+        Vector2 desiredVelocity = toTarget.normalized * GetMovementSpeed();
+
+        // If enemy is colliding, slide along the surface
+        if (_RigidBody.IsTouchingLayers(LayerMask.GetMask("Collision")))
+        {
+            ContactPoint2D[] contacts = new ContactPoint2D[4];
+            int count = _RigidBody.GetContacts(contacts);
+
+            for (int i = 0; i < count; i++)
+            {
+                Vector2 normal = contacts[i].normal;
+
+                // Remove component pushing into the surface
+                float intoSurface = Vector2.Dot(desiredVelocity, normal);
+                if (intoSurface < 0f)
+                {
+                    desiredVelocity -= normal * intoSurface;
+                }
+            }
+        }
+
+        _RigidBody.linearVelocity = desiredVelocity;
+    }
+
+    private void StopMovement()
+    {
+        _IsFollowingPath = false;
+        _RigidBody.linearVelocity = Vector2.zero;
     }
 
     public void TakeDamage(float damage)
@@ -167,6 +174,13 @@ public class EnemyController : MonoBehaviour
     private float GetMovementSpeed()
     {
         // TODO use input to determine walk/sprint/sneak/etc
-        return _BaseSpeed;
+        if (_ShouldChasePlayer)
+        {
+            return _BaseSpeed;
+        }
+        else
+        {
+            return _BaseSpeed * .5f;
+        }
     }
 }

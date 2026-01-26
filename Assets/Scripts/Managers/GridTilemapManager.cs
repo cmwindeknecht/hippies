@@ -78,10 +78,10 @@ public class GridTilemapManager : MonoBehaviour
         {
             case TilemapType.Walkable:
                 if (_WalkableTilemap == null) throw new System.Exception("_WalkableTilemap is null!");
-                return _WalkableTilemap.GetCellFromPosition(position);
+                return _WalkableTilemap.GetTileFromPosition(position);
             case TilemapType.Collision:
                 if (_CollisionTilemap == null) throw new System.Exception("_CollisionTilemap is null!");
-                return _CollisionTilemap.GetCellFromPosition(position);
+                return _CollisionTilemap.GetTileFromPosition(position);
             default:
                 throw new System.ArgumentException($"Unknown tilemap type: {tilemap}");
         }

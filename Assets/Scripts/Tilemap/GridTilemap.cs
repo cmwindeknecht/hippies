@@ -50,7 +50,7 @@ public class GridTilemap : MonoBehaviour
         return _Tilemap.GetCellCenterWorld(tilePosition);
     }
 
-    public Vector3Int GetCellFromPosition(Vector3 tilePosition)
+    public Vector3Int GetTileFromPosition(Vector3 tilePosition)
     {
         return _Tilemap.WorldToCell(tilePosition);
     }
