@@ -24,9 +24,14 @@ public class PlayerController : MonoBehaviour
     private Vector2 _LinearVelocity = Vector2.zero;
 
     private bool _ShouldZeroOut = true; // Plan is to make this false when knockback/environment modifies velocity
-    private readonly float _BaseSpeed = 6f;
+    private const float _BaseSpeed = 6f;
 
     private bool _CanFireSingleShot = true;
+
+    private bool _FacingLocked;
+    private const float _AttackFacingLockTimeMinimum = .25f;
+    private const float _AttackFacingLockTimeMaximum = 1f;
+    private float _AttackFacingLockTime = 0f;
 
     private void Awake()
     {
@@ -48,25 +53,38 @@ public class PlayerController : MonoBehaviour
 
     private void UpdateFacingDirection()
     {
-        if (_AttackValue == Vector2.zero)
-        {
-            _CanFireSingleShot = true;
-        }
+        // Check only required for single shot weapons
+        //if (_AttackValue == Vector2.zero)
+        //{
+        //    _CanFireSingleShot = true;
+        //}
 
-        if (_AttackValue != Vector2.zero && _LastAttackInput == Vector2.zero)
+        if (_AttackValue != Vector2.zero && _LastAttackInput != _AttackValue)
         {
-            _FacingDirection = _AttackValue;
             if (_CanFireSingleShot)
             {
-                _CanFireSingleShot = false;
+                _FacingDirection = _AttackValue;
                 Attack();
+
+                // TODO weapon SO will have attackRate
+                float weaponAttackRate = .25f;
+                PreventManualWeaponUse(weaponAttackRate).Forget();
+
+                _AttackFacingLockTime = Time.time + Mathf.Clamp(weaponAttackRate * 2f, _AttackFacingLockTimeMinimum, _AttackFacingLockTimeMaximum);
             }
         }
-
-        if (_MoveValue != Vector2.zero && _LastMoveInput == Vector2.zero)
+        else if (Time.time >= _AttackFacingLockTime && _MoveValue != Vector2.zero)
         {
             _FacingDirection = _MoveValue;
         }
+    }
+
+    // True for any melee weapon or non automatic gun
+    private async UniTask PreventManualWeaponUse(float attackRate)
+    {
+        _CanFireSingleShot = false;
+        await UniTask.WaitForSeconds(attackRate);
+        _CanFireSingleShot = true;
     }
 
     private void FixedUpdate()
