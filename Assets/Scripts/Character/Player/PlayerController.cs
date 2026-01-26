@@ -10,6 +10,7 @@ public class PlayerController : MonoBehaviour
 
 
     [SerializeField] private GameObject _TestBullet;
+    private PlayerAttackController _AttackController;
     private Rigidbody2D _RigidBody;
 
     private InputAction _MoveInputAction;
@@ -18,24 +19,24 @@ public class PlayerController : MonoBehaviour
 
     private Vector2 _MoveValue = Vector2.zero;
     private Vector2 _AttackValue = Vector2.zero;
-    private Vector2 _LastMoveInput = Vector2.zero;
-    private Vector2 _LastAttackInput = Vector2.zero;
+    //private Vector2 _LastAttackInput = Vector2.zero;
     private Vector2 _FacingDirection = Vector2.zero;
     private Vector2 _LinearVelocity = Vector2.zero;
 
     private bool _ShouldZeroOut = true; // Plan is to make this false when knockback/environment modifies velocity
     private const float _BaseSpeed = 6f;
 
-    private bool _CanFireSingleShot = true;
+    //private bool _CanFireSingleShot = true;
 
-    private bool _FacingLocked;
-    private const float _AttackFacingLockTimeMinimum = .25f;
+    //private const float _AttackFacingLockTimeMinimum = .25f;
     private const float _AttackFacingLockTimeMaximum = 1f;
     private float _AttackFacingLockTime = 0f;
 
     private void Awake()
     {
         _RigidBody = GetComponent<Rigidbody2D>();
+        _AttackController = GetComponent<PlayerAttackController>();
+
         _MoveInputAction = InputSystem.actions.FindAction("Move");
         _AttackInputAction = InputSystem.actions.FindAction("Attack");
     }
@@ -47,30 +48,37 @@ public class PlayerController : MonoBehaviour
 
         UpdateFacingDirection();
 
-        _LastMoveInput = _MoveValue;
-        _LastAttackInput = _AttackValue;
+        //_LastAttackInput = _AttackValue;
     }
 
     private void UpdateFacingDirection()
     {
-        // Check only required for single shot weapons
-        //if (_AttackValue == Vector2.zero)
+        // Old version of shit before attack controller and weapons and shit
+        //if (_AttackValue != Vector2.zero && _LastAttackInput != _AttackValue)
         //{
-        //    _CanFireSingleShot = true;
+        //    if (_CanFireSingleShot)
+        //    {
+        //        _FacingDirection = _AttackValue;
+        //        Attack();
+
+        //        // TODO weapon SO will have attackRate
+        //        float weaponAttackRate = .25f;
+        //        PreventManualWeaponUse(weaponAttackRate).Forget();
+
+        //        _AttackFacingLockTime = Time.time + Mathf.Clamp(weaponAttackRate * 2f, _AttackFacingLockTimeMinimum, _AttackFacingLockTimeMaximum);
+        //    }
+        //}
+        //else if (Time.time >= _AttackFacingLockTime && _MoveValue != Vector2.zero)
+        //{
+        //    _FacingDirection = _MoveValue;
         //}
 
-        if (_AttackValue != Vector2.zero && _LastAttackInput != _AttackValue)
+        if (_AttackValue != Vector2.zero)
         {
-            if (_CanFireSingleShot)
+            if (_AttackController.TryAttack(_AttackValue))
             {
                 _FacingDirection = _AttackValue;
-                Attack();
-
-                // TODO weapon SO will have attackRate
-                float weaponAttackRate = .25f;
-                PreventManualWeaponUse(weaponAttackRate).Forget();
-
-                _AttackFacingLockTime = Time.time + Mathf.Clamp(weaponAttackRate * 2f, _AttackFacingLockTimeMinimum, _AttackFacingLockTimeMaximum);
+                _AttackFacingLockTime = Time.time + _AttackFacingLockTimeMaximum;
             }
         }
         else if (Time.time >= _AttackFacingLockTime && _MoveValue != Vector2.zero)
@@ -79,13 +87,13 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    // True for any melee weapon or non automatic gun
-    private async UniTask PreventManualWeaponUse(float attackRate)
-    {
-        _CanFireSingleShot = false;
-        await UniTask.WaitForSeconds(attackRate);
-        _CanFireSingleShot = true;
-    }
+    //// True for any melee weapon or non automatic gun
+    //private async UniTask PreventManualWeaponUse(float attackRate)
+    //{
+    //    _CanFireSingleShot = false;
+    //    await UniTask.WaitForSeconds(attackRate);
+    //    _CanFireSingleShot = true;
+    //}
 
     private void FixedUpdate()
     {

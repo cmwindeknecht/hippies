@@ -13,7 +13,6 @@ public class EnemyController : MonoBehaviour
     private bool _ShouldChasePlayer = false;
     
     // TODO EnemySO shit
-    private float _Health = 5f;
     private float _BaseSpeed = 3f;
     private readonly float _MaxViewDistance = 10f; // I feel like some enemies should see longer than other
     private readonly float _OutOfSightChaseDistance = 5f; // Not sure if I should just do half the max view distance or this should be a const?
@@ -159,16 +158,6 @@ public class EnemyController : MonoBehaviour
     {
         _IsFollowingPath = false;
         _RigidBody.linearVelocity = Vector2.zero;
-    }
-
-    public void TakeDamage(float damage)
-    {
-        _Health -= damage;
-
-        if (_Health < 0)
-        {
-            Destroy(gameObject);
-        }
     }
 
     private float GetMovementSpeed()

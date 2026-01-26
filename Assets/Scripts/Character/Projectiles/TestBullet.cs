@@ -18,7 +18,7 @@ public class TestBullet : MonoBehaviour
 
         Destroy(gameObject);
 
-        if (collision.TryGetComponent<EnemyController>(out EnemyController enemy))
+        if (collision.TryGetComponent<Enemy>(out Enemy enemy))
         {
             enemy.TakeDamage(3f);
         }
