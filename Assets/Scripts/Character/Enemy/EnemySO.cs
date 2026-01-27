@@ -7,8 +7,11 @@ public class EnemySO : ScriptableObject
     public int Health;
     public float MovementSpeed;
 
+    // TODO shit like burst only makes sense for ranged, so should have a MeleeEnemySO and a RangedEnemySO or whatever ultimately makes sense 
     [Header("Attack Behavior")]
-    public float attackCooldown = 2f; // Time between attack attempts
-    public int burstCount = 1; // Shots per burst (1 = single shot, 3 = triple burst)
-    public float burstDelay = 0.2f; // Time between shots in a burst
+    public WeaponSO WeaponSO;
+    public float AttackRange = 5f; // When the enemy should start shooting
+    public float AttackCooldown = 2f; // Time between attack attempts
+    public int BurstCount = 1; // Shots per burst (1 = single shot, 3 = triple burst)
+    public float BurstDelay = 0.2f; // Time between shots in a burst
 }

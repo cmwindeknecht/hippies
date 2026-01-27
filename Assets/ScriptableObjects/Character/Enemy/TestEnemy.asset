@@ -14,6 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Health: 5
   MovementSpeed: 5
-  attackCooldown: 2
-  burstCount: 3
-  burstDelay: 0.25
+  WeaponSO: {fileID: 11400000, guid: 9ecb8350c4eed94418065830fea3cc0a, type: 2}
+  AttackRange: 5
+  AttackCooldown: 2
+  BurstCount: 1
+  BurstDelay: 0.2

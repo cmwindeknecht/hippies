@@ -29,7 +29,7 @@ public class GameManager : MonoBehaviour
         }
         _Player = player;
 
-        // TODO remove this --- just for testing
+        // TODO remove this --- just for testing --- should send an event that player is ready or whatever
         SpawnManager.Instance.SpawnEnemiesForScene(SceneManager.GetActiveScene());
     }
 }
