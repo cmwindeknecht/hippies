@@ -14,8 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Name: Test Bullet
   DamageMin: 1
-  DamageMax: 2
-  Knockback: 1
+  DamageMax: 1
+  Knockback: 10
   Speed: 10
   Lifetime: 5
   Hollowpoint: 0
