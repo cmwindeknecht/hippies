@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9d1514134bc4fbd41bb739b1b9a49231, type: 3}
   m_Name: TestCollisionRuleTile
   m_EditorClassIdentifier: 
-  m_DefaultSprite: {fileID: 0}
+  m_DefaultSprite: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
   m_DefaultGameObject: {fileID: 4944864837374665321, guid: 6a2fc4f908e9b9a40b71dda6520ad08c, type: 3}
   m_DefaultColliderType: 1
   m_TilingRules: []

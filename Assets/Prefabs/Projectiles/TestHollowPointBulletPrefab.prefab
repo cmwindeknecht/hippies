@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 1142214860912944172}
   - component: {fileID: 6944337265132057423}
   m_Layer: 0
-  m_Name: TestBulletPrefab
+  m_Name: TestHollowPointBulletPrefab
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -165,4 +165,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 221d5081140dd0341874e6767a3b6a24, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _ProjectileSO: {fileID: 11400000, guid: 0451a667f4bb08943801bc74d29c2596, type: 2}
+  _ProjectileSO: {fileID: 11400000, guid: ec99cec43574ab74ca515bff2251ac4d, type: 2}

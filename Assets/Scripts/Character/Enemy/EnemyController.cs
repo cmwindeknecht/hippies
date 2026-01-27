@@ -13,10 +13,11 @@ public class EnemyController : MonoBehaviour
     private bool _ShouldChasePlayer = false;
     
     // TODO EnemySO shit
-    private float _Health = 5f;
     private float _BaseSpeed = 3f;
     private readonly float _MaxViewDistance = 10f; // I feel like some enemies should see longer than other
     private readonly float _OutOfSightChaseDistance = 5f; // Not sure if I should just do half the max view distance or this should be a const?
+    private Vector2 _Knockback;
+    private const float _KnockbackDecay = 5f;
 
     // Pathfinding Shit
     private List<Vector3> _CurrentPath;
@@ -42,6 +43,16 @@ public class EnemyController : MonoBehaviour
         }
 
         SimpleChasePlayer();
+    }
+
+    public void Knockback(Vector3 direction, float speed)
+    {
+        // If I want to have stun at some point, do this 
+        //      rb.AddForce(direction * strength, ForceMode2D.Impulse);
+        //      knockbackEndTime = Time.time + 0.3f; // 0.3 second knockback duration
+        //      And in the fixed update --- if (Time.time < knockbackEndTime) return
+
+        _Knockback = direction * speed;
     }
 
     private void SimpleChasePlayer()
@@ -85,7 +96,15 @@ public class EnemyController : MonoBehaviour
 
     private void GoToPlayer()
     {
-        _RigidBody.linearVelocity = (_Player.transform.position - _RigidBodyPosition).normalized * GetMovementSpeed();
+        Vector2 movement = (_Player.transform.position - _RigidBodyPosition).normalized * GetMovementSpeed();
+        if (_Knockback.magnitude > 0.1f)
+        {
+            _RigidBody.linearVelocity = _Knockback;
+            _Knockback = Vector2.Lerp(_Knockback, Vector2.zero, _KnockbackDecay * Time.fixedDeltaTime);
+        } else
+        {
+            _RigidBody.linearVelocity = movement;
+        }
     }
 
     private void FollowPath(Vector3 finalTarget)
@@ -152,23 +171,21 @@ public class EnemyController : MonoBehaviour
             }
         }
 
-        _RigidBody.linearVelocity = desiredVelocity;
+        if (_Knockback.magnitude > 0.1f)
+        {
+            _RigidBody.linearVelocity = _Knockback;
+            _Knockback = Vector2.Lerp(_Knockback, Vector2.zero, _KnockbackDecay * Time.fixedDeltaTime);
+        }
+        else
+        {
+            _RigidBody.linearVelocity = desiredVelocity;
+        }
     }
 
     private void StopMovement()
     {
         _IsFollowingPath = false;
         _RigidBody.linearVelocity = Vector2.zero;
-    }
-
-    public void TakeDamage(float damage)
-    {
-        _Health -= damage;
-
-        if (_Health < 0)
-        {
-            Destroy(gameObject);
-        }
     }
 
     private float GetMovementSpeed()
