@@ -1,7 +1,8 @@
 using UnityEngine;
 
-public class Player : MonoBehaviour
+public class Player : Character
 {
+    public CharacterType CharacterType = CharacterType.Player;
     private PlayerController _Controller;
     private PlayerInventory _Inventory;
     private CharacterStats _CharacterStats;

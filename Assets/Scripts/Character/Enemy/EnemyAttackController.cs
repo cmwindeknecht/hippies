@@ -2,6 +2,7 @@ using UnityEngine;
 
 public class EnemyAttackController : MonoBehaviour
 {
+    private Enemy _Enemy;
     EnemyInventory _Inventory;
 
     private Weapon _EquippedWeapon;
@@ -11,6 +12,7 @@ public class EnemyAttackController : MonoBehaviour
     void Awake()
     {
         _Inventory = GetComponent<EnemyInventory>();
+        _Enemy = GetComponent<Enemy>();
     }
 
     public bool TryAttack(Vector3 targetPosition)
@@ -73,8 +75,7 @@ public class EnemyAttackController : MonoBehaviour
                 MeleeWeaponSO meleeWeaponSO = _EquippedWeapon.WeaponSO as MeleeWeaponSO;
                 GameObject hitBoxInstance = Instantiate(_MeleeHitboxPrefab, transform.position, Quaternion.identity);
                 MeleeHitBox meleeHitBox = hitBoxInstance.GetComponent<MeleeHitBox>();
-                // TODO just pass in the weapon SO I think
-                meleeHitBox.Initialize(transform.position, attackDirection.normalized, meleeWeaponSO);
+                meleeHitBox.Initialize(_Enemy, attackDirection.normalized, meleeWeaponSO);
 
                 return true;
             }

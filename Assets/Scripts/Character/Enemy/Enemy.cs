@@ -1,7 +1,8 @@
 using UnityEngine;
 
-public class Enemy : MonoBehaviour
+public class Enemy : Character
 {
+    public CharacterType CharacterType = CharacterType.Enemy;
     private Player _Player;
     private EnemyController _Controller;
     private CharacterStats _Stats;

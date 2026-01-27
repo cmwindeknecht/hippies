@@ -2,14 +2,16 @@ using UnityEngine;
 
 public class PlayerAttackController : MonoBehaviour
 {
-    PlayerInventory _Inventory;
+    private Player _Player;
+    private PlayerInventory _Inventory;
 
     private Weapon _EquippedWeapon;
 
     [SerializeField] private GameObject _MeleeHitboxPrefab;
 
-    void Awake()
+    private void Awake()
     {
+        _Player = GetComponent<Player>();
         _Inventory = GetComponent<PlayerInventory>();
     }
 
@@ -74,7 +76,7 @@ public class PlayerAttackController : MonoBehaviour
                 GameObject hitBoxInstance = Instantiate(_MeleeHitboxPrefab, transform.position, Quaternion.identity);
                 MeleeHitBox meleeHitBox = hitBoxInstance.GetComponent<MeleeHitBox>();
                 // TODO just pass in the weapon SO I think
-                meleeHitBox.Initialize(transform.position, attackDirection.normalized, meleeWeaponSO);
+                meleeHitBox.Initialize(_Player, attackDirection.normalized, meleeWeaponSO);
 
                 return true;
             }

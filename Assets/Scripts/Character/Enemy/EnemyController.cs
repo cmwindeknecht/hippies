@@ -128,7 +128,13 @@ public class EnemyController : MonoBehaviour
             movement = (_Player.transform.position - _RigidBodyPosition).normalized * GetMovementSpeed();
         }
 
-        if (movement != Vector2.zero)
+        if (_Knockback.magnitude < 0.1f)
+        {
+            _Knockback = Vector2.zero;
+        }
+
+        // Only rotate the enemy if they are moving and there is no knockback
+        if (movement != Vector2.zero && _Knockback == Vector2.zero)
         {
             float angle = Mathf.Atan2(movement.y, movement.x) * Mathf.Rad2Deg;
             transform.rotation = Quaternion.Euler(0, 0, angle);
