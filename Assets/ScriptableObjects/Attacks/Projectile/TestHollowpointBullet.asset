@@ -16,7 +16,6 @@ MonoBehaviour:
   DamageMin: 1
   DamageMax: 2
   Knockback: 1
-  Speed: 30
-  Lifetime: 500
-  Sprite: {fileID: 10913, guid: 0000000000000000f000000000000000, type: 0}
+  Speed: 10
+  Lifetime: 5
   Hollowpoint: 1

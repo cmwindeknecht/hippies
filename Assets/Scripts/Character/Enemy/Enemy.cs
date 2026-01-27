@@ -17,13 +17,17 @@ public class Enemy : MonoBehaviour
         _Controller.Setup(player);
     }
 
-    public void TakeDamage(float damage)
+    public void TakeDamage(float damage, Vector3? attackDirection = null, float knockbackSpeed = 0)
     {
         _Health -= damage;
 
         if (_Health <= 0)
         {
             Destroy(gameObject);
+        }
+
+        if (attackDirection != null) {
+            _Controller.Knockback(attackDirection.Value, knockbackSpeed);
         }
     }
 }

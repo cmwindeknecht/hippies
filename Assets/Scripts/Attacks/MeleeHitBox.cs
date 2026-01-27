@@ -12,6 +12,7 @@ public class MeleeHitBox : MonoBehaviour
     private MeleeWeaponType _WeaponType;
     private int _Damage;
     private bool _IsInitialized;
+    private float _Knockback;
 
     private HashSet<Collider2D> _HitTargets;
 
@@ -23,14 +24,15 @@ public class MeleeHitBox : MonoBehaviour
         _IsInitialized = false;
     }
 
-    public void Initialize(Vector3 playerPosition, Vector3 attackDirection, float reach, float attackDuration, MeleeWeaponType meleeWeaponType, int damage)
+    public void Initialize(Vector3 playerPosition, Vector3 attackDirection, MeleeWeaponSO weaponSO)
     {
         _StartPosition = playerPosition;
         _AttackDirection = attackDirection.normalized;
-        _Radius = reach;
-        _Duration = attackDuration;
-        _WeaponType = meleeWeaponType;
-        _Damage = damage;
+        _Radius = weaponSO.Reach;
+        _Duration = weaponSO.AttackRate;
+        _WeaponType = weaponSO.WeaponType;
+        _Damage = Random.Range(weaponSO.DamageMin, weaponSO.DamageMax + 1);
+        _Knockback = weaponSO.Knockback;
 
         //_Rigidbody.MovePosition(_StartPosition + _AttackDirection * _Radius);
 
@@ -54,9 +56,8 @@ public class MeleeHitBox : MonoBehaviour
             {
                 throw new System.Exception("Enemy tag does not have Enemy Component!");
             }
-            Debug.Log($"Hit enemy - previous health {enemy.Health}");
-            enemy.TakeDamage(_Damage);
-            Debug.Log($"Hit enemy - after health {enemy.Health}");
+
+            enemy.TakeDamage(_Damage, _Knockback > 0 ? _AttackDirection : null, _Knockback);
         }
     }
 

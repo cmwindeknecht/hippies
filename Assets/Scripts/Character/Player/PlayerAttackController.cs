@@ -60,7 +60,7 @@ public class PlayerAttackController : MonoBehaviour
                 RangedWeaponSO rangedWeaponSO = _EquippedWeapon.WeaponSO as RangedWeaponSO;
                 Vector3 spawnPos = transform.position + attackDirection.normalized * 1.5f; // spawn in front of the player in the direction of the attack
                 Projectile projectile = Instantiate(rangedWeaponSO.ProjectilePrefab, spawnPos, Quaternion.identity);
-                projectile.Initialize(attackDirection.normalized, Random.Range(rangedWeaponSO.DamageMin, rangedWeaponSO.DamageMax + 1));
+                projectile.Initialize(attackDirection.normalized, rangedWeaponSO);
                 return true;
             }
             return false;
@@ -74,7 +74,7 @@ public class PlayerAttackController : MonoBehaviour
                 GameObject hitBoxInstance = Instantiate(_MeleeHitboxPrefab, transform.position, Quaternion.identity);
                 MeleeHitBox meleeHitBox = hitBoxInstance.GetComponent<MeleeHitBox>();
                 // TODO just pass in the weapon SO I think
-                meleeHitBox.Initialize(transform.position, attackDirection.normalized, meleeWeaponSO.Reach, meleeWeaponSO.AttackRate, meleeWeaponSO.WeaponType, Random.Range(meleeWeaponSO.DamageMin, meleeWeaponSO.DamageMax + 1));
+                meleeHitBox.Initialize(transform.position, attackDirection.normalized, meleeWeaponSO);
 
                 return true;
             }

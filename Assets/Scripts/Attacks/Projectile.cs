@@ -8,6 +8,7 @@ public class Projectile : MonoBehaviour
 
     private Rigidbody2D _Rigidbody;
     private int _Damage;
+    private float _Knockback;
     private Vector3 _AttackDirection;
     private float _AttackTimer;
     private bool _IsInitialized;
@@ -21,9 +22,10 @@ public class Projectile : MonoBehaviour
         _HitTargets = new();
     }
 
-    public void Initialize(Vector3 direction, int damage)
+    public void Initialize(Vector3 direction, RangedWeaponSO weaponSO)
     {
-        _Damage = damage;
+        _Damage = Random.Range(weaponSO.DamageMin, weaponSO.DamageMax + 1) + Random.Range(_ProjectileSO.DamageMin, _ProjectileSO.DamageMax + 1);
+        _Knockback = weaponSO.Knockback + _ProjectileSO.Knockback;
         _AttackDirection = direction.normalized;
         _IsInitialized = true;
         float angle = Mathf.Atan2(_AttackDirection.y, _AttackDirection.x) * Mathf.Rad2Deg;
@@ -71,8 +73,8 @@ public class Projectile : MonoBehaviour
         // TODO need projectile owner so I can use this interchangeably by enemies and players
         if (collision.collider.TryGetComponent<Enemy>(out Enemy enemy))
         {
-            // TODO way more advanced shit --- need to take into account strength/
-            enemy.TakeDamage(_Damage + Random.Range(_ProjectileSO.DamageMin, _ProjectileSO.DamageMax + 1));
+            // TODO way more advanced shit --- need to take into account strength/agility/etc
+            enemy.TakeDamage(_Damage, _Knockback > 0 ? _AttackDirection : null, _Knockback);
         }
 
         if (_ProjectileSO.Hollowpoint)

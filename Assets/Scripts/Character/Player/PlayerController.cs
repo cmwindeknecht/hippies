@@ -16,6 +16,7 @@ public class PlayerController : MonoBehaviour
 
     private bool _ShouldZeroOut = true; // Plan is to make this false when knockback/environment modifies velocity
     private const float _BaseSpeed = 6f;
+    private Vector2 _Knockback;
 
     private const float _AttackFacingLockTimeMaximum = 1f;
     private float _AttackFacingLockTime = 0f;
@@ -35,8 +36,6 @@ public class PlayerController : MonoBehaviour
         _AttackValue = _AttackInputAction.ReadValue<Vector2>();
 
         UpdateFacingDirection();
-
-        //_LastAttackInput = _AttackValue;
     }
 
     private void UpdateFacingDirection()
@@ -58,9 +57,16 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        GetInputVelocity();
-        // TODO factor in knockback and whatever else
-
+        if (_Knockback.magnitude > 0.1f)
+        {
+            _LinearVelocity = _Knockback;
+            _Knockback = Vector2.Lerp(_Knockback, Vector2.zero, 5f * Time.fixedDeltaTime);
+        } 
+        else
+        {
+            GetInputVelocity();
+        }
+        
         MovePlayer();
         SetRotation();
 
@@ -69,6 +75,16 @@ public class PlayerController : MonoBehaviour
         //{
         //    _RigidBody.AddForce(transform.up * GetMovementSpeed(), ForceMode2D.Impulse);
         //}
+    }
+
+    public void Knockback(Vector3 direction, float speed)
+    {
+        // If I want to have stun at some point, do this 
+        //      rb.AddForce(direction * strength, ForceMode2D.Impulse);
+        //      knockbackEndTime = Time.time + 0.3f; // 0.3 second knockback duration
+        //      And in the fixed update --- if (Time.time < knockbackEndTime) return
+
+        _Knockback = direction * speed;
     }
 
     private void SetRotation()
