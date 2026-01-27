@@ -19,3 +19,4 @@ MonoBehaviour:
   AttackRate: 0.25
   SoundEffect: {fileID: 0}
   Reach: 1
+  WeaponType: 1

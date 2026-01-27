@@ -11,14 +11,16 @@ public class MeleeHitBox : MonoBehaviour
     private float _AttackTimer;
     private MeleeWeaponType _WeaponType;
     private int _Damage;
-    private bool _IsInitialized = false;
+    private bool _IsInitialized;
 
-    private HashSet<Collider2D> _HitTargets = new();
+    private HashSet<Collider2D> _HitTargets;
 
     private void Awake()
     {
         _Rigidbody = GetComponent<Rigidbody2D>();
         _AttackTimer = 0f;
+        _HitTargets = new();
+        _IsInitialized = false;
     }
 
     public void Initialize(Vector3 playerPosition, Vector3 attackDirection, float reach, float attackDuration, MeleeWeaponType meleeWeaponType, int damage)
@@ -58,14 +60,14 @@ public class MeleeHitBox : MonoBehaviour
         }
     }
 
-    private void Update()
+    private void FixedUpdate() // Changed from Update
     {
         if (!_IsInitialized) return;
-
         if (_WeaponType.Equals(MeleeWeaponType.Swing))
         {
             SpawnArcingHitBox();
-        } else
+        }
+        else
         {
             throw new System.Exception($"Unknown weapon type {_WeaponType}");
         }
@@ -73,15 +75,13 @@ public class MeleeHitBox : MonoBehaviour
 
     private void SpawnArcingHitBox()
     {
-        _AttackTimer += Time.deltaTime;
+        _AttackTimer += Time.fixedDeltaTime; // Changed from Time.deltaTime
         float normalizedDuration = Mathf.Clamp01(_AttackTimer / _Duration);
-
         // Lerp = Sweep 180 degrees, left to right, Atan2 = rotate in 2D
         float angle = Mathf.Lerp(90f, -90f, normalizedDuration) + Mathf.Atan2(_AttackDirection.y, _AttackDirection.x) * Mathf.Rad2Deg;
         float radians = angle * Mathf.Deg2Rad;
         Vector3 direction = new(Mathf.Cos(radians), Mathf.Sin(radians), 0f);
         _Rigidbody.MovePosition(_StartPosition + direction * _Radius);
-
         if (normalizedDuration >= 1f)
         {
             Destroy(gameObject);

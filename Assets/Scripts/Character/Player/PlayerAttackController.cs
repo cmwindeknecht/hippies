@@ -52,13 +52,15 @@ public class PlayerAttackController : MonoBehaviour
 
     private bool TryAttackByType(Vector3 targetPosition)
     {
+        Vector3 attackDirection = new Vector3(targetPosition.x, targetPosition.y, 0).normalized;
         if (_EquippedWeapon is RangedWeapon)
         {
             if (_EquippedWeapon.Attack())
             {
                 RangedWeaponSO rangedWeaponSO = _EquippedWeapon.WeaponSO as RangedWeaponSO;
-                Projectile projectileInstance = Instantiate(rangedWeaponSO.ProjectilePrefab, transform.position, Quaternion.identity);
-                projectileInstance.Initialize(targetPosition.normalized, Random.Range(rangedWeaponSO.DamageMin, rangedWeaponSO.DamageMax + 1));
+                Vector3 spawnPos = transform.position + attackDirection.normalized * 1.5f; // spawn in front of the player in the direction of the attack
+                Projectile projectile = Instantiate(rangedWeaponSO.ProjectilePrefab, spawnPos, Quaternion.identity);
+                projectile.Initialize(attackDirection.normalized, Random.Range(rangedWeaponSO.DamageMin, rangedWeaponSO.DamageMax + 1));
                 return true;
             }
             return false;
@@ -69,10 +71,10 @@ public class PlayerAttackController : MonoBehaviour
             if (_EquippedWeapon.Attack())
             {
                 MeleeWeaponSO meleeWeaponSO = _EquippedWeapon.WeaponSO as MeleeWeaponSO;
-                Vector3 attackDir = new Vector3(targetPosition.x, targetPosition.y, 0).normalized;
-                GameObject gameObject = Instantiate(_MeleeHitboxPrefab, transform.position, Quaternion.identity);
-                MeleeHitBox hitbox = gameObject.GetComponent<MeleeHitBox>();
-                hitbox.Initialize(transform.position, attackDir, meleeWeaponSO.Reach, meleeWeaponSO.AttackRate, meleeWeaponSO.WeaponType, Random.Range(meleeWeaponSO.DamageMin, meleeWeaponSO.DamageMax + 1));
+                GameObject hitBoxInstance = Instantiate(_MeleeHitboxPrefab, transform.position, Quaternion.identity);
+                MeleeHitBox meleeHitBox = hitBoxInstance.GetComponent<MeleeHitBox>();
+                // TODO just pass in the weapon SO I think
+                meleeHitBox.Initialize(transform.position, attackDirection.normalized, meleeWeaponSO.Reach, meleeWeaponSO.AttackRate, meleeWeaponSO.WeaponType, Random.Range(meleeWeaponSO.DamageMin, meleeWeaponSO.DamageMax + 1));
 
                 return true;
             }
@@ -86,4 +88,18 @@ public class PlayerAttackController : MonoBehaviour
 
         throw new System.Exception($"Unknown attack type for weapon type {_EquippedWeapon.WeaponSO.Name}");
     }
+
+    // TODO Proper way to do this but not now
+    //private Vector3 GetBulletSpawnPosition()
+    //{
+    //    Collider2D playerCol = GetComponent<Collider2D>();
+    //    Collider2D projCol = projectilePrefab.GetComponent<Collider2D>();
+
+    //    float playerRadius = playerCol.bounds.extents.magnitude;
+    //    float projRadius = projCol.bounds.extents.magnitude;
+
+    //    float spawnOffset = playerRadius + projRadius + 0.05f;
+
+    //    Vector3 spawnPos = transform.position + (Vector3)attackDir.normalized * spawnOffset;
+    //}
 }
