@@ -7,6 +7,7 @@ public class Enemy : MonoBehaviour
 
     // TODO EnemySO shit
     private float _Health = 5f;
+    public float Health => _Health;
 
     public void RegisterPlayer(Player player)
     {
@@ -20,7 +21,7 @@ public class Enemy : MonoBehaviour
     {
         _Health -= damage;
 
-        if (_Health < 0)
+        if (_Health <= 0)
         {
             Destroy(gameObject);
         }

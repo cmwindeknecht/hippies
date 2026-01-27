@@ -1,34 +1,22 @@
-using Cysharp.Threading.Tasks;
-using System;
-using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.Rendering.UI;
 
 public class PlayerController : MonoBehaviour
 {
-
-
-    [SerializeField] private GameObject _TestBullet;
     private PlayerAttackController _AttackController;
     private Rigidbody2D _RigidBody;
 
     private InputAction _MoveInputAction;
-    //private InputAction _JumpInputAction;
     private InputAction _AttackInputAction;
 
     private Vector2 _MoveValue = Vector2.zero;
     private Vector2 _AttackValue = Vector2.zero;
-    //private Vector2 _LastAttackInput = Vector2.zero;
     private Vector2 _FacingDirection = Vector2.zero;
     private Vector2 _LinearVelocity = Vector2.zero;
 
     private bool _ShouldZeroOut = true; // Plan is to make this false when knockback/environment modifies velocity
     private const float _BaseSpeed = 6f;
 
-    //private bool _CanFireSingleShot = true;
-
-    //private const float _AttackFacingLockTimeMinimum = .25f;
     private const float _AttackFacingLockTimeMaximum = 1f;
     private float _AttackFacingLockTime = 0f;
 
@@ -53,28 +41,9 @@ public class PlayerController : MonoBehaviour
 
     private void UpdateFacingDirection()
     {
-        // Old version of shit before attack controller and weapons and shit
-        //if (_AttackValue != Vector2.zero && _LastAttackInput != _AttackValue)
-        //{
-        //    if (_CanFireSingleShot)
-        //    {
-        //        _FacingDirection = _AttackValue;
-        //        Attack();
-
-        //        // TODO weapon SO will have attackRate
-        //        float weaponAttackRate = .25f;
-        //        PreventManualWeaponUse(weaponAttackRate).Forget();
-
-        //        _AttackFacingLockTime = Time.time + Mathf.Clamp(weaponAttackRate * 2f, _AttackFacingLockTimeMinimum, _AttackFacingLockTimeMaximum);
-        //    }
-        //}
-        //else if (Time.time >= _AttackFacingLockTime && _MoveValue != Vector2.zero)
-        //{
-        //    _FacingDirection = _MoveValue;
-        //}
-
         if (_AttackValue != Vector2.zero)
         {
+
             if (_AttackController.TryAttack(_AttackValue))
             {
                 _FacingDirection = _AttackValue;
@@ -86,14 +55,6 @@ public class PlayerController : MonoBehaviour
             _FacingDirection = _MoveValue;
         }
     }
-
-    //// True for any melee weapon or non automatic gun
-    //private async UniTask PreventManualWeaponUse(float attackRate)
-    //{
-    //    _CanFireSingleShot = false;
-    //    await UniTask.WaitForSeconds(attackRate);
-    //    _CanFireSingleShot = true;
-    //}
 
     private void FixedUpdate()
     {
@@ -108,18 +69,6 @@ public class PlayerController : MonoBehaviour
         //{
         //    _RigidBody.AddForce(transform.up * GetMovementSpeed(), ForceMode2D.Impulse);
         //}
-    }
-
-    // TODO This shit should be in an attack controller or maybe on weapons something.  Need to do shit like fire rate of gun and stuff, shouldn't be on the controller.  Controller should just be movement
-    //          An argument for it being on the weapon is
-    //              1) the weapon will know its bullet type
-    //              2) the project needs to fire from the weapon position
-    //   Since I need the attack direction, just send an event (setup the weaponcontroller with the player and subscribe)
-    private void Attack()
-    {
-        GameObject gameObject = Instantiate(_TestBullet, transform.position + new Vector3(_FacingDirection.x, _FacingDirection.y), Quaternion.identity);
-        TestBullet projectile = gameObject.GetComponent<TestBullet>();
-        projectile.Fly(_FacingDirection);
     }
 
     private void SetRotation()
@@ -146,12 +95,7 @@ public class PlayerController : MonoBehaviour
             // Player Mass already in this calculation
             // TODO armor/inventory/etc relative to strength should modify player mass
 
-            // This kind of sucks for player movement, have to be a math / physics nerd to balance mass / damping / force etc which sucks if I let a player increase their speed
-            // That being said --- I might need it for knockback / environment shit (moving platforms, water current, etc if I do that) so I am leaving it here
-            //_RigidBody.AddForce(moveValue * GetMovementSpeed(), ForceMode2D.Impulse);
-
             _LinearVelocity += _MoveValue * GetMovementSpeed();
-            //Debug.Log($"Velocity INSIDE {_LinearVelocity}");
         }
     }
 

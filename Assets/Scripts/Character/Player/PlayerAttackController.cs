@@ -68,11 +68,11 @@ public class PlayerAttackController : MonoBehaviour
         {
             if (_EquippedWeapon.Attack())
             {
-                MeleeWeaponSO melee = _EquippedWeapon.WeaponSO as MeleeWeaponSO;
+                MeleeWeaponSO meleeWeaponSO = _EquippedWeapon.WeaponSO as MeleeWeaponSO;
                 Vector3 attackDir = new Vector3(targetPosition.x, targetPosition.y, 0).normalized;
                 GameObject gameObject = Instantiate(_MeleeHitboxPrefab, transform.position, Quaternion.identity);
                 MeleeHitBox hitbox = gameObject.GetComponent<MeleeHitBox>();
-                hitbox.Initialize(transform.position, attackDir, melee.Reach, melee.AttackRate);
+                hitbox.Initialize(transform.position, attackDir, meleeWeaponSO.Reach, meleeWeaponSO.AttackRate, meleeWeaponSO.WeaponType, Random.Range(meleeWeaponSO.DamageMin, meleeWeaponSO.DamageMax + 1));
 
                 return true;
             }

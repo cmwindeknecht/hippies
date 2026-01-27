@@ -16,6 +16,6 @@ MonoBehaviour:
   DamageMin: 1
   DamageMax: 3
   Knockback: 1
-  AttackRate: 0.1
+  AttackRate: 0.25
   SoundEffect: {fileID: 0}
-  Reach: 0.5
+  Reach: 1

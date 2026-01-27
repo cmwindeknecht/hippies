@@ -1,46 +1,90 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class MeleeHitBox : MonoBehaviour
 {
-    public float Radius = 1f;
-    public float Duration = 0.5f;
-    private Vector3 center;
-    private Vector3 startDir;
-    private float timer = 0f;
-    private bool initialized = false;
+    private Rigidbody2D _Rigidbody;
+    public float _Radius;
+    public float _Duration;
+    private Vector3 _StartPosition;
+    private Vector3 _AttackDirection;
+    private float _AttackTimer;
+    private MeleeWeaponType _WeaponType;
+    private int _Damage;
+    private bool _IsInitialized = false;
 
-    public void Initialize(Vector3 playerPosition, Vector3 forwardDir, float reach, float attackDuration)
+    private HashSet<Collider2D> _HitTargets = new();
+
+    private void Awake()
     {
-        center = playerPosition;
-        startDir = forwardDir.normalized;
-        Radius = reach;
-        Duration = attackDuration;
-        timer = 0f;
-        transform.position = center + startDir * Radius;
-        initialized = true;        
+        _Rigidbody = GetComponent<Rigidbody2D>();
+        _AttackTimer = 0f;
+    }
+
+    public void Initialize(Vector3 playerPosition, Vector3 attackDirection, float reach, float attackDuration, MeleeWeaponType meleeWeaponType, int damage)
+    {
+        _StartPosition = playerPosition;
+        _AttackDirection = attackDirection.normalized;
+        _Radius = reach;
+        _Duration = attackDuration;
+        _WeaponType = meleeWeaponType;
+        _Damage = damage;
+
+        //_Rigidbody.MovePosition(_StartPosition + _AttackDirection * _Radius);
+
+        _IsInitialized = true;        
+    }
+
+    public void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (!_IsInitialized) return;
+
+        // TODO need to know if the owner is player or enemy so I can reuse this shit
+        if (collision.CompareTag("Enemy"))
+        {
+            // Prevent unintended double taps
+            if (!_HitTargets.Add(collision))
+            {
+                return;
+            }
+
+            if (!collision.TryGetComponent<Enemy>(out Enemy enemy))
+            {
+                throw new System.Exception("Enemy tag does not have Enemy Component!");
+            }
+            Debug.Log($"Hit enemy - previous health {enemy.Health}");
+            enemy.TakeDamage(_Damage);
+            Debug.Log($"Hit enemy - after health {enemy.Health}");
+        }
     }
 
     private void Update()
     {
-        if (!initialized) return;
+        if (!_IsInitialized) return;
 
-        timer += Time.deltaTime;
-        float t = Mathf.Clamp01(timer / Duration);
+        if (_WeaponType.Equals(MeleeWeaponType.Swing))
+        {
+            SpawnArcingHitBox();
+        } else
+        {
+            throw new System.Exception($"Unknown weapon type {_WeaponType}");
+        }
+    }
 
-        // Sweep 180 degrees, left to right
-        float angleOffset = Mathf.Lerp(90f, -90f, t);
+    private void SpawnArcingHitBox()
+    {
+        _AttackTimer += Time.deltaTime;
+        float normalizedDuration = Mathf.Clamp01(_AttackTimer / _Duration);
 
-        // rotate in 2D correctly
-        float baseAngle = Mathf.Atan2(startDir.y, startDir.x) * Mathf.Rad2Deg;
-        float finalAngle = baseAngle + angleOffset;
+        // Lerp = Sweep 180 degrees, left to right, Atan2 = rotate in 2D
+        float angle = Mathf.Lerp(90f, -90f, normalizedDuration) + Mathf.Atan2(_AttackDirection.y, _AttackDirection.x) * Mathf.Rad2Deg;
+        float radians = angle * Mathf.Deg2Rad;
+        Vector3 direction = new(Mathf.Cos(radians), Mathf.Sin(radians), 0f);
+        _Rigidbody.MovePosition(_StartPosition + direction * _Radius);
 
-        // convert angle back to direction
-        float rad = finalAngle * Mathf.Deg2Rad;
-        Vector3 dir = new Vector3(Mathf.Cos(rad), Mathf.Sin(rad), 0f);
-
-        transform.position = center + dir * Radius;
-
-        if (t >= 1f)
+        if (normalizedDuration >= 1f)
+        {
             Destroy(gameObject);
+        }
     }
 }
