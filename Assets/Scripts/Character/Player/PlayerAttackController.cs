@@ -1,22 +1,60 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class PlayerAttackController : MonoBehaviour
 {
     private Player _Player;
     private PlayerInventory _Inventory;
+    [SerializeField] private Shield _Shield;
 
     private Weapon _EquippedWeapon;
+    private ShieldSO _EquippedShield;
 
     [SerializeField] private GameObject _MeleeHitboxPrefab;
+
+    private InputAction _ShieldInputAction;
+    private bool _IsShielding = false;
 
     private void Awake()
     {
         _Player = GetComponent<Player>();
         _Inventory = GetComponent<PlayerInventory>();
+        _ShieldInputAction = InputSystem.actions.FindAction("Shield");
+    }
+
+    private void Update()
+    {
+        // If I want shield to be a toggle
+        //if (_ShieldInputAction.triggered)
+        //{
+        //    _IsShielding = !_IsShielding;
+        //}
+        // If I want shield to be a hold
+        _IsShielding = _ShieldInputAction.IsPressed();
+
+        ShowShield();
+    }
+
+    private void ShowShield()
+    {
+        if (_IsShielding)
+        {
+            EnsureShield();
+
+            if (_EquippedShield == null) return;
+
+            _Shield.gameObject.SetActive(true);
+        }
+        else
+        {
+            _Shield.gameObject.SetActive(false);
+        }
     }
 
     public bool TryAttack(Vector3 targetPosition)
     {
+        if (_IsShielding) return false;
+
         EnsureWeapon();
         return TryAttackByType(targetPosition);
     }
@@ -49,6 +87,20 @@ public class PlayerAttackController : MonoBehaviour
             }
 
             _EquippedWeapon.Initialize(weaponSO);
+        }
+    }
+
+    private void EnsureShield()
+    {
+        if (_EquippedShield == null)
+        {
+            ShieldSO shieldSO = _Inventory.EquippedShieldSO;
+
+            if (shieldSO != null )
+            {
+                _EquippedShield = shieldSO;
+                _Shield.Setup(shieldSO, _Player);
+            }
         }
     }
 

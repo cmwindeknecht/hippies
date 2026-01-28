@@ -15,7 +15,7 @@ MonoBehaviour:
   Name: Test Pistol
   DamageMin: 1
   DamageMax: 2
-  Knockback: 10
+  Knockback: 1
   AttackRate: 0.25
   AttackCooldown: 1
   SoundEffect: {fileID: 0}

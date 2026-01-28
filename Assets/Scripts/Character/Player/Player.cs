@@ -6,12 +6,14 @@ public class Player : Character
     private PlayerController _Controller;
     private PlayerInventory _Inventory;
     private CharacterStats _CharacterStats;
+    private Shield _Shield;
 
     private void Start()
     {
         _Controller = GetComponent<PlayerController>();
         _Inventory = GetComponent<PlayerInventory>();
         _CharacterStats = GetComponent<CharacterStats>();
+        _Shield = GetComponent<Shield>();
 
         GameManager.Instance.RegisterPlayer(this);
     }

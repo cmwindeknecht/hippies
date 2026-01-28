@@ -9,13 +9,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ceb980d02e2780e4bbd2fc2b6704a3bd, type: 3}
-  m_Name: TestBullet
+  m_Script: {fileID: 11500000, guid: da473377623e0fb47a0edb18fe2dde57, type: 3}
+  m_Name: TestShield
   m_EditorClassIdentifier: 
-  Name: Test Bullet
-  DamageMin: 1
-  DamageMax: 1
-  Knockback: 1
-  Speed: 10
-  Lifetime: 5
-  Hollowpoint: 0
+  KnockbackResistance: 1
+  DamageNegationMin: 1
+  DamageNegationMax: 2
