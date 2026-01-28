@@ -29,6 +29,7 @@ public class SpawnManager : MonoBehaviour
         SceneManager.activeSceneChanged += SceneManager_activeSceneChanged;
     }
 
+
     private void SceneManager_activeSceneChanged(Scene arg0, Scene arg1)
     {
         Debug.Log($"SpawnManager: Scene changed from {arg0} to {arg1}");
@@ -53,12 +54,8 @@ public class SpawnManager : MonoBehaviour
         {
             throw new System.Exception("Enemy attempting to re-register!");
         }
-        if (GameManager.Instance.Player == null)
-        {
-            throw new System.Exception("Cannot register enemy when the player is null!");
-        }
 
-        enemy.RegisterPlayer(GameManager.Instance.Player);
+        enemy.Setup();
         _Enemies.Add(enemy.GetInstanceID(), enemy);
         Debug.Log($"Registered Enemy {enemy.name}");
     }

@@ -26,9 +26,8 @@ public class EnemyController : MonoBehaviour
     private int _CurrentPathIndex;
     private bool _IsFollowingPath;
 
-    public void Setup(Player player, EnemySO enemySO)
+    public void Setup(EnemySO enemySO)
     {
-        _Player = player;
         _EnemySO = enemySO;
     }
 
@@ -37,6 +36,23 @@ public class EnemyController : MonoBehaviour
         _RigidBody = GetComponent<Rigidbody2D>();
         _AttackController = GetComponent<EnemyAttackController>();
         _SpawnPosition = _RigidBody.position;
+    }
+
+    private void Start()
+    {
+        if (GameManager.Instance.Player != null)
+        {
+            _Player = GameManager.Instance.Player;
+        }
+        else
+        {
+            GameManager.Instance.OnPlayerRegistered += Instance_OnPlayerRegistered; ;
+        }
+    }
+
+    private void Instance_OnPlayerRegistered(object sender, GameManager.OnPlayerRegisteredEventArgs e)
+    {
+        _Player = e.player;
     }
 
     private void Update()

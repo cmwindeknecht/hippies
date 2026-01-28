@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class Enemy : Character
 {
@@ -15,18 +16,32 @@ public class Enemy : Character
     public EnemySO EnemySO;
     [SerializeField] GameObject EnemyDropPrefab;
 
-    public void RegisterPlayer(Player player)
+    private void Start()
     {
-        _Player = player;
+        if (GameManager.Instance.Player != null)
+        {
+            _Player = GameManager.Instance.Player;
+        }
+        else
+        {
+            GameManager.Instance.OnPlayerRegistered += Instance_OnPlayerRegistered; ;
+        }
+    }
 
+    private void Instance_OnPlayerRegistered(object sender, GameManager.OnPlayerRegisteredEventArgs e)
+    {
+        _Player = e.player;
+    }
+
+    public void Setup()
+    {
         _Controller = GetComponent<EnemyController>();
-        _Controller.Setup(player, EnemySO);
+        _Controller.Setup(EnemySO);
 
         _Stats = GetComponent<CharacterStats>();
         _Stats.Setup(EnemySO);
 
         _Inventory = GetComponent<EnemyInventory>();
-        _Inventory.Setup(_Player);
         _Inventory.EquipWeapon(EnemySO.WeaponSO);
     }
 

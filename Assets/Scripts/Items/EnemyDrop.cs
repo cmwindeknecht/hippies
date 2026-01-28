@@ -21,6 +21,23 @@ public class EnemyDrop : MonoBehaviour
         _CircleCollider = GetComponent<CircleCollider2D>();
     }
 
+    private void Start()
+    {
+        if (GameManager.Instance.Player != null)
+        {
+            _Player = GameManager.Instance.Player;
+        }
+        else
+        {
+            GameManager.Instance.OnPlayerRegistered += Instance_OnPlayerRegistered; ;
+        }
+    }
+
+    private void Instance_OnPlayerRegistered(object sender, GameManager.OnPlayerRegisteredEventArgs e)
+    {
+        _Player = e.player;
+    }
+
     public void Update()
     {
         Vector2 toPlayerDirection = _Player.Position - _Rigidbody2D.position;
@@ -47,9 +64,8 @@ public class EnemyDrop : MonoBehaviour
         }
     }
 
-    public async UniTaskVoid DropFromEnemy(Player player, ItemSO itemSO)
+    public async UniTaskVoid DropFromEnemy(ItemSO itemSO)
     {
-        _Player = player;
         _ItemSO = itemSO;
 
         // Apply initial force

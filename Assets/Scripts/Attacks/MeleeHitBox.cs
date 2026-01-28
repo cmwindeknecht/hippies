@@ -7,7 +7,6 @@ public class MeleeHitBox : MonoBehaviour
     private Rigidbody2D _Rigidbody;
     public float _Radius;
     public float _Duration;
-    private Vector3 _StartPosition;
     
     private float _AttackTimer;
     private MeleeWeaponType _WeaponType;
@@ -36,7 +35,6 @@ public class MeleeHitBox : MonoBehaviour
     public void Initialize(Character character, Vector3 attackDirection, MeleeWeaponSO weaponSO)
     {
         _Character = character;
-        _StartPosition = _Character.Position;
         _AttackDirection = attackDirection.normalized;
         _Radius = weaponSO.Reach;
         _Duration = weaponSO.AttackRate;
@@ -50,6 +48,7 @@ public class MeleeHitBox : MonoBehaviour
     public void OnTriggerEnter2D(Collider2D collision)
     {
         if (!_IsInitialized) return;
+        if (!_HitTargets.Add(collision)) return;
 
         if (_Character is Player)
         {
@@ -75,9 +74,10 @@ public class MeleeHitBox : MonoBehaviour
         }
     }
 
-    private void FixedUpdate() // Changed from Update
+    private void FixedUpdate()
     {
         if (!_IsInitialized) return;
+
         if (_WeaponType.Equals(MeleeWeaponType.Swing))
         {
             SpawnArcingHitBox();
