@@ -1,3 +1,4 @@
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 public class EnemyDrop : MonoBehaviour
@@ -7,9 +8,12 @@ public class EnemyDrop : MonoBehaviour
     private Rigidbody2D _Rigidbody2D;
     private CircleCollider2D _CircleCollider;
     private Player _Player;
-    [SerializeField] private float _FlyForce;
+    [SerializeField] private float _FlyForceFromEnemy;
+    [SerializeField] private float _FlyForceToPlayer;
     [SerializeField] private float _DistanceToPlayerPickup;
     private bool _IsFlyingAtPlayer = false;
+
+    private const float _ApexScale = .5f;
 
     private void Awake()
     {
@@ -19,28 +23,57 @@ public class EnemyDrop : MonoBehaviour
 
     public void Update()
     {
+        Vector2 toPlayerDirection = _Player.Position - _Rigidbody2D.position;
+        float distanceToPlayer = toPlayerDirection.magnitude;
+
         if (_Player != null && !_IsFlyingAtPlayer)
         {
-            Vector2 toPlayerDirection = _Player.Position - _Rigidbody2D.position;
-            float distanceToPlayer = toPlayerDirection.magnitude;
-
             if (distanceToPlayer < _DistanceToPlayerPickup)
             {
                 _IsFlyingAtPlayer = true;
                 _CircleCollider.isTrigger = true;
-
-                _Rigidbody2D.linearVelocity = (_Player.transform.position - (Vector3) _Rigidbody2D.position).normalized * _FlyForce;
             }
+        }
+
+        if (_IsFlyingAtPlayer)
+        {
+            Vector2 movementSpeed = (_Player.transform.position - (Vector3)_Rigidbody2D.position).normalized * (_FlyForceToPlayer / Mathf.Max(distanceToPlayer, 0.25f));
+            if (distanceToPlayer > _DistanceToPlayerPickup)
+            {
+                _IsFlyingAtPlayer = false;
+                movementSpeed = Vector2.zero;
+            }
+            _Rigidbody2D.linearVelocity = movementSpeed;
         }
     }
 
-    public void Shoot(Player player, ItemSO itemSO)
+    public async UniTaskVoid DropFromEnemy(Player player, ItemSO itemSO)
     {
         _Player = player;
         _ItemSO = itemSO;
 
-        Vector2 randomDir = new Vector2(Random.Range(-1f, 1f), Random.Range(0.5f, 1f)).normalized;
-        _Rigidbody2D.AddForce(randomDir * _FlyForce, ForceMode2D.Impulse);
+        // Apply initial force
+        Vector2 randomDir = new Vector2(Random.Range(-1f, 1f), Random.Range(-1f, 1f)).normalized;
+        _Rigidbody2D.AddForce(randomDir * _FlyForceFromEnemy, ForceMode2D.Impulse);
+
+        // Animate scale for arc effect
+        float duration = 0.5f;
+        float elapsed = 0f;
+        Vector3 startScale = transform.localScale;
+
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            float t = elapsed / duration;
+
+            // Scale up then down
+            float scaleMultiplier = 1f + Mathf.Sin(t * Mathf.PI) * _ApexScale;
+            transform.localScale = startScale * scaleMultiplier;
+
+            await UniTask.Yield();
+        }
+
+        transform.localScale = startScale;
     }
 
     private void OnTriggerEnter2D(Collider2D collision)

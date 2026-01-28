@@ -165,5 +165,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e0d80c3fafc77c247af1620c3c3bd7b1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _FlyForce: 10
-  _DistanceToPlayerPickup: 2
+  _FlyForceFromEnemy: 15
+  _FlyForceToPlayer: 7
+  _DistanceToPlayerPickup: 3

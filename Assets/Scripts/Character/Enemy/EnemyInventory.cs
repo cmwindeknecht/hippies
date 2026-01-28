@@ -38,7 +38,7 @@ public class EnemyInventory : MonoBehaviour
                     return;
                 }
                 EnemyDrop enemyDrop = Instantiate(_EnemyDropPrefab, transform.position, Quaternion.identity);
-                enemyDrop.Shoot(_Player, enemyDropSO.ItemSO);
+                enemyDrop.DropFromEnemy(_Player, enemyDropSO.ItemSO).Forget();
             }
         }
     }
