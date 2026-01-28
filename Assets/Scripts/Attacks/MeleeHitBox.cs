@@ -96,7 +96,7 @@ public class MeleeHitBox : MonoBehaviour
         float angle = Mathf.Lerp(90f, -90f, normalizedDuration) + Mathf.Atan2(_AttackDirection.y, _AttackDirection.x) * Mathf.Rad2Deg;
         float radians = angle * Mathf.Deg2Rad;
         Vector3 direction = new(Mathf.Cos(radians), Mathf.Sin(radians), 0f);
-        _Rigidbody.MovePosition(_Character.Position + direction * _Radius);
+        _Rigidbody.MovePosition((Vector3) _Character.Position + direction * _Radius);
         if (normalizedDuration >= 1f)
         {
             Destroy(gameObject);

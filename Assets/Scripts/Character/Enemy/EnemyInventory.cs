@@ -11,10 +11,35 @@ public class EnemyInventory : MonoBehaviour
     [SerializeField] private WeaponSO _EquippedWeaponSO;
     public WeaponSO EquippedWeaponSO => _EquippedWeaponSO;
     // TODO Armor stuff
-    public Dictionary<InventoryItemType, List<InventoryItem>> Inventory;
+    [SerializeField] private List<EnemyDropSO> _EnemyDropSOs;
+    [SerializeField] private EnemyDrop _EnemyDropPrefab;
+    private Player _Player;
+
+    public void Setup(Player player)
+    {
+        _Player = player;
+    }
 
     public void EquipWeapon(WeaponSO weapon)
     {
         _EquippedWeaponSO = weapon;
+    }
+
+    public void DropItems()
+    {
+        if (_Player == null) return;
+
+        foreach (EnemyDropSO enemyDropSO in _EnemyDropSOs)
+        {
+            for (int i = 0; i < enemyDropSO.QuantityToDrop; i++)
+            {
+                if (!Utilities.TestRoll(Random.Range(enemyDropSO.DropChanceMin, enemyDropSO.DropChanceMax)))
+                {
+                    return;
+                }
+                EnemyDrop enemyDrop = Instantiate(_EnemyDropPrefab, transform.position, Quaternion.identity);
+                enemyDrop.Shoot(_Player, enemyDropSO.ItemSO);
+            }
+        }
     }
 }

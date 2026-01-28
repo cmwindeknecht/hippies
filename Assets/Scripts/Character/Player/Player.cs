@@ -32,4 +32,9 @@ public class Player : Character
             _Controller.Knockback(attackDirection.Value, knockbackSpeed);
         }
     }
+
+    public void AddToInventory(ItemSO itemSO)
+    {
+        _Inventory.AddToInventory(itemSO);
+    }
 }

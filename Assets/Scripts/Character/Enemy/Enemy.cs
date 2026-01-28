@@ -13,6 +13,7 @@ public class Enemy : Character
     //      3. Database or whatever provides the SO to the spawn manager
     //      4. Spawn manager passes enemySO here
     public EnemySO EnemySO;
+    [SerializeField] GameObject EnemyDropPrefab;
 
     public void RegisterPlayer(Player player)
     {
@@ -25,6 +26,7 @@ public class Enemy : Character
         _Stats.Setup(EnemySO);
 
         _Inventory = GetComponent<EnemyInventory>();
+        _Inventory.Setup(_Player);
         _Inventory.EquipWeapon(EnemySO.WeaponSO);
     }
 
@@ -34,6 +36,7 @@ public class Enemy : Character
 
         if (_Stats.CurrentHealth <= 0)
         {
+            _Inventory.DropItems();
             Destroy(gameObject);
         }
 
