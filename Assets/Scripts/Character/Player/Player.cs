@@ -1,26 +1,26 @@
 using UnityEngine;
 
-public class Player : MonoBehaviour
+public class Player : Character
 {
+    public CharacterType CharacterType = CharacterType.Player;
     private PlayerController _Controller;
     private PlayerInventory _Inventory;
-
-    private float _Health = 5f;
-    public float Health => _Health;
+    private CharacterStats _CharacterStats;
 
     private void Start()
     {
         _Controller = GetComponent<PlayerController>();
         _Inventory = GetComponent<PlayerInventory>();
+        _CharacterStats = GetComponent<CharacterStats>();
 
         GameManager.Instance.RegisterPlayer(this);
     }
 
-    public void TakeDamage(float damage, Vector3? attackDirection = null, float knockbackSpeed = 0)
+    public void TakeDamage(int damage, Vector3? attackDirection = null, float knockbackSpeed = 0)
     {
-        _Health -= damage;
+        _CharacterStats.TakeDamage(damage);
 
-        if (_Health <= 0)
+        if (_CharacterStats.CurrentHealth <= 0)
         {
             Destroy(gameObject);
         }

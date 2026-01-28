@@ -13,6 +13,8 @@ public class Projectile : MonoBehaviour
     private float _AttackTimer;
     private bool _IsInitialized;
     private HashSet<Collider2D> _HitTargets;
+    private Character _Character;
+    private Character _Target;
 
     private void Awake()
     {
@@ -22,8 +24,18 @@ public class Projectile : MonoBehaviour
         _HitTargets = new();
     }
 
-    public void Initialize(Vector3 direction, RangedWeaponSO weaponSO)
+    // TODO Enemy Initialization
+    //   Current iteration just fires a burst where the player WAS
+    //   Should have a second version that fires where the player IS but this requires a new EnemyAttackController and all that, thats future shit
+    public void Initialize(Vector3 direction, RangedWeaponSO weaponSO, Character projectileOwner, Character target)
     {
+        _Target = target;
+        Initialize(direction, weaponSO, projectileOwner);
+    }
+
+    public void Initialize(Vector3 direction, RangedWeaponSO weaponSO, Character projectileOwner)
+    {
+        _Character = projectileOwner;
         _Damage = Random.Range(weaponSO.DamageMin, weaponSO.DamageMax + 1) + Random.Range(_ProjectileSO.DamageMin, _ProjectileSO.DamageMax + 1);
         _Knockback = weaponSO.Knockback + _ProjectileSO.Knockback;
         _AttackDirection = direction.normalized;
@@ -55,35 +67,29 @@ public class Projectile : MonoBehaviour
         // Prevent unintended double taps
         if (!_HitTargets.Add(collision.collider))
         {
+            Destroy(gameObject);
             return;
         }
 
-        if (collision.collider.TryGetComponent<Player>(out Player player))
+        if (_Character is Player)
         {
-            Debug.Log($"Ignoring collision with player {player.name}");
-            return;
-        }
-
-        if (collision.collider.TryGetComponent<Projectile>(out Projectile projectile))
-        {
-            Debug.Log($"Ignoring collision with projectile {projectile.name}");
-            return;
-        }
-
-        // TODO need projectile owner so I can use this interchangeably by enemies and players
-        if (collision.collider.TryGetComponent<Enemy>(out Enemy enemy))
-        {
-            // TODO way more advanced shit --- need to take into account strength/agility/etc
-            enemy.TakeDamage(_Damage, _Knockback > 0 ? _AttackDirection : null, _Knockback);
-        }
-
-        if (_ProjectileSO.Hollowpoint)
-        {
-            // Only destroy hollowpoint bullets on collisions
-            if (collision.collider.CompareTag("Collision"))
+            if (collision.collider.TryGetComponent<Enemy>(out Enemy enemy))
             {
-                Destroy(gameObject);
+                enemy.TakeDamage(_Damage, _Knockback > 0 ? _AttackDirection : null, _Knockback);
             }
+            
+        }
+        else if (_Character is Enemy)
+        {
+            if (collision.collider.TryGetComponent<Player>(out Player player))
+            {
+                player.TakeDamage(_Damage, _Knockback > 0 ? _AttackDirection : null, _Knockback);
+            }
+        }
+
+        if (_ProjectileSO.Hollowpoint && collision.collider.CompareTag("Collision"))
+        {
+            Destroy(gameObject);
         }
         else
         {

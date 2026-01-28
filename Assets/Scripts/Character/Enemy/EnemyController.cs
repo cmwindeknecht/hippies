@@ -6,6 +6,8 @@ using UnityEngine;
 public class EnemyController : MonoBehaviour
 {
     private Player _Player;
+    private EnemySO _EnemySO;
+    private EnemyAttackController _AttackController;
     private Rigidbody2D _RigidBody;
     private Vector3 _RigidBodyPosition => new(_RigidBody.position.x, _RigidBody.position.y, 0);
 
@@ -24,14 +26,16 @@ public class EnemyController : MonoBehaviour
     private int _CurrentPathIndex;
     private bool _IsFollowingPath;
 
-    public void Setup(Player player)
+    public void Setup(Player player, EnemySO enemySO)
     {
         _Player = player;
+        _EnemySO = enemySO;
     }
 
     private void Awake()
     {
         _RigidBody = GetComponent<Rigidbody2D>();
+        _AttackController = GetComponent<EnemyAttackController>();
         _SpawnPosition = _RigidBody.position;
     }
 
@@ -96,15 +100,62 @@ public class EnemyController : MonoBehaviour
 
     private void GoToPlayer()
     {
-        Vector2 movement = (_Player.transform.position - _RigidBodyPosition).normalized * GetMovementSpeed();
+        if (_EnemySO.WeaponSO == null) throw new System.Exception("Enemy has no weapon SO!"); // even a weaponless enemy should have an unarmed SO
+
+        if (_Knockback.magnitude < 0.1f)
+        {
+            _Knockback = Vector2.zero;
+        }
+
+        // If in range of the player, either attack or don't move
+        Vector2 movement = Vector2.zero;
+        bool shouldChasePlayer = true;
+
+        // Only attack / rotate if there is no knockback
+        if (_Knockback == Vector2.zero)
+        {
+            if (_EnemySO.WeaponSO is MeleeWeaponSO)
+            {
+                MeleeWeaponSO meleeWeaponSO = _EnemySO.WeaponSO as MeleeWeaponSO;
+                // Check if the enemy is in range 
+                if (Utilities.IsSameVectorPosition(_RigidBodyPosition + transform.right * meleeWeaponSO.Reach, _Player.transform.position))
+                {
+                    shouldChasePlayer = false;
+                    _AttackController.TryAttack(transform.right);
+                }
+            }
+            else if (_EnemySO.WeaponSO is RangedWeaponSO)
+            {
+                RangedWeaponSO rangedWeaponSO = _EnemySO.WeaponSO as RangedWeaponSO;
+                Vector2 toPlayer = _Player.transform.position - _RigidBodyPosition;
+                float distanceToPlayer = toPlayer.magnitude;
+
+                // Player is within attack range
+                if (distanceToPlayer <= Mathf.Max(_EnemySO.AttackRange, rangedWeaponSO.Range))
+                {
+                    shouldChasePlayer = false;
+                    _AttackController.TryAttack(toPlayer.normalized); // Attack toward player
+                }
+            }
+
+            Vector2 rotation = (_Player.transform.position - _RigidBodyPosition).normalized;
+            float angle = Mathf.Atan2(rotation.y, rotation.x) * Mathf.Rad2Deg;
+            transform.rotation = Quaternion.Euler(0, 0, angle);
+        }
+
+        // If knockback occurred, overwrite the possibly stalled movement due to proximity
         if (_Knockback.magnitude > 0.1f)
         {
-            _RigidBody.linearVelocity = _Knockback;
+            movement = _Knockback;
             _Knockback = Vector2.Lerp(_Knockback, Vector2.zero, _KnockbackDecay * Time.fixedDeltaTime);
-        } else
-        {
-            _RigidBody.linearVelocity = movement;
         }
+        // Keep chasing if no knockback / no proximity
+        else if (shouldChasePlayer)
+        {
+            movement = (_Player.transform.position - _RigidBodyPosition).normalized * GetMovementSpeed();
+        }
+
+        _RigidBody.linearVelocity = movement;
     }
 
     private void FollowPath(Vector3 finalTarget)
@@ -150,7 +201,7 @@ public class EnemyController : MonoBehaviour
         }
 
         // Move toward current waypoint
-        Vector2 desiredVelocity = toTarget.normalized * GetMovementSpeed();
+        Vector2 movement = toTarget.normalized * GetMovementSpeed();
 
         // If enemy is colliding, slide along the surface
         if (_RigidBody.IsTouchingLayers(LayerMask.GetMask("Collision")))
@@ -163,23 +214,27 @@ public class EnemyController : MonoBehaviour
                 Vector2 normal = contacts[i].normal;
 
                 // Remove component pushing into the surface
-                float intoSurface = Vector2.Dot(desiredVelocity, normal);
+                float intoSurface = Vector2.Dot(movement, normal);
                 if (intoSurface < 0f)
                 {
-                    desiredVelocity -= normal * intoSurface;
+                    movement -= normal * intoSurface;
                 }
             }
         }
 
         if (_Knockback.magnitude > 0.1f)
         {
-            _RigidBody.linearVelocity = _Knockback;
+            movement = _Knockback;
             _Knockback = Vector2.Lerp(_Knockback, Vector2.zero, _KnockbackDecay * Time.fixedDeltaTime);
         }
-        else
+
+        if (movement != Vector2.zero)
         {
-            _RigidBody.linearVelocity = desiredVelocity;
+            float angle = Mathf.Atan2(movement.y, movement.x) * Mathf.Rad2Deg;
+            transform.rotation = Quaternion.Euler(0, 0, angle);
         }
+
+        _RigidBody.linearVelocity = movement;
     }
 
     private void StopMovement()

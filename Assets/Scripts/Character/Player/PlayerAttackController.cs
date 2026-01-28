@@ -2,14 +2,16 @@ using UnityEngine;
 
 public class PlayerAttackController : MonoBehaviour
 {
-    PlayerInventory _Inventory;
+    private Player _Player;
+    private PlayerInventory _Inventory;
 
     private Weapon _EquippedWeapon;
 
     [SerializeField] private GameObject _MeleeHitboxPrefab;
 
-    void Awake()
+    private void Awake()
     {
+        _Player = GetComponent<Player>();
         _Inventory = GetComponent<PlayerInventory>();
     }
 
@@ -60,7 +62,7 @@ public class PlayerAttackController : MonoBehaviour
                 RangedWeaponSO rangedWeaponSO = _EquippedWeapon.WeaponSO as RangedWeaponSO;
                 Vector3 spawnPos = transform.position + attackDirection.normalized * 1.5f; // spawn in front of the player in the direction of the attack
                 Projectile projectile = Instantiate(rangedWeaponSO.ProjectilePrefab, spawnPos, Quaternion.identity);
-                projectile.Initialize(attackDirection.normalized, rangedWeaponSO);
+                projectile.Initialize(attackDirection.normalized, rangedWeaponSO, _Player);
                 return true;
             }
             return false;
@@ -74,7 +76,7 @@ public class PlayerAttackController : MonoBehaviour
                 GameObject hitBoxInstance = Instantiate(_MeleeHitboxPrefab, transform.position, Quaternion.identity);
                 MeleeHitBox meleeHitBox = hitBoxInstance.GetComponent<MeleeHitBox>();
                 // TODO just pass in the weapon SO I think
-                meleeHitBox.Initialize(transform.position, attackDirection.normalized, meleeWeaponSO);
+                meleeHitBox.Initialize(_Player, attackDirection.normalized, meleeWeaponSO);
 
                 return true;
             }

@@ -9,13 +9,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ceb980d02e2780e4bbd2fc2b6704a3bd, type: 3}
-  m_Name: TestBullet
+  m_Script: {fileID: 11500000, guid: 16cbb4be27ac6db40adee46b53150bb0, type: 3}
+  m_Name: TestEnemy
   m_EditorClassIdentifier: 
-  Name: Test Bullet
-  DamageMin: 1
-  DamageMax: 1
-  Knockback: 10
-  Speed: 10
-  Lifetime: 5
-  Hollowpoint: 0
+  Health: 5
+  MovementSpeed: 5
+  WeaponSO: {fileID: 11400000, guid: aafe9f2f74e8d45409021fa7ab92d0a8, type: 2}
+  AttackRange: 5
+  AttackCooldown: 2
+  BurstCount: 3
+  BurstDelay: 0.25

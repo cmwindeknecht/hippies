@@ -32,11 +32,11 @@ public class GridTilemapManager : MonoBehaviour
         switch (tilemap.TilemapType)
         {
             case TilemapType.Walkable:
-                Debug.Log($"Setting {tilemap.TilemapType} from {(_WalkableTilemap == null ? "UNSET" : _WalkableTilemap.Name)} to {tilemap.Name}");
+                //Debug.Log($"Setting {tilemap.TilemapType} from {(_WalkableTilemap == null ? "UNSET" : _WalkableTilemap.Name)} to {tilemap.Name}");
                 _WalkableTilemap = tilemap; 
                 break;
             case TilemapType.Collision:
-                Debug.Log($"Setting {tilemap.TilemapType} from {(_CollisionTilemap == null ? "UNSET" : _CollisionTilemap.Name)} to {tilemap.Name}");
+                //Debug.Log($"Setting {tilemap.TilemapType} from {(_CollisionTilemap == null ? "UNSET" : _CollisionTilemap.Name)} to {tilemap.Name}");
                 _CollisionTilemap = tilemap; 
                 break;
         }

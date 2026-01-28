@@ -13,11 +13,12 @@ MonoBehaviour:
   m_Name: Pistol
   m_EditorClassIdentifier: 
   Name: Test Pistol
-  DamageMin: 2
-  DamageMax: 3
-  Knockback: 1
-  AttackRate: 0.1
+  DamageMin: 1
+  DamageMax: 2
+  Knockback: 10
+  AttackRate: 0.25
+  AttackCooldown: 1
   SoundEffect: {fileID: 0}
-  Range: 0
+  Range: 5
   ProjectilePrefab: {fileID: 6944337265132057423, guid: d858f9bc3e0eff84886379462d1ab007, type: 3}
   BulletCost: 1

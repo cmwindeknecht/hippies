@@ -59,16 +59,18 @@ public class PlayerController : MonoBehaviour
     {
         if (_Knockback.magnitude > 0.1f)
         {
+            _ShouldZeroOut = false;
             _LinearVelocity = _Knockback;
             _Knockback = Vector2.Lerp(_Knockback, Vector2.zero, 5f * Time.fixedDeltaTime);
-        } 
+        }
         else
         {
-            GetInputVelocity();
+            _ShouldZeroOut = true;
         }
-        
-        MovePlayer();
+
+        GetInputVelocity();
         SetRotation();
+        MovePlayer();
 
         // Not going to have a jump (I think --- maybe?) but leaving this here for sneak or whatever
         //if (_JumpInputAction.IsPressed())
