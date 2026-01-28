@@ -8,12 +8,20 @@ public class MeleeHitBox : MonoBehaviour
     public float _Radius;
     public float _Duration;
     private Vector3 _StartPosition;
-    private Vector3 _AttackDirection;
+    
     private float _AttackTimer;
     private MeleeWeaponType _WeaponType;
+    
     private int _Damage;
-    private bool _IsInitialized;
+    public int Damage => _Damage;
+
     private float _Knockback;
+    public float Knockback => _Knockback;
+
+    private Vector3 _AttackDirection;
+    public Vector3 AttackDirection => _AttackDirection;
+
+    private bool _IsInitialized;
 
     private HashSet<Collider2D> _HitTargets;
 

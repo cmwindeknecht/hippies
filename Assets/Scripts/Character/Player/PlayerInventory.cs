@@ -10,7 +10,10 @@ public class PlayerInventory : MonoBehaviour
     // TODO remove serializefield, just doign this for testing
     [SerializeField] private WeaponSO _EquippedWeaponSO;
     public WeaponSO EquippedWeaponSO => _EquippedWeaponSO;
+    [SerializeField] private ShieldSO _EquippedShieldSO;
+    public ShieldSO EquippedShieldSO => _EquippedShieldSO;
     // TODO Armor stuff
+
     public Dictionary<InventoryItemType, List<InventoryItem>> Inventory;
 
     public void EquipWeapon(WeaponSO weapon)

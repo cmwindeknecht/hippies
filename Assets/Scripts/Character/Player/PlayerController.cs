@@ -30,6 +30,8 @@ public class PlayerController : MonoBehaviour
         _AttackInputAction = InputSystem.actions.FindAction("Attack");
     }
 
+
+
     void Update()
     {
         _MoveValue = _MoveInputAction.ReadValue<Vector2>();
@@ -42,10 +44,9 @@ public class PlayerController : MonoBehaviour
     {
         if (_AttackValue != Vector2.zero)
         {
-
+            _FacingDirection = _AttackValue;
             if (_AttackController.TryAttack(_AttackValue))
             {
-                _FacingDirection = _AttackValue;
                 _AttackFacingLockTime = Time.time + _AttackFacingLockTimeMaximum;
             }
         }

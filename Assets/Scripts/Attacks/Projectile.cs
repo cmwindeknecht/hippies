@@ -7,14 +7,20 @@ public class Projectile : MonoBehaviour
     public ProjectileSO ProjectileSO => _ProjectileSO;
 
     private Rigidbody2D _Rigidbody;
-    private int _Damage;
-    private float _Knockback;
-    private Vector3 _AttackDirection;
     private float _AttackTimer;
     private bool _IsInitialized;
     private HashSet<Collider2D> _HitTargets;
     private Character _Character;
     private Character _Target;
+
+    private int _Damage;
+    public int Damage => _Damage;
+
+    private float _Knockback;
+    public float Knockback => _Knockback;
+
+    private Vector3 _AttackDirection;
+    public Vector3 AttackDirection => _AttackDirection;
 
     private void Awake()
     {
@@ -83,6 +89,7 @@ public class Projectile : MonoBehaviour
         {
             if (collision.collider.TryGetComponent<Player>(out Player player))
             {
+                Debug.Log($"Projectile hit player for damage {_Damage} and knockback {_Knockback}");
                 player.TakeDamage(_Damage, _Knockback > 0 ? _AttackDirection : null, _Knockback);
             }
         }
