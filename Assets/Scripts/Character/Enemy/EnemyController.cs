@@ -115,13 +115,26 @@ public class EnemyController : MonoBehaviour
                 _AttackController.TryAttack(transform.right);
             }
         }
+        else if (_EnemySO.WeaponSO is RangedWeaponSO)
+        {
+            RangedWeaponSO rangedWeaponSO = _EnemySO.WeaponSO as RangedWeaponSO;
+            Vector2 toPlayer = _Player.transform.position - _RigidBodyPosition;
+            float distanceToPlayer = toPlayer.magnitude;
+
+            // Player is within attack range
+            if (distanceToPlayer <= Mathf.Max(_EnemySO.AttackRange, rangedWeaponSO.Range))
+            {
+                shouldChasePlayer = false;
+                _AttackController.TryAttack(toPlayer.normalized); // Attack toward player
+            }
+        }
 
         // If knockback occurred, overwrite the possibly stalled movement due to proximity
         if (_Knockback.magnitude > 0.1f)
         {
             movement = _Knockback;
             _Knockback = Vector2.Lerp(_Knockback, Vector2.zero, _KnockbackDecay * Time.fixedDeltaTime);
-        } 
+        }
         // Keep chasing if no knockback / no proximity
         else if (shouldChasePlayer)
         {

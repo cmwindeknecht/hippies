@@ -12,20 +12,20 @@ public class Enemy : Character
     //      2. SO has sprite / animatinos / etc
     //      3. Database or whatever provides the SO to the spawn manager
     //      4. Spawn manager passes enemySO here
-    [SerializeField] private EnemySO _EnemySO;
+    public EnemySO EnemySO;
 
     public void RegisterPlayer(Player player)
     {
         _Player = player;
 
         _Controller = GetComponent<EnemyController>();
-        _Controller.Setup(player, _EnemySO);
+        _Controller.Setup(player, EnemySO);
 
         _Stats = GetComponent<CharacterStats>();
-        _Stats.Setup(_EnemySO);
+        _Stats.Setup(EnemySO);
 
         _Inventory = GetComponent<EnemyInventory>();
-        _Inventory.EquipWeapon(_EnemySO.WeaponSO);
+        _Inventory.EquipWeapon(EnemySO.WeaponSO);
     }
 
     public void TakeDamage(int damage, Vector3? attackDirection = null, float knockbackSpeed = 0)

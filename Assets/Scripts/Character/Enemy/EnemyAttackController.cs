@@ -1,3 +1,6 @@
+using Cysharp.Threading.Tasks;
+using System;
+using System.Threading.Tasks;
 using UnityEngine;
 
 public class EnemyAttackController : MonoBehaviour
@@ -48,46 +51,65 @@ public class EnemyAttackController : MonoBehaviour
                 throw new System.Exception($"Unknown weaponSO to of {weaponSO.name}");
             }
 
-            _EquippedWeapon.Initialize(weaponSO);
+            _EquippedWeapon.Initialize(weaponSO, _Enemy.EnemySO.AttackCooldown);
         }
     }
 
     private bool TryAttackByType(Vector3 targetPosition)
     {
         Vector3 attackDirection = new Vector3(targetPosition.x, targetPosition.y, 0).normalized;
-        if (_EquippedWeapon is RangedWeapon)
+        if (_EquippedWeapon.Attack())
         {
-            if (_EquippedWeapon.Attack())
+            BurstAttack(attackDirection, _EquippedWeapon.WeaponSO).Forget();
+            return true;
+        }
+        return false;
+    }
+
+    private async UniTaskVoid BurstAttack(Vector2 attackDirection, WeaponSO weaponSO)
+    {
+        float burstDelay = GetBurstDelay(weaponSO);
+
+        for (int i = 0; i < _Enemy.EnemySO.BurstCount; i++)
+        {
+            if (weaponSO is MeleeWeaponSO)
             {
-                RangedWeaponSO rangedWeaponSO = _EquippedWeapon.WeaponSO as RangedWeaponSO;
-                Vector3 spawnPos = transform.position + attackDirection.normalized * 1.5f; // spawn in front of the player in the direction of the attack
-                Projectile projectile = Instantiate(rangedWeaponSO.ProjectilePrefab, spawnPos, Quaternion.identity);
-                projectile.Initialize(attackDirection.normalized, rangedWeaponSO);
-                return true;
+                SpawnMeleeHitBox(attackDirection, weaponSO as MeleeWeaponSO);
             }
-            return false;
-        }
-
-        if (_EquippedWeapon is MeleeWeapon)
-        {
-            if (_EquippedWeapon.Attack())
+            else if (weaponSO is RangedWeaponSO)
             {
-                MeleeWeaponSO meleeWeaponSO = _EquippedWeapon.WeaponSO as MeleeWeaponSO;
-                GameObject hitBoxInstance = Instantiate(_MeleeHitboxPrefab, transform.position, Quaternion.identity);
-                MeleeHitBox meleeHitBox = hitBoxInstance.GetComponent<MeleeHitBox>();
-                meleeHitBox.Initialize(_Enemy, attackDirection.normalized, meleeWeaponSO);
-
-                return true;
+                SpawnProjectile(attackDirection, weaponSO as RangedWeaponSO);
             }
-            return false;
-        }
+            else if (weaponSO is MagicAttackSO)
+            {
+                throw new NotImplementedException("Magic Attack Not Implemented!");
+            }
 
-        if (_EquippedWeapon is MagicAttack)
-        {
-            return _EquippedWeapon.Attack();
+            if (i < _Enemy.EnemySO.BurstCount - 1)
+            {
+                await UniTask.WaitForSeconds(burstDelay);
+            }
         }
+    }
 
-        throw new System.Exception($"Unknown attack type for weapon type {_EquippedWeapon.WeaponSO.Name}");
+    private void SpawnMeleeHitBox(Vector3 attackDirection, MeleeWeaponSO meleeWeaponSO)
+    {
+        GameObject hitBoxInstance = Instantiate(_MeleeHitboxPrefab, transform.position, Quaternion.identity);
+        MeleeHitBox meleeHitBox = hitBoxInstance.GetComponent<MeleeHitBox>();
+        meleeHitBox.Initialize(_Enemy, attackDirection.normalized, meleeWeaponSO);
+    }
+
+    private void SpawnProjectile(Vector3 attackDirection, RangedWeaponSO rangedWeaponSO)
+    {
+        Vector3 spawnPos = transform.position + attackDirection.normalized * 1.5f; // spawn in front of the player in the direction of the attack
+        Projectile projectile = Instantiate(rangedWeaponSO.ProjectilePrefab, spawnPos, Quaternion.identity);
+        projectile.Initialize(attackDirection.normalized, rangedWeaponSO);
+    }
+
+    // Ensure that if the weapon is slower than the burst delay of the enemy, the weapon wins out (it is what determines Attack() true/false)
+    private float GetBurstDelay(WeaponSO weaponSO)
+    {
+        return Mathf.Max(_Enemy.EnemySO.BurstDelay, weaponSO.AttackRate);
     }
 
     // TODO Proper way to do this but not now

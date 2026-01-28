@@ -296,6 +296,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7574cd66c6d53e249ad8085a9ae8538a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  CharacterType: 1
 --- !u!114 &86635781
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -380,8 +381,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 195f40f8d0c8ddb4c934ad5f71aa77cd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _MaxHealth: 10
-  _CurrentHealth: 10
+  _MaxHealth: 100
+  _CurrentHealth: 100
   _MovementSpeed: 6
 --- !u!1 &115667969
 GameObject:
