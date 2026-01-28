@@ -9,7 +9,7 @@ public enum CharacterType
 public class Character : MonoBehaviour
 {
     private Rigidbody2D _Rigidbody2D;
-    public Vector3 Position => _Rigidbody2D == null ? Vector3.zero : (Vector3)_Rigidbody2D.position;
+    public Vector2 Position => _Rigidbody2D == null ? Vector3.zero : (Vector3)_Rigidbody2D.position;
 
     private void Awake()
     {

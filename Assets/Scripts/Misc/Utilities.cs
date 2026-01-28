@@ -26,7 +26,7 @@ public static class Utilities
         return Vector3Int.Distance(positionA, positionB);
     }
 
-    public static bool TestRandomChance(float chancePercent)
+    public static bool TestRoll(float chancePercent)
     {
         return Random.Range(0f, 100f) < chancePercent;
     }

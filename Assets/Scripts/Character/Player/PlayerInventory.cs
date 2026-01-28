@@ -16,6 +16,11 @@ public class PlayerInventory : MonoBehaviour
 
     public Dictionary<InventoryItemType, List<InventoryItem>> Inventory;
 
+    private void Awake()
+    {
+        Inventory = new();
+    }
+
     public void EquipWeapon(WeaponSO weapon)
     {
         if (Inventory.TryGetValue(InventoryItemType.Weapon, out List<InventoryItem> items)) {
@@ -37,5 +42,27 @@ public class PlayerInventory : MonoBehaviour
 
         // TODO stat checks and the like
         _EquippedWeaponSO = weapon;
+    }
+
+    public void AddToInventory(ItemSO itemSO)
+    {
+        if (Inventory.TryGetValue(itemSO.Type, out List<InventoryItem> inventoryItems))
+        {
+            foreach (InventoryItem inventoryItem in inventoryItems)
+            {
+                if (inventoryItem.ItemSO.Name.Equals(itemSO.Name))
+                {
+                    inventoryItem.IncreaseQuantity();
+                    return;
+                }
+            }
+            inventoryItems.Add(new InventoryItem(itemSO));
+        }
+        else
+        {
+            List<InventoryItem> newInventoryItems = new();
+            newInventoryItems.Add(new InventoryItem(itemSO));
+            Inventory.Add(itemSO.Type, newInventoryItems);
+        }
     }
 }
