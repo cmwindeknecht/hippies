@@ -102,31 +102,45 @@ public class EnemyController : MonoBehaviour
     {
         if (_EnemySO.WeaponSO == null) throw new System.Exception("Enemy has no weapon SO!"); // even a weaponless enemy should have an unarmed SO
 
+        if (_Knockback.magnitude < 0.1f)
+        {
+            _Knockback = Vector2.zero;
+        }
+
         // If in range of the player, either attack or don't move
         Vector2 movement = Vector2.zero;
         bool shouldChasePlayer = true;
-        if (_EnemySO.WeaponSO is MeleeWeaponSO)
-        {
-            MeleeWeaponSO meleeWeaponSO = _EnemySO.WeaponSO as MeleeWeaponSO;
-            // Check if the enemy is in range 
-            if (Utilities.IsSameVectorPosition(_RigidBodyPosition + transform.right * meleeWeaponSO.Reach, _Player.transform.position))
-            {
-                shouldChasePlayer = false;
-                _AttackController.TryAttack(transform.right);
-            }
-        }
-        else if (_EnemySO.WeaponSO is RangedWeaponSO)
-        {
-            RangedWeaponSO rangedWeaponSO = _EnemySO.WeaponSO as RangedWeaponSO;
-            Vector2 toPlayer = _Player.transform.position - _RigidBodyPosition;
-            float distanceToPlayer = toPlayer.magnitude;
 
-            // Player is within attack range
-            if (distanceToPlayer <= Mathf.Max(_EnemySO.AttackRange, rangedWeaponSO.Range))
+        // Only attack / rotate if there is no knockback
+        if (_Knockback == Vector2.zero)
+        {
+            if (_EnemySO.WeaponSO is MeleeWeaponSO)
             {
-                shouldChasePlayer = false;
-                _AttackController.TryAttack(toPlayer.normalized); // Attack toward player
+                MeleeWeaponSO meleeWeaponSO = _EnemySO.WeaponSO as MeleeWeaponSO;
+                // Check if the enemy is in range 
+                if (Utilities.IsSameVectorPosition(_RigidBodyPosition + transform.right * meleeWeaponSO.Reach, _Player.transform.position))
+                {
+                    shouldChasePlayer = false;
+                    _AttackController.TryAttack(transform.right);
+                }
             }
+            else if (_EnemySO.WeaponSO is RangedWeaponSO)
+            {
+                RangedWeaponSO rangedWeaponSO = _EnemySO.WeaponSO as RangedWeaponSO;
+                Vector2 toPlayer = _Player.transform.position - _RigidBodyPosition;
+                float distanceToPlayer = toPlayer.magnitude;
+
+                // Player is within attack range
+                if (distanceToPlayer <= Mathf.Max(_EnemySO.AttackRange, rangedWeaponSO.Range))
+                {
+                    shouldChasePlayer = false;
+                    _AttackController.TryAttack(toPlayer.normalized); // Attack toward player
+                }
+            }
+
+            Vector2 rotation = (_Player.transform.position - _RigidBodyPosition).normalized;
+            float angle = Mathf.Atan2(rotation.y, rotation.x) * Mathf.Rad2Deg;
+            transform.rotation = Quaternion.Euler(0, 0, angle);
         }
 
         // If knockback occurred, overwrite the possibly stalled movement due to proximity
@@ -141,17 +155,6 @@ public class EnemyController : MonoBehaviour
             movement = (_Player.transform.position - _RigidBodyPosition).normalized * GetMovementSpeed();
         }
 
-        if (_Knockback.magnitude < 0.1f)
-        {
-            _Knockback = Vector2.zero;
-        }
-
-        // Only rotate the enemy if they are moving and there is no knockback
-        if (movement != Vector2.zero && _Knockback == Vector2.zero)
-        {
-            float angle = Mathf.Atan2(movement.y, movement.x) * Mathf.Rad2Deg;
-            transform.rotation = Quaternion.Euler(0, 0, angle);
-        }
         _RigidBody.linearVelocity = movement;
     }
 

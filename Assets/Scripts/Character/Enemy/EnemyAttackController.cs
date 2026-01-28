@@ -68,6 +68,7 @@ public class EnemyAttackController : MonoBehaviour
 
     private async UniTaskVoid BurstAttack(Vector2 attackDirection, WeaponSO weaponSO)
     {
+        var cancellationToken = this.GetCancellationTokenOnDestroy();
         float burstDelay = GetBurstDelay(weaponSO);
 
         for (int i = 0; i < _Enemy.EnemySO.BurstCount; i++)
@@ -87,7 +88,7 @@ public class EnemyAttackController : MonoBehaviour
 
             if (i < _Enemy.EnemySO.BurstCount - 1)
             {
-                await UniTask.WaitForSeconds(burstDelay);
+                await UniTask.WaitForSeconds(burstDelay, cancellationToken:cancellationToken);
             }
         }
     }
@@ -103,7 +104,7 @@ public class EnemyAttackController : MonoBehaviour
     {
         Vector3 spawnPos = transform.position + attackDirection.normalized * 1.5f; // spawn in front of the player in the direction of the attack
         Projectile projectile = Instantiate(rangedWeaponSO.ProjectilePrefab, spawnPos, Quaternion.identity);
-        projectile.Initialize(attackDirection.normalized, rangedWeaponSO);
+        projectile.Initialize(attackDirection.normalized, rangedWeaponSO, _Enemy);
     }
 
     // Ensure that if the weapon is slower than the burst delay of the enemy, the weapon wins out (it is what determines Attack() true/false)

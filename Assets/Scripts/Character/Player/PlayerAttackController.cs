@@ -62,7 +62,7 @@ public class PlayerAttackController : MonoBehaviour
                 RangedWeaponSO rangedWeaponSO = _EquippedWeapon.WeaponSO as RangedWeaponSO;
                 Vector3 spawnPos = transform.position + attackDirection.normalized * 1.5f; // spawn in front of the player in the direction of the attack
                 Projectile projectile = Instantiate(rangedWeaponSO.ProjectilePrefab, spawnPos, Quaternion.identity);
-                projectile.Initialize(attackDirection.normalized, rangedWeaponSO);
+                projectile.Initialize(attackDirection.normalized, rangedWeaponSO, _Player);
                 return true;
             }
             return false;
