@@ -209,7 +209,7 @@ public class EnemyController : MonoBehaviour
 
             if (_CurrentPathIndex >= _CurrentPath.Count)
             {
-                Debug.Log($"PATH COMPLETE --- _CurrentPathIndex {_CurrentPathIndex} >= _CurrentPath.Count {_CurrentPath.Count}");
+                //Debug.Log($"PATH COMPLETE --- _CurrentPathIndex {_CurrentPathIndex} >= _CurrentPath.Count {_CurrentPath.Count}");
                 StopMovement();
             }
 

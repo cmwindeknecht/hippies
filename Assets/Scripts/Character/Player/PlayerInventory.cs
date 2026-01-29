@@ -4,12 +4,6 @@ using UnityEngine;
 
 public class PlayerInventory : MonoBehaviour
 {
-    public class OnInventoryUpdate : EventArgs
-    {
-        public bool isPaused;
-    }
-    public event EventHandler<OnInventoryUpdate> OnGamePaused;
-
     // TODO UI / Logic to have a 1-0 means to equip shit
     //      If an attack is in the 1-0 --- changes the attack to that
     //      If an item / healing spell / etc --- automatically uses it
@@ -30,7 +24,7 @@ public class PlayerInventory : MonoBehaviour
 
     public void EquipWeapon(WeaponSO weapon)
     {
-        if (Inventory.TryGetValue(InventoryItemType.Weapon, out List<InventoryItem> items)) {
+        if (Inventory.TryGetValue(InventoryItemType.Weapons, out List<InventoryItem> items)) {
             bool found = false;
             foreach (InventoryItem item in items)
             {

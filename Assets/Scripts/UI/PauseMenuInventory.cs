@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -15,5 +17,77 @@ public class PauseMenuInventory : MonoBehaviour
     [SerializeField] private GameObject _ScrollBar; // Hide if content doesn't exceed shit (get height, get count shown * height of each child, show / dont show)
 
     [Header("Prefabs")]
-    [SerializeField] private GameObject _ConsumablePrefab;
+    [SerializeField] private InventoryItemConsumable _ConsumablePrefab;
+
+    private Player _Player;
+    private InventoryItemType _ActiveItemType = InventoryItemType.Weapons; // On click, update this
+
+    public void Setup(Player player)
+    {
+        _Player = player;
+        RefreshInventory();
+
+        _WeaponsButton.onClick.AddListener(() =>
+        {
+            _ActiveItemType = InventoryItemType.Weapons;
+            RefreshInventory();
+        });
+        _ArmorButton.onClick.AddListener(() =>
+        {
+            _ActiveItemType = InventoryItemType.Armor;
+            RefreshInventory();
+        });
+        _ConsumablesButton.onClick.AddListener(() =>
+        {
+            _ActiveItemType = InventoryItemType.Consumable;
+            RefreshInventory();
+        });
+        _OthersButton.onClick.AddListener(() =>
+        {
+            _ActiveItemType = InventoryItemType.Others;
+            RefreshInventory();
+        });
+        _AllButton.onClick.AddListener(() =>
+        {
+            _ActiveItemType = InventoryItemType.None;
+            RefreshInventory();
+        });
+    }
+
+    private void OnEnable()
+    {
+        RefreshInventory();
+    }
+
+    public void RefreshInventory()
+    {
+        if (_Player == null) return;
+
+        // Clear existing items
+        foreach (Transform child in _ContentRectTransform)
+        {
+            Destroy(child.gameObject);
+        }
+
+        Dictionary<InventoryItemType, List<InventoryItem>> inventory = _Player.Inventory;
+        foreach (KeyValuePair<InventoryItemType, List<InventoryItem>> kvp in inventory)
+        {
+            if (!_ActiveItemType.Equals(InventoryItemType.None) && !kvp.Key.Equals(_ActiveItemType)) continue;
+
+            List<InventoryItem> sortedItems = kvp.Value.OrderBy(p => p.ItemSO.Name).ToList();
+
+            foreach (InventoryItem item in sortedItems)
+            {
+                switch (kvp.Key)
+                {
+                    case InventoryItemType.Consumable:
+                        InventoryItemConsumable consumable = Instantiate(_ConsumablePrefab, _ContentRectTransform);
+                        consumable.Setup(item, _Player);
+                        break;
+                    default:
+                        throw new System.NotImplementedException();
+                }
+            }
+        }
+    }
 }

@@ -2,10 +2,11 @@ using UnityEngine;
 
 public enum InventoryItemType
 {
-    Weapon,
+    None, // No item should ever be assigned this, used in inventory UI
+    Weapons,
     Armor,
     Consumable,
-    Food
+    Others
 }
 
 public class InventoryItem

@@ -13,5 +13,14 @@ MonoBehaviour:
   m_Name: BananaMedallion
   m_EditorClassIdentifier: 
   Name: Banana Medallion
-  Health: 10
-  Magic: 0
+  Description: "Provides the minimum amount of happiness for those that prefer banana. 
+    \n+10 Health over 5 seconds on consumption."
+  Sprite: {fileID: 0}
+  Effects:
+  - {fileID: 11400000, guid: a7c5944967c8fab48aa87caedec02958, type: 2}
+  HealthRestored: 10
+  HealthIterations: 3
+  HealthTotalTime: 5
+  MagicRestored: 0
+  MagicIterations: 1
+  MagicTotalTime: 0
