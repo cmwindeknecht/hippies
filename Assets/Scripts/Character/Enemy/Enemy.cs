@@ -1,8 +1,18 @@
+using System;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UIElements;
 
 public class Enemy : Character
 {
+    public class HealthChangedEventArgs : EventArgs
+    {
+        public int CurrentHealth;
+        public int MaxHealth;
+    }
+    public event EventHandler<HealthChangedEventArgs> OnHealthChanged;
+    public event EventHandler OnDeath;
+
     public CharacterType CharacterType = CharacterType.Enemy;
     private Player _Player;
     private EnemyController _Controller;
@@ -43,14 +53,20 @@ public class Enemy : Character
 
         _Inventory = GetComponent<EnemyInventory>();
         _Inventory.EquipWeapon(EnemySO.WeaponSO);
+
+        EnemyWorldCanvas enemyCanvas = GetComponentInChildren<EnemyWorldCanvas>();
+        enemyCanvas.GetComponent<Canvas>().worldCamera = Camera.main;
+        enemyCanvas.RegisterEnemy(this);
     }
 
     public void TakeDamage(int damage, Vector3? attackDirection = null, float knockbackSpeed = 0)
     {
         _Stats.TakeDamage(damage);
+        OnHealthChanged?.Invoke(this, new HealthChangedEventArgs { CurrentHealth = _Stats.CurrentHealth, MaxHealth = _Stats.MaxHealth });
 
         if (_Stats.CurrentHealth <= 0)
         {
+            OnDeath?.Invoke(null, EventArgs.Empty);
             _Inventory.DropItems();
             Destroy(gameObject);
         }

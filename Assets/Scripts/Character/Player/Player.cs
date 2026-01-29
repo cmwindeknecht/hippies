@@ -14,13 +14,13 @@ public class Player : Character
     public CharacterType CharacterType = CharacterType.Player;
     private PlayerController _Controller;
     private PlayerInventory _Inventory;
-    private CharacterStats _CharacterStats;
+    private CharacterStats _Stats;
 
     private void Awake()
     {
         _Controller = GetComponent<PlayerController>();
         _Inventory = GetComponent<PlayerInventory>();
-        _CharacterStats = GetComponent<CharacterStats>();
+        _Stats = GetComponent<CharacterStats>();
         _Rigidbody2D = GetComponent<Rigidbody2D>();
     }
 
@@ -31,10 +31,10 @@ public class Player : Character
 
     public void TakeDamage(int damage, Vector3? attackDirection = null, float knockbackSpeed = 0)
     {
-        _CharacterStats.TakeDamage(damage);
-        OnHealthChanged?.Invoke(this, new HealthChangedEventArgs { CurrentHealth = _CharacterStats.CurrentHealth, MaxHealth = _CharacterStats.MaxHealth });
+        _Stats.TakeDamage(damage);
+        OnHealthChanged?.Invoke(this, new HealthChangedEventArgs { CurrentHealth = _Stats.CurrentHealth, MaxHealth = _Stats.MaxHealth });
 
-        if (_CharacterStats.CurrentHealth <= 0)
+        if (_Stats.CurrentHealth <= 0)
         {
             OnDeath?.Invoke(null, EventArgs.Empty);
             Destroy(gameObject);
