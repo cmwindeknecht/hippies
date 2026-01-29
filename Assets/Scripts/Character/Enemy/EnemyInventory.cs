@@ -13,12 +13,6 @@ public class EnemyInventory : MonoBehaviour
     // TODO Armor stuff
     [SerializeField] private List<EnemyDropSO> _EnemyDropSOs;
     [SerializeField] private EnemyDrop _EnemyDropPrefab;
-    private Player _Player;
-
-    public void Setup(Player player)
-    {
-        _Player = player;
-    }
 
     public void EquipWeapon(WeaponSO weapon)
     {
@@ -27,8 +21,6 @@ public class EnemyInventory : MonoBehaviour
 
     public void DropItems()
     {
-        if (_Player == null) return;
-
         foreach (EnemyDropSO enemyDropSO in _EnemyDropSOs)
         {
             for (int i = 0; i < enemyDropSO.QuantityToDrop; i++)
@@ -38,7 +30,7 @@ public class EnemyInventory : MonoBehaviour
                     return;
                 }
                 EnemyDrop enemyDrop = Instantiate(_EnemyDropPrefab, transform.position, Quaternion.identity);
-                enemyDrop.DropFromEnemy(_Player, enemyDropSO.ItemSO).Forget();
+                enemyDrop.DropFromEnemy(enemyDropSO.ItemSO).Forget();
             }
         }
     }

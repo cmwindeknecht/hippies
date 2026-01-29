@@ -30,7 +30,7 @@ public class Projectile : MonoBehaviour
         _HitTargets = new();
     }
 
-    // TODO Enemy Initialization
+    // TODO Enemy Initialization (could also be for like homing missle type shit for the player?)
     //   Current iteration just fires a burst where the player WAS
     //   Should have a second version that fires where the player IS but this requires a new EnemyAttackController and all that, thats future shit
     public void Initialize(Vector3 direction, RangedWeaponSO weaponSO, Character projectileOwner, Character target)
