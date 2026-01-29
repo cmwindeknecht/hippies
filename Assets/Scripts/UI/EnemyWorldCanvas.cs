@@ -9,22 +9,25 @@ public class EnemyWorldCanvas : MonoBehaviour
 
     private Enemy _Enemy;
     private Vector3 _Offset;
-    private const float _OffsetOffset = .2f; // How much to offset the offset by so it sits just above the enemy
+    private const float _OffsetOffset = .3f; // How much to offset the offset by so it sits just above the enemy
     private const float _WidthAdjustment = 200f;
 
     void Start()
     {
         SpriteRenderer enemySprite = _Enemy.GetComponent<SpriteRenderer>();
-        float enemyHeight = enemySprite.bounds.size.y;
-        _Offset = new Vector3(0, (enemyHeight / 2f) + _OffsetOffset, 0); // Place at the enemy top + a small offset
 
+        // Place at the enemy top + a small offset
+        float enemyHeight = enemySprite.bounds.size.y;
+        _Offset = new Vector3(0, (enemyHeight / 2f) + _OffsetOffset, 0); 
+
+        // Make it the width of the enemy
         float enemyWidth = enemySprite.bounds.size.x;
         RectTransform rectTransformBackground = _HealthBarBackground.GetComponent<RectTransform>();
         RectTransform rectTransformFill = _HealthBarFill.GetComponent<RectTransform>();
         rectTransformBackground.sizeDelta = new Vector2(enemyWidth * _WidthAdjustment, rectTransformBackground.sizeDelta.y);
         rectTransformFill.sizeDelta = new Vector2(enemyWidth * _WidthAdjustment, rectTransformFill.sizeDelta.y);
 
-        transform.SetParent(null); // Unparent from enemy so it doesn't rotate
+        transform.SetParent(null); // Unparent from enemy so it doesn't rotate with the enemy
     }
 
     void LateUpdate()

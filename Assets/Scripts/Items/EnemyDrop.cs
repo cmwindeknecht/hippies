@@ -40,6 +40,8 @@ public class EnemyDrop : MonoBehaviour
 
     public void Update()
     {
+        if (_Player == null) return;
+
         Vector2 toPlayerDirection = _Player.Position - _Rigidbody2D.position;
         float distanceToPlayer = toPlayerDirection.magnitude;
 
