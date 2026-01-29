@@ -26,6 +26,11 @@ public class Enemy : Character
     public EnemySO EnemySO;
     [SerializeField] GameObject EnemyDropPrefab;
 
+    private void Awake()
+    {
+        _Rigidbody2D = GetComponent<Rigidbody2D>();
+    }
+
     private void Start()
     {
         if (GameManager.Instance.Player != null)

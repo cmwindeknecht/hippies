@@ -6,7 +6,7 @@ using UnityEngine.SceneManagement;
 public class SpawnManager : MonoBehaviour
 {
     public static SpawnManager Instance { get; private set; }
-    [SerializeField] private GameObject _EnemyPrefab;
+    [SerializeField] private List<GameObject> _EnemyPrefabs; // TODO should be stored on the tile or something (especially for shit like popping out of trees)
 
     private Dictionary<int, Enemy> _Enemies;
 
@@ -40,10 +40,11 @@ public class SpawnManager : MonoBehaviour
     public void SpawnEnemiesForScene(Scene scene)
     {
         // TODO have a database and what not for spawning enemies, this is just for testing
-        for (int i = 0; i < 10; i++) {
-            GameObject gameObject = Instantiate(_EnemyPrefab, new Vector3(6.5f, (i*2) +.5f, 0), Quaternion.identity);
-            gameObject.name += "-#" + i;
-            Enemy enemy = gameObject.GetComponent<Enemy>();
+        for (int i = 0; i < 20; i++) {
+            GameObject enemyPrefab = _EnemyPrefabs[Utilities.GetRandomInt(0, _EnemyPrefabs.Count - 1)];
+            GameObject instantiatedPrefab = Instantiate(enemyPrefab, new Vector3(i % 2 == 0 ? 6.5f : 5.5f, (i % 2 == 0 ? i + 1 : i * 2) + .5f, 0), Quaternion.identity);
+            instantiatedPrefab.name += "-#" + i;
+            Enemy enemy = instantiatedPrefab.GetComponent<Enemy>();
             RegisterEnemy(enemy);
         }
     }
@@ -57,7 +58,7 @@ public class SpawnManager : MonoBehaviour
 
         enemy.Setup();
         _Enemies.Add(enemy.GetInstanceID(), enemy);
-        Debug.Log($"Registered Enemy {enemy.name}");
+        //Debug.Log($"Registered Enemy {enemy.name}");
     }
 
     // To be used between biomes

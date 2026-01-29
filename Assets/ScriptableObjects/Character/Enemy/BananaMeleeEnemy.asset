@@ -9,10 +9,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0d4e951d31f67c7449bf26d9f64851c1, type: 3}
-  m_Name: AppleSlices_5
+  m_Script: {fileID: 11500000, guid: 16cbb4be27ac6db40adee46b53150bb0, type: 3}
+  m_Name: BananaMeleeEnemy
   m_EditorClassIdentifier: 
-  ItemSO: {fileID: 11400000, guid: 5cffd8426154c3c45897927ebab3e5fe, type: 2}
-  DropChanceMin: 75
-  DropChanceMax: 100
-  QuantityToDrop: 5
+  Health: 8
+  MovementSpeed: 7
+  WeaponSO: {fileID: 11400000, guid: 9ecb8350c4eed94418065830fea3cc0a, type: 2}
+  AttackRange: 5
+  AttackCooldown: 3
+  BurstCount: 5
+  BurstDelay: 0.25

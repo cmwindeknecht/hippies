@@ -102,7 +102,7 @@ public class EnemyAttackController : MonoBehaviour
 
     private void SpawnProjectile(Vector3 attackDirection, RangedWeaponSO rangedWeaponSO)
     {
-        Vector3 spawnPos = transform.position + attackDirection.normalized * 1.5f; // spawn in front of the player in the direction of the attack
+        Vector3 spawnPos = transform.position + attackDirection.normalized * 1.1f; // spawn in front of the player in the direction of the attack
         Projectile projectile = Instantiate(rangedWeaponSO.ProjectilePrefab, spawnPos, Quaternion.identity);
         projectile.Initialize(attackDirection.normalized, rangedWeaponSO, _Enemy);
     }

@@ -45,13 +45,13 @@ public class Projectile : MonoBehaviour
         _Damage = Random.Range(weaponSO.DamageMin, weaponSO.DamageMax + 1) + Random.Range(_ProjectileSO.DamageMin, _ProjectileSO.DamageMax + 1);
         _Knockback = weaponSO.Knockback + _ProjectileSO.Knockback;
         _AttackDirection = direction.normalized;
-        _IsInitialized = true;
+        
         float angle = Mathf.Atan2(_AttackDirection.y, _AttackDirection.x) * Mathf.Rad2Deg;
         transform.rotation = Quaternion.Euler(0, 0, angle);
-
         // Set velocity instead of moving in FixedUpdate
         _Rigidbody.linearVelocity = _AttackDirection * _ProjectileSO.Speed;
 
+        _IsInitialized = true;
         Destroy(gameObject, _ProjectileSO.Lifetime);
     }
 
@@ -67,8 +67,8 @@ public class Projectile : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        Debug.Log($"Bullet hit {collision.gameObject.name} at position {transform.position}");
-        Debug.Log($"Contact point: {collision.GetContact(0).point}");
+        //Debug.Log($"Bullet hit {collision.gameObject.name} at position {transform.position}");
+        //Debug.Log($"Contact point: {collision.GetContact(0).point}");
 
         // Prevent unintended double taps
         if (!_HitTargets.Add(collision.collider))

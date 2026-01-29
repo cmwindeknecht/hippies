@@ -83,9 +83,9 @@ public class EnemyController : MonoBehaviour
         }
 
         Vector3 playerDirection = (_Player.transform.position - _RigidBodyPosition).normalized;
-        LayerMask playerLayerMask = LayerMask.GetMask("Player", "Collision");
+        LayerMask playerLayerMask = LayerMask.GetMask(Constants.PLAYER_LAYER, Constants.COLLISION_LAYER);
         RaycastHit2D playerHit = Physics2D.Raycast(_RigidBodyPosition, playerDirection, _MaxViewDistance, playerLayerMask);
-        bool canSeePlayer = playerHit && playerHit.collider.CompareTag("Player");
+        bool canSeePlayer = playerHit && (playerHit.collider.CompareTag(Constants.PLAYER_TAG) || playerHit.collider.CompareTag(Constants.SHIELD_TAG));
 
         // Scenario 1: Can see the player, chase them immediately
         if (canSeePlayer)
@@ -220,7 +220,7 @@ public class EnemyController : MonoBehaviour
         Vector2 movement = toTarget.normalized * GetMovementSpeed();
 
         // If enemy is colliding, slide along the surface
-        if (_RigidBody.IsTouchingLayers(LayerMask.GetMask("Collision")))
+        if (_RigidBody.IsTouchingLayers(LayerMask.GetMask(Constants.COLLISION_LAYER)))
         {
             ContactPoint2D[] contacts = new ContactPoint2D[4];
             int count = _RigidBody.GetContacts(contacts);

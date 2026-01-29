@@ -131,7 +131,7 @@ GameObject:
   - component: {fileID: -3107527084736732274}
   - component: {fileID: 6906959403870187813}
   m_Layer: 8
-  m_Name: TestEnemy
+  m_Name: AppleRangedEnemy
   m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -199,7 +199,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 1
   m_Sprite: {fileID: 7482667652216324306, guid: 48e93eef0688c4a259cb0eddcd8661f7, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.7735849, g: 0.21529014, b: 0.21529014, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -308,7 +308,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   CharacterType: 0
   EnemySO: {fileID: 11400000, guid: acaccc367f26322488527e420e433a99, type: 2}
-  EnemyDropPrefab: {fileID: 0}
+  EnemyDropPrefab: {fileID: 5839978663435734513, guid: 6727da941a5f92a48a611466e7d88e0c, type: 3}
 --- !u!114 &5282944137083453773
 MonoBehaviour:
   m_ObjectHideFlags: 0

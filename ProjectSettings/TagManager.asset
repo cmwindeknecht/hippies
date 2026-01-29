@@ -7,6 +7,7 @@ TagManager:
   - Collision
   - NPC
   - Enemy
+  - Shield
   layers:
   - Default
   - TransparentFX

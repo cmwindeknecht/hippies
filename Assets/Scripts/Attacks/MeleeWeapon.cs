@@ -4,7 +4,7 @@ public class MeleeWeapon : Weapon
 {
     public override bool Attack()
     {
-        Debug.Log($"Melee Attack() Called - CanAttack ={CanAttack}");
+        //Debug.Log($"Melee Attack() Called - CanAttack ={CanAttack}");
         if (!CanAttack) return false;
         CanAttack = false;
 

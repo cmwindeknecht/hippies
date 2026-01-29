@@ -30,7 +30,7 @@ public class EnemyWorldCanvas : MonoBehaviour
 
     private void UpdateWidth(Image component, float enemyWidth)
     {
-        RectTransform rectTransform = _HealthBarFill.GetComponent<RectTransform>();
+        RectTransform rectTransform = component.GetComponent<RectTransform>();
         rectTransform.sizeDelta = new Vector2(enemyWidth * _WidthAdjustment, rectTransform.sizeDelta.y);
     }
 
