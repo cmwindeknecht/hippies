@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
@@ -13,9 +14,18 @@ public class GameManager : MonoBehaviour
     }
     public event EventHandler<OnPlayerRegisteredEventArgs> OnPlayerRegistered;
 
+    public class OnGamePausedEventArgs : EventArgs
+    {
+        public bool isPaused;
+    }
+    public event EventHandler<OnGamePausedEventArgs> OnGamePaused;
+
     private Player _Player;
     public Player Player => _Player;
-    
+
+    private InputAction _PauseInputAction;
+    private bool _IsPaused;
+
     public void Awake()
     {
         if (Instance != null && Instance != this)
@@ -26,6 +36,24 @@ public class GameManager : MonoBehaviour
 
         Instance = this;
         DontDestroyOnLoad(gameObject);
+
+        _PauseInputAction = InputSystem.actions.FindAction("Pause");
+    }
+
+    private void Update()
+    {
+        if (_PauseInputAction.triggered)
+        {
+            _IsPaused = !_IsPaused;
+        }
+        
+        HandleIsPaused();
+    }
+
+    private void HandleIsPaused()
+    {
+        Time.timeScale = _IsPaused ? 0.0f : 1.0f;
+        OnGamePaused?.Invoke(null, new OnGamePausedEventArgs { isPaused = _IsPaused });
     }
 
     public void RegisterPlayer(Player player)

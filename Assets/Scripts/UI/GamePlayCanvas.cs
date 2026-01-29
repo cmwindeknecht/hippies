@@ -1,55 +1,26 @@
 using UnityEngine;
-using UnityEngine.UI;
 
 public class GamePlayCanvas : MonoBehaviour
 {
     [SerializeField] private GameObject _HUD;
-    [SerializeField] private Image _HealthBarFill;
-
     [SerializeField] private GameObject _PauseMenu;
-
-    private Player _Player;
 
     private void Start()
     {
-        if (GameManager.Instance.Player != null)
+        GameManager.Instance.OnGamePaused += Instance_OnGamePaused;
+    }
+
+    private void Instance_OnGamePaused(object sender, GameManager.OnGamePausedEventArgs e)
+    {
+        if (e.isPaused)
         {
-            TrackPlayer(GameManager.Instance.Player);
+            _HUD.SetActive(false);
+            _PauseMenu.SetActive(true);
         }
         else
         {
-            GameManager.Instance.OnPlayerRegistered += GameManager_OnPlayerRegistered;
+            _HUD.SetActive(true);
+            _PauseMenu.SetActive(false);
         }
-    }
-
-    private void GameManager_OnPlayerRegistered(object sender, GameManager.OnPlayerRegisteredEventArgs e)
-    {
-        if (_Player == null)
-        {
-            TrackPlayer(e.player);
-        }
-    }
-
-    private void TrackPlayer(Player player)
-    {
-        _Player = player;
-        _Player.OnHealthChanged += Player_OnHealthChanged;
-        _Player.OnDeath += Player_OnDeath;
-        _Player.TakeDamage(0); // TODO hacky way to have a current health bar
-    }
-
-    private void Player_OnDeath(object sender, System.EventArgs e)
-    {
-        // TODO show death animation, respawn at the business or whatever makes sense
-    }
-
-    private void Player_OnHealthChanged(object sender, Player.HealthChangedEventArgs e)
-    {
-        UpdateHealth(e.CurrentHealth, e.MaxHealth);
-    }
-
-    void UpdateHealth(int currentHealth, int maxHealth)
-    {
-        _HealthBarFill.fillAmount = (float) currentHealth / maxHealth;
     }
 }

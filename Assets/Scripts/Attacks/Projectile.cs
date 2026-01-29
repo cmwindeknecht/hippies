@@ -89,7 +89,7 @@ public class Projectile : MonoBehaviour
         {
             if (collision.collider.TryGetComponent<Player>(out Player player))
             {
-                Debug.Log($"Projectile hit player for damage {_Damage} and knockback {_Knockback}");
+                //Debug.Log($"Projectile hit player for damage {_Damage} and knockback {_Knockback}");
                 player.TakeDamage(_Damage, _Knockback > 0 ? _AttackDirection : null, _Knockback);
             }
         }

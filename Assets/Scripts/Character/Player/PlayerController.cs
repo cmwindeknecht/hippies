@@ -30,8 +30,6 @@ public class PlayerController : MonoBehaviour
         _AttackInputAction = InputSystem.actions.FindAction("Attack");
     }
 
-
-
     void Update()
     {
         _MoveValue = _MoveInputAction.ReadValue<Vector2>();
