@@ -13,6 +13,6 @@ MonoBehaviour:
   m_Name: AppleSlices_5
   m_EditorClassIdentifier: 
   ItemSO: {fileID: 11400000, guid: 5cffd8426154c3c45897927ebab3e5fe, type: 2}
-  DropChanceMin: 0
-  DropChanceMax: 1
-  QuantityToDrop: 1
+  DropChanceMin: 100
+  DropChanceMax: 100
+  QuantityToDrop: 5

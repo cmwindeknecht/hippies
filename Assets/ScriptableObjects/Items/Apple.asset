@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 91f83115f0d718c40804472d1a35a1b9, type: 3}
   m_Name: Apple
   m_EditorClassIdentifier: 
-  Name: 
-  Health: 0
+  Name: Apple
+  Health: 10
   Magic: 0

@@ -3,7 +3,10 @@ using UnityEngine.UI;
 
 public class GamePlayCanvas : MonoBehaviour
 {
+    [SerializeField] private GameObject _HUD;
     [SerializeField] private Image _HealthBarFill;
+
+    [SerializeField] private GameObject _PauseMenu;
 
     private Player _Player;
 
