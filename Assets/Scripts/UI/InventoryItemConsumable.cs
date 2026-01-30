@@ -1,3 +1,4 @@
+using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -10,7 +11,7 @@ public class InventoryItemConsumable : MonoBehaviour
     [SerializeField] private TextMeshProUGUI _Description;
     [SerializeField] private Button _UseButton;
 
-    public void Setup(InventoryItem item, Player player)
+    public void Setup(InventoryItem item, Player player, Action refreshInventory)
     {
         _Icon.sprite = item.ItemSO.Sprite;
         _Name.text = item.ItemSO.Name;
@@ -26,6 +27,7 @@ public class InventoryItemConsumable : MonoBehaviour
                     {
                         effect.Use(player, item);
                         item.DecreaseQuantity();
+                        refreshInventory();
                     }
                     catch (HealthAlreadyAtMaxException exception)
                     {

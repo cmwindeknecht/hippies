@@ -82,7 +82,7 @@ public class PauseMenuInventory : MonoBehaviour
                 {
                     case InventoryItemType.Consumable:
                         InventoryItemConsumable consumable = Instantiate(_ConsumablePrefab, _ContentRectTransform);
-                        consumable.Setup(item, _Player);
+                        consumable.Setup(item, _Player, RefreshInventory);
                         break;
                     default:
                         throw new System.NotImplementedException();
