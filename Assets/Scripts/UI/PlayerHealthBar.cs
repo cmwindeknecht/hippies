@@ -2,6 +2,8 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
+// TODO worst case, should just have "PlayerFillBar" to be used with stamina/health/mana --- best case its just a fill bar that works for both enemy and player but thats way trickier
+// TODO figure out non filled image version so it doesn't look like shit and all distorted
 public class PlayerHealthBar : MonoBehaviour
 {
     private Player _Player;

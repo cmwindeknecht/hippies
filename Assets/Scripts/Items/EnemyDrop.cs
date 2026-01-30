@@ -12,7 +12,6 @@ public class EnemyDrop : MonoBehaviour
     [SerializeField] private float _FlyForceFromEnemy;
     [SerializeField] private float _FlyForceToPlayer;
     [SerializeField] private float _DistanceToPlayerPickup;
-    private bool _CanFlyAtPlayer = false;
     private bool _IsFlyingAtPlayer = false;
 
     private const float _ApexScale = .5f;
@@ -43,7 +42,6 @@ public class EnemyDrop : MonoBehaviour
     public void Update()
     {
         if (_Player == null) return;
-        if (!_CanFlyAtPlayer) return;
 
         Vector2 toPlayerDirection = _Player.Position - _Rigidbody2D.position;
         float distanceToPlayer = toPlayerDirection.magnitude;
@@ -82,7 +80,6 @@ public class EnemyDrop : MonoBehaviour
         float elapsed = 0f;
         Vector3 startScale = transform.localScale;
 
-        _CanFlyAtPlayer = false;
         while (elapsed < duration)
         {
             elapsed += Time.deltaTime;
@@ -94,7 +91,6 @@ public class EnemyDrop : MonoBehaviour
 
             await UniTask.Yield(cancelDropToken);
         }
-        _CanFlyAtPlayer = true;
 
         transform.localScale = startScale;
     }

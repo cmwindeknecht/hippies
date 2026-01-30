@@ -17,6 +17,8 @@ public class Enemy : Character
     public EnemySO EnemySO;
     [SerializeField] GameObject EnemyDropPrefab;
 
+    private float _OnDamageYellRadius = 3f;
+
     private void Awake()
     {
         _Rigidbody2D = GetComponent<Rigidbody2D>();
@@ -60,6 +62,13 @@ public class Enemy : Character
         _Stats.TakeDamage(damage);
         SendHealthChangeEvent();
 
+        // TODO due to the hack for the UI
+        if (_Stats.CurrentHealth < _Stats.MaxHealth)
+        {
+            NotifyNearbyEnemies();
+            _Controller.NotifiedToChasePlayer().Forget(); // Notify self to chase enemy
+        }
+
         if (_Stats.CurrentHealth <= 0)
         {
             SendOnDeathEvent();
@@ -70,5 +79,25 @@ public class Enemy : Character
         if (attackDirection != null) {
             _Controller.Knockback(attackDirection.Value, knockbackSpeed);
         }
+    }
+
+    private void NotifyNearbyEnemies()
+    {
+        LayerMask enemyLayerMask = LayerMask.GetMask(Constants.ENEMY_LAYER);
+        Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, _OnDamageYellRadius, enemyLayerMask);
+
+        foreach (Collider2D hit in hits)
+        {
+            if (hit.TryGetComponent<EnemyController>(out EnemyController enemy))
+            {
+                enemy.NotifiedToChasePlayer().Forget();
+            }
+        }
+    }
+
+    void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireSphere(transform.position, _OnDamageYellRadius);
     }
 }

@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 91f83115f0d718c40804472d1a35a1b9, type: 3}
   m_Name: BananaMedallion
   m_EditorClassIdentifier: 
+  Type: 3
   Name: Banana Medallion
   Description: "Provides the minimum amount of happiness for those that prefer banana. 
     \n+10 Health over 5 seconds on consumption."

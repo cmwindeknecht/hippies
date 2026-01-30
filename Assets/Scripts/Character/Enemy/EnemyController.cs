@@ -1,6 +1,7 @@
 using Cysharp.Threading.Tasks;
 using NUnit.Framework;
 using System.Collections.Generic;
+using System.Threading;
 using UnityEngine;
 
 public class EnemyController : MonoBehaviour
@@ -13,6 +14,9 @@ public class EnemyController : MonoBehaviour
 
     private Vector3 _SpawnPosition = Vector3.zero;
     private bool _ShouldChasePlayer = false;
+
+    private bool _NotifiedChaseOverride = false;
+    private const float _NotifiedChaseTime = 10f;
     
     // TODO EnemySO shit
     private float _BaseSpeed = 3f;
@@ -23,8 +27,11 @@ public class EnemyController : MonoBehaviour
 
     // Pathfinding Shit
     private List<Vector3> _CurrentPath;
-    private int _CurrentPathIndex;
     private bool _IsFollowingPath;
+
+    private int _CurrentPathIndex;
+    private float _LastPathIndexTime;
+    private const float _MaxStallTime = 3f;
 
     public void Setup(EnemySO enemySO)
     {
@@ -55,7 +62,7 @@ public class EnemyController : MonoBehaviour
         _Player = e.player;
     }
 
-    private void Update()
+    private void FixedUpdate()
     {
         if (_Player == null)
         {
@@ -75,12 +82,21 @@ public class EnemyController : MonoBehaviour
         _Knockback = direction * speed;
     }
 
+    public async UniTaskVoid NotifiedToChasePlayer()
+    {
+        _NotifiedChaseOverride = true;
+        float currentTime = 0f;
+        while (currentTime < _NotifiedChaseTime)
+        {
+            currentTime += Time.deltaTime;
+            await UniTask.Yield(this.GetCancellationTokenOnDestroy());
+        }
+        _NotifiedChaseOverride = false;
+    }
+
     private void SimpleChasePlayer()
     {
-        if (_Player == null)
-        {
-            return;
-        }
+        if (_Player == null) return;
 
         Vector3 playerDirection = (_Player.transform.position - _RigidBodyPosition).normalized;
         LayerMask playerLayerMask = LayerMask.GetMask(Constants.PLAYER_LAYER, Constants.COLLISION_LAYER);
@@ -93,10 +109,10 @@ public class EnemyController : MonoBehaviour
             _ShouldChasePlayer = true;
             GoToPlayer();
         }
-        else if (_ShouldChasePlayer)
+        else if (ShouldChasePlayer())
         {
             // Scenario 3: Saw the player, no longer sees and is too far away to chase, pathfind back to spawn position
-            if (Utilities.GetDistanceBetween(_Player.transform.position, _RigidBodyPosition) > _OutOfSightChaseDistance)
+            if (Utilities.GetDistanceBetween(_Player.transform.position, _RigidBodyPosition) > _OutOfSightChaseDistance && !_NotifiedChaseOverride)
             {
                 _ShouldChasePlayer = false;
                 FollowPath(_SpawnPosition);
@@ -185,6 +201,7 @@ public class EnemyController : MonoBehaviour
                 throw new System.Exception($"SETTING _IsFollowingPath FALSE --- NO PATH --- Current Position {_RigidBodyPosition} Final Target Position {finalTarget}");
             }
 
+            _LastPathIndexTime = Time.fixedDeltaTime;
             _CurrentPathIndex = 1;
             _IsFollowingPath = true;
 
@@ -194,7 +211,15 @@ public class EnemyController : MonoBehaviour
             //}
         }
 
+        // Stopgap to ensure the path didn't change and path index didn't get reset
         if (_CurrentPathIndex >= _CurrentPath.Count)
+        {
+            StopMovement();
+            return;
+        }
+
+        // In case they get stuck, figure out a new path
+        if (Time.fixedDeltaTime - _LastPathIndexTime > _MaxStallTime)
         {
             StopMovement();
             return;
@@ -205,6 +230,7 @@ public class EnemyController : MonoBehaviour
 
         if (Utilities.IsSameVectorPosition(_CurrentPath[_CurrentPathIndex], _RigidBodyPosition))
         {
+            _LastPathIndexTime = Time.fixedDeltaTime;
             _CurrentPathIndex++;
 
             if (_CurrentPathIndex >= _CurrentPath.Count)
@@ -262,7 +288,7 @@ public class EnemyController : MonoBehaviour
     private float GetMovementSpeed()
     {
         // TODO use input to determine walk/sprint/sneak/etc
-        if (_ShouldChasePlayer)
+        if (ShouldChasePlayer())
         {
             return _BaseSpeed;
         }
@@ -270,5 +296,10 @@ public class EnemyController : MonoBehaviour
         {
             return _BaseSpeed * .5f;
         }
+    }
+
+    private bool ShouldChasePlayer()
+    {
+        return _ShouldChasePlayer || _NotifiedChaseOverride;
     }
 }
