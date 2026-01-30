@@ -5,18 +5,9 @@ using UnityEngine.UIElements;
 
 public class Enemy : Character
 {
-    public class HealthChangedEventArgs : EventArgs
-    {
-        public int CurrentHealth;
-        public int MaxHealth;
-    }
-    public event EventHandler<HealthChangedEventArgs> OnHealthChanged;
-    public event EventHandler OnDeath;
-
     public CharacterType CharacterType = CharacterType.Enemy;
     private Player _Player;
     private EnemyController _Controller;
-    private CharacterStats _Stats;
     private EnemyInventory _Inventory;
     // TODO TEMP --- should be passed in during a setup function or something; basic plan
     //      1. Enemy Prefab
@@ -64,14 +55,14 @@ public class Enemy : Character
         enemyCanvas.RegisterEnemy(this);
     }
 
-    public void TakeDamage(int damage, Vector3? attackDirection = null, float knockbackSpeed = 0)
+    public override void TakeDamage(int damage, Vector3? attackDirection = null, float knockbackSpeed = 0)
     {
         _Stats.TakeDamage(damage);
-        OnHealthChanged?.Invoke(this, new HealthChangedEventArgs { CurrentHealth = _Stats.CurrentHealth, MaxHealth = _Stats.MaxHealth });
+        SendHealthChangeEvent();
 
         if (_Stats.CurrentHealth <= 0)
         {
-            OnDeath?.Invoke(null, EventArgs.Empty);
+            SendOnDeathEvent();
             _Inventory.DropItems();
             Destroy(gameObject);
         }

@@ -33,6 +33,6 @@ public class CharacterStats : MonoBehaviour
 
     public void RestoreHealth(int health)
     {
-        _CurrentHealth = Mathf.Max(_CurrentHealth + health, _MaxHealth);
+        _CurrentHealth = Mathf.Min(_CurrentHealth + health, _MaxHealth);
     }
 }

@@ -1,24 +1,16 @@
 using Cysharp.Threading.Tasks;
-using System;
 using System.Collections.Generic;
 using System.Threading;
 using UnityEngine;
 
 public class Player : Character
 {
-    public class HealthChangedEventArgs : EventArgs
-    {
-        public int CurrentHealth;
-        public int MaxHealth;
-    }
-    public event EventHandler<HealthChangedEventArgs> OnHealthChanged;
-    public event EventHandler OnDeath;
-
     public CharacterType CharacterType = CharacterType.Player;
     private PlayerController _Controller;
     private PlayerInventory _Inventory;
     public Dictionary<InventoryItemType, List<InventoryItem>> Inventory => _Inventory.Inventory;
-    private CharacterStats _Stats;
+
+    private int _OverTimeHealth;
 
     private void Awake()
     {
@@ -42,24 +34,26 @@ public class Player : Character
 
         if (iterations > 1)
         {
-            RestoreHealthOverTime(50, 10, 5f, this.GetCancellationTokenOnDestroy()).Forget();
+            _OverTimeHealth = health;
+            SendHealthChangeEvent(Mathf.Min(_Stats.CurrentHealth + _OverTimeHealth, _Stats.MaxHealth));
+            RestoreHealthOverTime(health, iterations, time, this.GetCancellationTokenOnDestroy()).Forget();
         }
         else
         {
             _Stats.RestoreHealth(health);
-            OnHealthChanged?.Invoke(this, new HealthChangedEventArgs { CurrentHealth = _Stats.CurrentHealth, MaxHealth = _Stats.MaxHealth });
+            SendHealthChangeEvent();
         }
     }
 
-    public async UniTaskVoid RestoreHealthOverTime(int totalHealth, int iterations, float totalTime, CancellationToken cancellationToken)
+    public async UniTaskVoid RestoreHealthOverTime(int health, int iterations, float totalTime, CancellationToken cancellationToken)
     {
         if (_Stats.CurrentHealth >= _Stats.MaxHealth)
         {
             throw new HealthAlreadyAtMaxException();
         }
 
-        int healthPerTick = totalHealth / iterations;
-        int remainder = totalHealth % iterations;
+        int healthPerTick = health / iterations;
+        int remainder = health % iterations;
         float delayBetweenTicks = totalTime / iterations;
 
         for (int i = 0; i < iterations; i++)
@@ -69,24 +63,26 @@ public class Player : Character
             // Check if still alive/valid
             if (this == null) return;
 
+            _OverTimeHealth -= healthPerTick + (i < remainder ? 1 : 0);
             _Stats.RestoreHealth(healthPerTick + (i < remainder ? 1 : 0));
-            OnHealthChanged?.Invoke(this, new HealthChangedEventArgs { CurrentHealth = _Stats.CurrentHealth, MaxHealth = _Stats.MaxHealth });
+            SendHealthChangeEvent(Mathf.Min(_Stats.CurrentHealth + _OverTimeHealth, _Stats.MaxHealth));
 
             if (_Stats.CurrentHealth >= _Stats.MaxHealth)
             {
+                _OverTimeHealth = 0;
                 break;
             }
         }
     }
 
-    public void TakeDamage(int damage, Vector3? attackDirection = null, float knockbackSpeed = 0)
+    public override void TakeDamage(int damage, Vector3? attackDirection = null, float knockbackSpeed = 0)
     {
         _Stats.TakeDamage(damage);
-        OnHealthChanged?.Invoke(this, new HealthChangedEventArgs { CurrentHealth = _Stats.CurrentHealth, MaxHealth = _Stats.MaxHealth });
+        SendHealthChangeEvent();
 
         if (_Stats.CurrentHealth <= 0)
         {
-            OnDeath?.Invoke(null, EventArgs.Empty);
+            SendOnDeathEvent();
             Destroy(gameObject);
         }
 
