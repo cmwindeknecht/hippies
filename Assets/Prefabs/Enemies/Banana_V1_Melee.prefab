@@ -64,6 +64,18 @@ PrefabInstance:
       propertyPath: m_Name
       value: Banana_V1_Melee
       objectReference: {fileID: 0}
+    - target: {fileID: 1729789964244634996, guid: 5aedf06e2bbcdd7469d47c3b3532a7b2, type: 3}
+      propertyPath: m_Color.b
+      value: 0.009077947
+      objectReference: {fileID: 0}
+    - target: {fileID: 1729789964244634996, guid: 5aedf06e2bbcdd7469d47c3b3532a7b2, type: 3}
+      propertyPath: m_Color.g
+      value: 0.6415094
+      objectReference: {fileID: 0}
+    - target: {fileID: 1729789964244634996, guid: 5aedf06e2bbcdd7469d47c3b3532a7b2, type: 3}
+      propertyPath: m_Color.r
+      value: 0.6369903
+      objectReference: {fileID: 0}
     - target: {fileID: 1955508991597522835, guid: 5aedf06e2bbcdd7469d47c3b3532a7b2, type: 3}
       propertyPath: EnemySO
       value: 
