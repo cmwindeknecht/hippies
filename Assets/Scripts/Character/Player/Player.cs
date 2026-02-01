@@ -8,6 +8,7 @@ public class Player : Character
     public CharacterType CharacterType = CharacterType.Player;
     private PlayerController _Controller;
     private PlayerInventory _Inventory;
+    private PlayerVisual _PlayerVisual;
     public Dictionary<InventoryItemType, List<InventoryItem>> Inventory => _Inventory.Inventory;
 
     private int _OverTimeHealth;
@@ -18,6 +19,9 @@ public class Player : Character
         _Inventory = GetComponent<PlayerInventory>();
         _Stats = GetComponent<CharacterStats>();
         _Rigidbody2D = GetComponent<Rigidbody2D>();
+        
+        _PlayerVisual = GetComponentInChildren<PlayerVisual>();
+        _PlayerVisual.Setup(_Controller);
     }
 
     private void Start()
