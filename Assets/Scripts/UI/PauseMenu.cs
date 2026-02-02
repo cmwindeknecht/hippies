@@ -6,9 +6,9 @@ public class PauseMenu : MonoBehaviour
     [Header("Menu Select Buttons")]
     [SerializeField] private Button _CharacterButton;
     [SerializeField] private Button _SkillsButton;
-    [SerializeField] private Button _CharacterInventoryButton;
-    [SerializeField] private Button _BusinessInventoryButton;
-    [SerializeField] private Button _CompoendiumButton;
+    [SerializeField] private Button _InventoryButton;
+    [SerializeField] private Button _BusinessButton;
+    [SerializeField] private Button _CompendiumButton;
     [SerializeField] private Button _OptionsButton;
 
     [Header("Subsections")]
@@ -19,7 +19,43 @@ public class PauseMenu : MonoBehaviour
     [SerializeField] private PauseMenuCompendium _Compendium;
     [SerializeField] private PauseMenuOptions _Options;
 
+    // TODO hook up these fuckin buttons first
+
     private Player _Player;
+
+    private void Awake()
+    {
+        _CharacterButton.onClick.AddListener(() =>
+        {
+            DisableAll();
+            _Character.gameObject.SetActive(true);
+        });
+        _SkillsButton.onClick.AddListener(() =>
+        {
+            DisableAll();
+            _Skills.gameObject.SetActive(true);
+        });
+        _InventoryButton.onClick.AddListener(() =>
+        {
+            DisableAll();
+            _Inventory.gameObject.SetActive(true);
+        });
+        _BusinessButton.onClick.AddListener(() =>
+        {
+            DisableAll();
+            _Business.gameObject.SetActive(true);
+        });
+        _CompendiumButton.onClick.AddListener(() =>
+        {
+            DisableAll();
+            _Compendium.gameObject.SetActive(true);
+        });
+        _OptionsButton.onClick.AddListener(() =>
+        {
+            DisableAll();
+            _Options.gameObject.SetActive(true);
+        });
+    }
 
     private void Start()
     {
@@ -48,5 +84,15 @@ public class PauseMenu : MonoBehaviour
         _Character.Setup(player);
         _Skills.Setup(player);
         _Inventory.Setup(player);
+    }
+
+    private void DisableAll()
+    {
+        _Character.gameObject.SetActive(false);
+        _Skills.gameObject.SetActive(false);
+        _Inventory.gameObject.SetActive(false);
+        _Business.gameObject.SetActive(false);
+        _Compendium.gameObject.SetActive(false);
+        _Options.gameObject.SetActive(false);
     }
 }
