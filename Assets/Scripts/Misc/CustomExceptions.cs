@@ -5,7 +5,7 @@ public class DynamicStatAlreadyAtMaxException : Exception
     public DynamicStatAlreadyAtMaxException() : base() { }
 }
 
-public class DynamicStaDepletedException : Exception
+public class DynamicStatDepletedException : Exception
 {
-    public DynamicStaDepletedException() : base() { }
+    public DynamicStatDepletedException() : base() { }
 }

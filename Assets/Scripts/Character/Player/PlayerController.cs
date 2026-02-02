@@ -38,8 +38,15 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
+        var kb = Keyboard.current;
+        if (kb != null)
+        {
+            Debug.Log($"Up:{kb.upArrowKey.isPressed} Left:{kb.leftArrowKey.isPressed} S:{kb.sKey.isPressed} A:{kb.aKey.isPressed}");
+        }
+
         _MoveValue = _MoveInputAction.ReadValue<Vector2>();
         _AttackValue = _AttackInputAction.ReadValue<Vector2>();
+        Debug.Log($"Raw Move: {_MoveValue}, Raw Attack: {_AttackValue}, S key: {Keyboard.current.sKey.isPressed}");
 
         UpdateFacingDirection();
     }
@@ -118,7 +125,7 @@ public class PlayerController : MonoBehaviour
             // Player Mass already in this calculation
             // TODO armor/inventory/etc relative to strength should modify player mass
 
-            _LinearVelocity += _MoveValue * GetMovementSpeed();
+            _LinearVelocity = _MoveValue * GetMovementSpeed();
         }
     }
 
@@ -144,6 +151,8 @@ public class PlayerController : MonoBehaviour
 
     private void MovePlayer()
     {
+        Debug.Log($"Moving: velocity={_LinearVelocity}, moveValue={_MoveValue}, knockback={_Knockback}");
+
         _RigidBody.linearVelocity = _LinearVelocity;
     }
 }

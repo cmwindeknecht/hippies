@@ -15,48 +15,61 @@ public class PauseMenuInventory : MonoBehaviour
     [Header("Content")]
     [SerializeField] private RectTransform _ContentRectTransform;
     [SerializeField] private GameObject _ScrollBar; // Hide if content doesn't exceed shit (get height, get count shown * height of each child, show / dont show)
+    [SerializeField] private GameObject _DynamicStats;
 
     [Header("Prefabs")]
     [SerializeField] private InventoryItemConsumable _ConsumablePrefab;
 
     private Player _Player;
     private InventoryItemType _ActiveItemType = InventoryItemType.None; // On click, update this
+    private Button _LastClicked;
 
     public void Setup(Player player)
     {
         _Player = player;
-        RefreshInventory();
+        _LastClicked = _AllButton;
+        _LastClicked.onClick.Invoke();
 
         _WeaponsButton.onClick.AddListener(() =>
         {
             _ActiveItemType = InventoryItemType.Weapons;
             RefreshInventory();
+            _DynamicStats.SetActive(false);
+            _LastClicked = _WeaponsButton;
         });
         _ArmorButton.onClick.AddListener(() =>
         {
             _ActiveItemType = InventoryItemType.Armor;
             RefreshInventory();
+            _DynamicStats.SetActive(false);
+            _LastClicked = _ArmorButton;
         });
         _ConsumablesButton.onClick.AddListener(() =>
         {
             _ActiveItemType = InventoryItemType.Consumable;
             RefreshInventory();
+            _DynamicStats.SetActive(true);
+            _LastClicked = _ConsumablesButton;
         });
         _OthersButton.onClick.AddListener(() =>
         {
             _ActiveItemType = InventoryItemType.Others;
             RefreshInventory();
+            _DynamicStats.SetActive(false);
+            _LastClicked = _OthersButton;
         });
         _AllButton.onClick.AddListener(() =>
         {
             _ActiveItemType = InventoryItemType.None;
             RefreshInventory();
+            _DynamicStats.SetActive(true);
+            _LastClicked = _AllButton;
         });
     }
 
     private void OnEnable()
     {
-        RefreshInventory();
+        _LastClicked.onClick.Invoke();
     }
 
     public void RefreshInventory()

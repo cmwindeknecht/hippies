@@ -57,29 +57,10 @@ public class Enemy : Character
         enemyCanvas.RegisterEnemy(this);
     }
 
-    public override void TakeDamage(int damage, Vector3? attackDirection = null, float knockbackSpeed = 0)
+    void OnDrawGizmosSelected()
     {
-        // TODO need to hook this up properly
-        _Stats.TakeDamage(damage);
-        SendHealthChangeEvent();
-
-        // TODO due to the hack for the UI
-        if (_Stats.Health.Current < _Stats.Health.Max)
-        {
-            NotifyNearbyEnemies();
-            _Controller.NotifiedToChasePlayer().Forget(); // Notify self to chase enemy
-        }
-
-        if (_Stats.Health.Current <= 0)
-        {
-            SendOnDeathEvent();
-            _Inventory.DropItems();
-            Destroy(gameObject);
-        }
-
-        if (attackDirection != null) {
-            _Controller.Knockback(attackDirection.Value, knockbackSpeed);
-        }
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireSphere(transform.position, _OnDamageYellRadius);
     }
 
     private void NotifyNearbyEnemies()
@@ -96,9 +77,39 @@ public class Enemy : Character
         }
     }
 
-    void OnDrawGizmosSelected()
+    public override void TakeDamage(int damage, Vector3? attackDirection = null, float knockbackSpeed = 0)
     {
-        Gizmos.color = Color.yellow;
-        Gizmos.DrawWireSphere(transform.position, _OnDamageYellRadius);
+        // TODO need to hook this up properly
+        _Stats.TakeDamage(damage);
+        SendHealthChangeEvent();
+
+        // TODO due to the hack for the UI
+        if (_Stats.Health.Current < _Stats.Health.Max)
+        {
+            NotifyNearbyEnemies();
+            _Controller.NotifiedToChasePlayer().Forget(); // Notify self to chase enemy
+        }
+
+        if (_Stats.Health.Current <= 0)
+        {
+            SendDeathEvent();
+            _Inventory.DropItems();
+            Destroy(gameObject);
+        }
+
+        if (attackDirection != null)
+        {
+            _Controller.Knockback(attackDirection.Value, knockbackSpeed);
+        }
+    }
+
+    public override void SpendEnergy(int energy)
+    {
+        throw new NotImplementedException();
+    }
+
+    public override void SpendMagic(int magic)
+    {
+        throw new NotImplementedException();
     }
 }

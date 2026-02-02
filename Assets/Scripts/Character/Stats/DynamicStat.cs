@@ -43,7 +43,7 @@ public class DynamicStat
 
         if (_Current.Equals(_Min))
         {
-            throw new DynamicStaDepletedException();
+            throw new DynamicStatDepletedException();
         }
     }
 }

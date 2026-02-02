@@ -19,42 +19,59 @@ public class PauseMenu : MonoBehaviour
     [SerializeField] private PauseMenuCompendium _Compendium;
     [SerializeField] private PauseMenuOptions _Options;
 
+    private Button _LastClicked;
+
     // TODO hook up these fuckin buttons first
 
     private Player _Player;
 
     private void Awake()
     {
+        DisableAll();
+        _LastClicked = _CharacterButton;
+        _LastClicked.onClick.Invoke();
+
         _CharacterButton.onClick.AddListener(() =>
         {
             DisableAll();
             _Character.gameObject.SetActive(true);
+            _LastClicked = _CharacterButton;
         });
         _SkillsButton.onClick.AddListener(() =>
         {
             DisableAll();
             _Skills.gameObject.SetActive(true);
+            _LastClicked = _SkillsButton;
         });
         _InventoryButton.onClick.AddListener(() =>
         {
             DisableAll();
             _Inventory.gameObject.SetActive(true);
+            _LastClicked = _InventoryButton;
         });
         _BusinessButton.onClick.AddListener(() =>
         {
             DisableAll();
             _Business.gameObject.SetActive(true);
+            _LastClicked = _BusinessButton;
         });
         _CompendiumButton.onClick.AddListener(() =>
         {
             DisableAll();
             _Compendium.gameObject.SetActive(true);
+            _LastClicked = _CompendiumButton;
         });
         _OptionsButton.onClick.AddListener(() =>
         {
             DisableAll();
             _Options.gameObject.SetActive(true);
+            _LastClicked = _OptionsButton;
         });
+    }
+
+    private void OnEnable()
+    {
+        _LastClicked.onClick.Invoke();
     }
 
     private void Start()

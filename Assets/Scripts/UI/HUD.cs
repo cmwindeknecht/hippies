@@ -3,5 +3,7 @@ using UnityEngine.UI;
 
 public class HUD : MonoBehaviour
 {
-    [SerializeField] private PlayerHealthBar _HealthBar;
+    [SerializeField] private BarFill _HealthBar;
+    [SerializeField] private BarFill _EnergyBar;
+    [SerializeField] private BarFill _MagicBar;
 }

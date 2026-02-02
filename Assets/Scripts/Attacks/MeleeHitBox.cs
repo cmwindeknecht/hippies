@@ -32,6 +32,26 @@ public class MeleeHitBox : MonoBehaviour
         _IsInitialized = false;
     }
 
+    private void FixedUpdate()
+    {
+        if (!_IsInitialized) return;
+
+        if (_Owner == null)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        if (_WeaponType.Equals(MeleeSwingType.Swing))
+        {
+            SpawnArcingHitBox();
+        }
+        else
+        {
+            throw new System.Exception($"Unknown weapon type {_WeaponType}");
+        }
+    }
+
     public void Initialize(Character owner, Vector3 attackDirection, MeleeWeaponSO weaponSO)
     {
         _Owner = owner;
@@ -96,20 +116,6 @@ public class MeleeHitBox : MonoBehaviour
         if (damage > 0 || _Knockback < 0)
         {
             adversaryHit.TakeDamage(_Damage, _Knockback > 0 ? _AttackDirection : null, _Knockback);
-        }
-    }
-
-    private void FixedUpdate()
-    {
-        if (!_IsInitialized) return;
-
-        if (_WeaponType.Equals(MeleeSwingType.Swing))
-        {
-            SpawnArcingHitBox();
-        }
-        else
-        {
-            throw new System.Exception($"Unknown weapon type {_WeaponType}");
         }
     }
 

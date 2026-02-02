@@ -47,9 +47,9 @@ public class EnemyWorldCanvas : MonoBehaviour
         _Enemy.TakeDamage(0); // TODO hacky way to have a current health bar
     }
 
-    private void _Enemy_OnHealthChanged(object sender, Enemy.HealthChangedEventArgs e)
+    private void _Enemy_OnHealthChanged(object sender, Enemy.DyanmicStatChangeEvent e)
     {
-        UpdateHealth(e.CurrentHealth, e.MaxHealth);
+        UpdateHealth(e.Current, e.Max);
     }
 
     void UpdateHealth(int currentHealth, int maxHealth)

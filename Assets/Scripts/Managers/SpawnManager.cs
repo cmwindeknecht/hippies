@@ -40,9 +40,9 @@ public class SpawnManager : MonoBehaviour
     public void SpawnEnemiesForScene(Scene scene)
     {
         // TODO have a database and what not for spawning enemies, this is just for testing
-        for (int i = 0; i < 20; i++) {
+        for (int i = -15; i < 30; i++) {
             GameObject enemyPrefab = _EnemyPrefabs[Utilities.GetRandomInt(0, _EnemyPrefabs.Count - 1)];
-            GameObject instantiatedPrefab = Instantiate(enemyPrefab, new Vector3(i % 2 == 0 ? 6.5f : 5.5f, (i % 2 == 0 ? i + 1 : i * 2) + .5f, 0), Quaternion.identity);
+            GameObject instantiatedPrefab = Instantiate(enemyPrefab, new Vector3(i % 2 == 0 ? 6.5f : 4.5f, (i % 2 == 0 ? i + 1 : i * 2) + .5f, 0), Quaternion.identity);
             instantiatedPrefab.name += "-#" + i;
             Enemy enemy = instantiatedPrefab.GetComponent<Enemy>();
             RegisterEnemy(enemy);

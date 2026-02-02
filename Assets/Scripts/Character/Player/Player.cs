@@ -1,6 +1,3 @@
-using Cysharp.Threading.Tasks;
-using System.Collections.Generic;
-using System.Threading;
 using UnityEngine;
 
 public class Player : Character
@@ -11,7 +8,12 @@ public class Player : Character
     private PlayerVisual _PlayerVisual;
     private new PlayerInventory _Inventory => (PlayerInventory)base._Inventory;
 
-    private int _OverTimeHealth;
+    public DynamicStat Health => _Stats.Health;
+    public DynamicStat Energy => _Stats.Energy;
+    public DynamicStat Magic => _Stats.Magic;
+    private OverTimeEffect _OverTimeHealth;
+    private OverTimeEffect _OverTimeEnergy;
+    private OverTimeEffect _OverTimeMagic;
 
     private void Awake()
     {
@@ -27,51 +29,25 @@ public class Player : Character
     private void Start()
     {
         GameManager.Instance.RegisterPlayer(this);
+
+        _OverTimeHealth = new OverTimeEffect(this, _Stats.Health, SendHealthChangeEvent, isDamage: false);
+        _OverTimeEnergy = new OverTimeEffect(this, _Stats.Energy, SendEnergyChangeEvent, isDamage: false);
+        _OverTimeMagic = new OverTimeEffect(this, _Stats.Magic, SendMagicChangeEvent, isDamage: false);
     }
 
     public void RestoreHealth(int health, int iterations, float time)
     {
-        if (iterations > 1)
-        {
-            _OverTimeHealth = health;
-            SendHealthChangeEvent(Mathf.Min(_Stats.Health.Current + _OverTimeHealth, _Stats.Health.Max));
-            RestoreHealthOverTime(health, iterations, time, this.GetCancellationTokenOnDestroy()).Forget();
-        }
-        else
-        {
-            _Stats.RestoreHealth(health);
-            SendHealthChangeEvent();
-        }
+        _OverTimeHealth.Add(health, iterations, time);
     }
 
-    public async UniTaskVoid RestoreHealthOverTime(int health, int iterations, float totalTime, CancellationToken cancellationToken)
+    public void RestoreMagic(int magic, int iterations, float time)
     {
-        if (_Stats.Health.Current >= _Stats.Health.Max)
-        {
-            throw new DynamicStatAlreadyAtMaxException();
-        }
+        _OverTimeMagic.Add(magic, iterations, time);
+    }
 
-        int healthPerTick = health / iterations;
-        int remainder = health % iterations;
-        float delayBetweenTicks = totalTime / iterations;
-
-        for (int i = 0; i < iterations; i++)
-        {
-            await UniTask.WaitForSeconds(delayBetweenTicks, cancellationToken: cancellationToken);
-
-            // Check if still alive/valid
-            if (this == null) return;
-
-            _OverTimeHealth -= healthPerTick + (i < remainder ? 1 : 0);
-            _Stats.RestoreHealth(healthPerTick + (i < remainder ? 1 : 0));
-            SendHealthChangeEvent(Mathf.Min(_Stats.Health.Current + _OverTimeHealth, _Stats.Health.Max));
-
-            if (_Stats.Health.Current >= _Stats.Health.Max)
-            {
-                _OverTimeHealth = 0;
-                break;
-            }
-        }
+    public void RestoreEnergy(int energy, int iterations, float time)
+    {
+        _OverTimeEnergy.Add(energy, iterations, time);
     }
 
     public override void TakeDamage(int damage, Vector3? attackDirection = null, float knockbackSpeed = 0)
@@ -81,13 +57,35 @@ public class Player : Character
 
         if (_Stats.Health.Current <= 0)
         {
-            SendOnDeathEvent();
+            SendDeathEvent();
             Destroy(gameObject);
         }
 
         if (attackDirection != null)
         {
             _Controller.Knockback(attackDirection.Value, knockbackSpeed);
+        }
+    }
+
+    public override void SpendEnergy(int energy)
+    {
+        _Stats.SpendEnergy(energy);
+        SendEnergyChangeEvent();
+
+        if (_Stats.Health.Current <= 0)
+        {
+            SendEnergyDepletedEvent();
+        }
+    }
+
+    public override void SpendMagic(int magic)
+    {
+        _Stats.SpendMagic(magic);
+        SendMagicChangeEvent();
+
+        if (_Stats.Health.Current <= 0)
+        {
+            SendMagicDepletedEvent();
         }
     }
 

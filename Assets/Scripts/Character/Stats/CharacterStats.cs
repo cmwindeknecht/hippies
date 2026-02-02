@@ -11,6 +11,7 @@ public class CharacterStats : MonoBehaviour
     public CharacterStat Strength { get; private set; }
     public CharacterStat Agility { get; private set; }
     public CharacterStat Vitality { get; private set; }
+    public CharacterStat Stamina { get; private set; }
     public CharacterStat Intelligence { get; private set; }
     public CharacterStat Luck { get; private set; }
 
@@ -27,12 +28,13 @@ public class CharacterStats : MonoBehaviour
         {
             Health = new DynamicStat(DynamicStatName.Health, _CurrentHealth, _MaxHealth);
             Energy = new DynamicStat(DynamicStatName.Energy, _CurrentHealth, _MaxHealth);
-            Magic = new DynamicStat(DynamicStatName.Magic, 0, 0);
+            Magic = new DynamicStat(DynamicStatName.Magic, 10, 10);
         }
 
         Strength = new CharacterStat(1);
         Agility = new CharacterStat(1);
         Vitality = new CharacterStat(1);
+        Stamina = new CharacterStat(1);
         Intelligence = new CharacterStat(1);
         Luck = new CharacterStat(1);
     }
@@ -59,7 +61,32 @@ public class CharacterStats : MonoBehaviour
         {
             Health.Decrease(damage);
         }
-        catch (DynamicStaDepletedException exception)
+        catch (DynamicStatDepletedException exception)
+        {
+            // TODO play the relevant animation (death or something in the UI or whatever)
+        }
+    }
+
+    public void SpendEnergy(int energy)
+    {
+        try
+        {
+            Energy.Decrease(energy);
+        }
+        catch (DynamicStatDepletedException exception)
+        {
+            // TODO play the relevant animation (death or something in the UI or whatever)
+        }
+    }
+
+
+    public void SpendMagic(int magic)
+    {
+        try
+        {
+            Magic.Decrease(magic);
+        }
+        catch (DynamicStatDepletedException exception)
         {
             // TODO play the relevant animation (death or something in the UI or whatever)
         }
@@ -68,5 +95,15 @@ public class CharacterStats : MonoBehaviour
     public void RestoreHealth(int health)
     {
         Health.Increase(health);
+    }
+
+    public void RestoreEnergy(int energy)
+    {
+        Energy.Increase(energy);
+    }
+
+    public void RestoreMagic(int magic)
+    {
+        Magic.Increase(magic);
     }
 }
