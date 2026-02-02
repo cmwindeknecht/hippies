@@ -6,16 +6,16 @@ using UnityEngine.UIElements;
 public class Enemy : Character
 {
     public CharacterType CharacterType = CharacterType.Enemy;
+    private new EnemyInventory _Inventory => (EnemyInventory) base._Inventory;
+
     private Player _Player;
     private EnemyController _Controller;
-    private EnemyInventory _Inventory;
     // TODO TEMP --- should be passed in during a setup function or something; basic plan
     //      1. Enemy Prefab
     //      2. SO has sprite / animatinos / etc
     //      3. Database or whatever provides the SO to the spawn manager
     //      4. Spawn manager passes enemySO here
     public EnemySO EnemySO;
-    [SerializeField] GameObject EnemyDropPrefab;
 
     private float _OnDamageYellRadius = 3f;
 
@@ -49,8 +49,8 @@ public class Enemy : Character
         _Stats = GetComponent<CharacterStats>();
         _Stats.Setup(EnemySO);
 
-        _Inventory = GetComponent<EnemyInventory>();
-        _Inventory.EquipWeapon(EnemySO.WeaponSO);
+        base._Inventory = GetComponent<EnemyInventory>();
+        base._Inventory.EquipWeapon(EnemySO.WeaponSO);
 
         EnemyWorldCanvas enemyCanvas = GetComponentInChildren<EnemyWorldCanvas>();
         enemyCanvas.GetComponent<Canvas>().worldCamera = Camera.main;
@@ -59,17 +59,18 @@ public class Enemy : Character
 
     public override void TakeDamage(int damage, Vector3? attackDirection = null, float knockbackSpeed = 0)
     {
+        // TODO need to hook this up properly
         _Stats.TakeDamage(damage);
         SendHealthChangeEvent();
 
         // TODO due to the hack for the UI
-        if (_Stats.CurrentHealth < _Stats.MaxHealth)
+        if (_Stats.Health.Current < _Stats.Health.Max)
         {
             NotifyNearbyEnemies();
             _Controller.NotifiedToChasePlayer().Forget(); // Notify self to chase enemy
         }
 
-        if (_Stats.CurrentHealth <= 0)
+        if (_Stats.Health.Current <= 0)
         {
             SendOnDeathEvent();
             _Inventory.DropItems();

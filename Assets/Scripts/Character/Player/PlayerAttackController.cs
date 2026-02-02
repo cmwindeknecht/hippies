@@ -8,7 +8,7 @@ public class PlayerAttackController : MonoBehaviour
     [SerializeField] private Shield _Shield;
 
     private Weapon _EquippedWeapon;
-    private ShieldSO _EquippedShield;
+    private ArmorSO _EquippedShield;
 
     [SerializeField] private GameObject _MeleeHitboxPrefab;
 
@@ -94,7 +94,7 @@ public class PlayerAttackController : MonoBehaviour
     {
         if (_EquippedShield == null)
         {
-            ShieldSO shieldSO = _Inventory.EquippedShieldSO;
+            ArmorSO shieldSO = _Inventory.EquippedShieldSO;
 
             if (shieldSO != null )
             {

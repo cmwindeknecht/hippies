@@ -1,6 +1,11 @@
 using System;
 
-public class HealthAlreadyAtMaxException : Exception
+public class DynamicStatAlreadyAtMaxException : Exception
 {
-    public HealthAlreadyAtMaxException() : base() { }
+    public DynamicStatAlreadyAtMaxException() : base() { }
+}
+
+public class DynamicStaDepletedException : Exception
+{
+    public DynamicStaDepletedException() : base() { }
 }

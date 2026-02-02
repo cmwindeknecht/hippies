@@ -18,4 +18,8 @@ public class ItemSO : ScriptableObject
     public int MagicRestored;
     public int MagicIterations = 1; // If it restores mana over time, how many iterations
     public int MagicTotalTime = 0; // How long the item takes to finish restoring magic
+
+    public int ArmorRating = 1;
+    public int Damage = 1;
+    public int AttackRating = 1;
 }

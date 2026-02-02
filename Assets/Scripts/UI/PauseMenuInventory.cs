@@ -20,7 +20,7 @@ public class PauseMenuInventory : MonoBehaviour
     [SerializeField] private InventoryItemConsumable _ConsumablePrefab;
 
     private Player _Player;
-    private InventoryItemType _ActiveItemType = InventoryItemType.Weapons; // On click, update this
+    private InventoryItemType _ActiveItemType = InventoryItemType.None; // On click, update this
 
     public void Setup(Player player)
     {
@@ -69,7 +69,7 @@ public class PauseMenuInventory : MonoBehaviour
             Destroy(child.gameObject);
         }
 
-        Dictionary<InventoryItemType, List<InventoryItem>> inventory = _Player.Inventory;
+        Dictionary<InventoryItemType, List<InventoryItem>> inventory = _Player.InventoryItems;
         foreach (KeyValuePair<InventoryItemType, List<InventoryItem>> kvp in inventory)
         {
             if (!_ActiveItemType.Equals(InventoryItemType.None) && !kvp.Key.Equals(_ActiveItemType)) continue;

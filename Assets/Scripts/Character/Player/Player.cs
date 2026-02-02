@@ -6,17 +6,17 @@ using UnityEngine;
 public class Player : Character
 {
     public CharacterType CharacterType = CharacterType.Player;
+
     private PlayerController _Controller;
-    private PlayerInventory _Inventory;
     private PlayerVisual _PlayerVisual;
-    public Dictionary<InventoryItemType, List<InventoryItem>> Inventory => _Inventory.Inventory;
+    private new PlayerInventory _Inventory => (PlayerInventory)base._Inventory;
 
     private int _OverTimeHealth;
 
     private void Awake()
     {
         _Controller = GetComponent<PlayerController>();
-        _Inventory = GetComponent<PlayerInventory>();
+        base._Inventory = GetComponent<PlayerInventory>();
         _Stats = GetComponent<CharacterStats>();
         _Rigidbody2D = GetComponent<Rigidbody2D>();
         
@@ -31,15 +31,10 @@ public class Player : Character
 
     public void RestoreHealth(int health, int iterations, float time)
     {
-        if (_Stats.CurrentHealth.Equals(_Stats.MaxHealth))
-        {
-            throw new HealthAlreadyAtMaxException();
-        }
-
         if (iterations > 1)
         {
             _OverTimeHealth = health;
-            SendHealthChangeEvent(Mathf.Min(_Stats.CurrentHealth + _OverTimeHealth, _Stats.MaxHealth));
+            SendHealthChangeEvent(Mathf.Min(_Stats.Health.Current + _OverTimeHealth, _Stats.Health.Max));
             RestoreHealthOverTime(health, iterations, time, this.GetCancellationTokenOnDestroy()).Forget();
         }
         else
@@ -51,9 +46,9 @@ public class Player : Character
 
     public async UniTaskVoid RestoreHealthOverTime(int health, int iterations, float totalTime, CancellationToken cancellationToken)
     {
-        if (_Stats.CurrentHealth >= _Stats.MaxHealth)
+        if (_Stats.Health.Current >= _Stats.Health.Max)
         {
-            throw new HealthAlreadyAtMaxException();
+            throw new DynamicStatAlreadyAtMaxException();
         }
 
         int healthPerTick = health / iterations;
@@ -69,9 +64,9 @@ public class Player : Character
 
             _OverTimeHealth -= healthPerTick + (i < remainder ? 1 : 0);
             _Stats.RestoreHealth(healthPerTick + (i < remainder ? 1 : 0));
-            SendHealthChangeEvent(Mathf.Min(_Stats.CurrentHealth + _OverTimeHealth, _Stats.MaxHealth));
+            SendHealthChangeEvent(Mathf.Min(_Stats.Health.Current + _OverTimeHealth, _Stats.Health.Max));
 
-            if (_Stats.CurrentHealth >= _Stats.MaxHealth)
+            if (_Stats.Health.Current >= _Stats.Health.Max)
             {
                 _OverTimeHealth = 0;
                 break;
@@ -84,7 +79,7 @@ public class Player : Character
         _Stats.TakeDamage(damage);
         SendHealthChangeEvent();
 
-        if (_Stats.CurrentHealth <= 0)
+        if (_Stats.Health.Current <= 0)
         {
             SendOnDeathEvent();
             Destroy(gameObject);
