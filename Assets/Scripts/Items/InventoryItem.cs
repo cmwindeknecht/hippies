@@ -12,7 +12,7 @@ public enum InventoryItemType
 
 public class InventoryItem
 {
-    private ItemSO _ItemSO;
+    private readonly ItemSO _ItemSO;
     public ItemSO ItemSO => _ItemSO;
 
     private readonly Action<ItemSO> _RemoveFromInventory;
@@ -22,7 +22,7 @@ public class InventoryItem
     public void IncreaseQuantity() => _Quantity++;
     public void DecreaseQuantity() {
         _Quantity--;
-        if (_Quantity < 0 )
+        if (_Quantity <= 0 )
         {
             _RemoveFromInventory(_ItemSO);
         }

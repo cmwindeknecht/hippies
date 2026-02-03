@@ -19,10 +19,14 @@ public class OverTimeEffect
         _Owner = owner;
     }
 
+    // Current Behavior --- Hitting max health removes over time effect
+    //   Possible behavior instead --- Keep healing regardless afterwards.  Just remove the CanPerformEffect and ShouldStop (and handle the exception)
     public void Add(int amount, int iterations, float time, bool isDecrement)
     {
         if (iterations > 1)
         {
+            CanPerformEffect(isDecrement);
+
             _CancellationToken?.Cancel();
             _CancellationToken = new CancellationTokenSource();
 
@@ -43,11 +47,19 @@ public class OverTimeEffect
         }
     }
 
-    private async UniTaskVoid ApplyOverTime(float delayBetweenTicks, bool isDamage, CancellationToken cancellationToken)
+    private async UniTaskVoid ApplyOverTime(float delayBetweenTicks, bool isDecrement, CancellationToken cancellationToken)
     {
         while (_RemainingAmount > 0 && !cancellationToken.IsCancellationRequested)
         {
             await UniTask.WaitForSeconds(delayBetweenTicks, cancellationToken: cancellationToken);
+
+            if (ShouldStop(isDecrement))
+            {
+                _RemainingAmount = 0;
+                _RemainingIterations = 0;
+                _SendChangeEvent(0);
+                break;
+            }
 
             if (_Owner == null) return;
 
@@ -57,28 +69,28 @@ public class OverTimeEffect
             _RemainingAmount -= tickAmount;
             _RemainingIterations--;
 
-            PerformEffect(tickAmount, isDamage);
+            PerformEffect(tickAmount, isDecrement);
 
-            int projectedValue = GetProjectedAmount(isDamage);
+            int projectedValue = GetProjectedAmount(isDecrement);
             _SendChangeEvent(projectedValue);
-
-            if (ShouldStop(isDamage))
-            {
-                _RemainingAmount = 0;
-                _RemainingIterations = 0;
-                break;
-            }
         }
     }
 
-    private bool ShouldStop(bool isDamage)
+    private bool ShouldStop(bool isDecrement)
     {
-        return (isDamage && _Stat.Current <= 0) || (!isDamage && _Stat.Current >= _Stat.Max);
+        return (isDecrement && _Stat.Current <= 0) || (!isDecrement && _Stat.Current >= _Stat.Max);
     }
 
     private int GetProjectedAmount(bool isDecrement)
     {
+        if (ShouldStop(isDecrement))
+        {
+            _RemainingAmount = 0;
+            _RemainingIterations = 0;
+            return _Stat.Current;
+        }
         return _Stat.Current + _RemainingAmount;
+        // Might be necessary for decrementing, unsure for now
         //if (isDecrement)
         //{
         //    return Mathf.Max(_Stat.Current - _RemainingAmount, 0);
@@ -87,6 +99,18 @@ public class OverTimeEffect
         //{
         //    return Mathf.Min(_Stat.Current + _RemainingAmount, _Stat.Max);
         //}
+    }
+
+    private void CanPerformEffect(bool isDecrement)
+    {
+        if (isDecrement)
+        {
+            _Stat.CanDecrease();
+        }
+        else
+        {
+            _Stat.CanIncrease();
+        }
     }
 
     private void PerformEffect(int amount, bool isDecrement)
