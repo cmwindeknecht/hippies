@@ -14,9 +14,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Name: Short Sword
   DamageMin: 1
-  DamageMax: 3
+  DamageMax: 5
   Knockback: 1
+  DamageType: 0
   AttackRate: 0.25
+  AttackCooldown: 1
+  StrengthRequirement: 1
+  AgilityRequirement: 1
+  IntelligenceRequirement: 1
   SoundEffect: {fileID: 0}
   Reach: 1
-  WeaponType: 1
+  SwingType: 1

@@ -10,8 +10,14 @@ public class PlayerController : MonoBehaviour
     private InputAction _AttackInputAction;
 
     private Vector2 _MoveValue = Vector2.zero;
+    public Vector2 MoveValue => _MoveValue;
+
     private Vector2 _AttackValue = Vector2.zero;
+    public Vector2 AttackValue => _AttackValue;
+
     private Vector2 _FacingDirection = Vector2.zero;
+    public Vector2 FacingDirection => _FacingDirection;
+
     private Vector2 _LinearVelocity = Vector2.zero;
 
     private bool _ShouldZeroOut = true; // Plan is to make this false when knockback/environment modifies velocity
@@ -30,12 +36,25 @@ public class PlayerController : MonoBehaviour
         _AttackInputAction = InputSystem.actions.FindAction("Attack");
     }
 
-
-
     void Update()
     {
         _MoveValue = _MoveInputAction.ReadValue<Vector2>();
-        _AttackValue = _AttackInputAction.ReadValue<Vector2>();
+
+        // Get mouse position in world space
+        Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        mouseWorldPos.z = 0;
+
+        // Direction from player to mouse
+        Vector2 attackDirection = (mouseWorldPos - transform.position).normalized;
+
+        if (Input.GetMouseButton(0)) // Left click
+        {
+            _AttackValue = attackDirection;
+        }
+        else
+        {
+            _AttackValue = Vector2.zero;
+        }
 
         UpdateFacingDirection();
     }
@@ -114,7 +133,7 @@ public class PlayerController : MonoBehaviour
             // Player Mass already in this calculation
             // TODO armor/inventory/etc relative to strength should modify player mass
 
-            _LinearVelocity += _MoveValue * GetMovementSpeed();
+            _LinearVelocity = _MoveValue * GetMovementSpeed();
         }
     }
 
@@ -140,6 +159,8 @@ public class PlayerController : MonoBehaviour
 
     private void MovePlayer()
     {
+        Debug.Log($"Moving: velocity={_LinearVelocity}, moveValue={_MoveValue}, knockback={_Knockback}");
+
         _RigidBody.linearVelocity = _LinearVelocity;
     }
 }

@@ -1,10 +1,11 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.TextCore.Text;
 
 public class Shield : MonoBehaviour
 {
     private Character _Owner;
-    private ShieldSO _ShieldSO;
+    private ArmorSO _ShieldSO;
     private bool _IsInitialized = false;
     private HashSet<Collider2D> _HitTargets;
 
@@ -13,7 +14,7 @@ public class Shield : MonoBehaviour
         _HitTargets = new();
     }
 
-    public void Setup(ShieldSO shieldSO, Character owner)
+    public void Setup(ArmorSO shieldSO, Character owner)
     {
         _IsInitialized = false;
 
@@ -25,7 +26,7 @@ public class Shield : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (!_IsInitialized) { return; }    
+        if (!_IsInitialized) return;   
 
         // prevent double taps
         if (!_HitTargets.Add(collision.collider))
@@ -34,68 +35,32 @@ public class Shield : MonoBehaviour
         }
 
         // ignore non hitbox / projectile collisions
-        if (collision.collider.GetComponent<MeleeHitBox>() == null || collision.collider.GetComponent<Projectile>() == null)
+        if (collision.collider.GetComponent<MeleeHitBox>() == null && collision.collider.GetComponent<Projectile>() == null)
         {
             return;
         }
 
-        if (_Owner is Player)
+        // TODO maybe all of this logic should be in the Projectile/Hitbox code --- otherwise its weird as they check for player/enemy on enter, they should check if shield then if enemy or player
+        if (collision.collider.TryGetComponent<MeleeHitBox>(out MeleeHitBox meleeHitBox))
         {
-            Player player = _Owner as Player;
-            if (collision.collider.TryGetComponent<MeleeHitBox>(out MeleeHitBox meleeHitBox))
-            {
-                int damage = Mathf.Max(0, meleeHitBox.Damage - Random.Range(_ShieldSO.DamageNegationMin, _ShieldSO.DamageNegationMax + 1));
-                float knockback = Mathf.Max(0, meleeHitBox.Knockback - _ShieldSO.KnockbackResistance);
-               
-
-                if (damage > 0 || knockback > 0)
-                {
-                    player.TakeDamage(damage, knockback > 0 ? meleeHitBox.AttackDirection : null, knockback);
-                }
-
-                Destroy(collision.gameObject);
-            }
-            else if (collision.collider.TryGetComponent<Projectile>(out Projectile projectile))
-            {
-                int damage = Mathf.Max(0, projectile.Damage - Random.Range(_ShieldSO.DamageNegationMin, _ShieldSO.DamageNegationMax + 1));
-                float knockback = Mathf.Max(0, projectile.Knockback - _ShieldSO.KnockbackResistance);
-                Debug.Log($"Projectile hit shield for damage {damage} and knockback {knockback}");
-
-                if (damage > 0 || knockback > 0)
-                {
-                    player.TakeDamage(damage, knockback > 0 ? projectile.AttackDirection : null, knockback);
-                }
-
-                Destroy(collision.gameObject);
-            }
+            HandleAttack(meleeHitBox.Damage, meleeHitBox.Knockback, meleeHitBox.AttackDirection, collision.gameObject);
         }
-        else if (_Owner is Enemy)
+        else if (collision.collider.TryGetComponent<Projectile>(out Projectile projectile))
         {
-            Enemy enemy = _Owner as Enemy;
-            if (collision.collider.TryGetComponent<MeleeHitBox>(out MeleeHitBox meleeHitBox))
-            {
-                int damage = Mathf.Max(0, meleeHitBox.Damage - Random.Range(_ShieldSO.DamageNegationMin, _ShieldSO.DamageNegationMax + 1));
-                float knockback = Mathf.Max(0, meleeHitBox.Knockback - _ShieldSO.KnockbackResistance);
-
-                if (damage > 0 || knockback > 0)
-                {
-                    enemy.TakeDamage(damage, knockback > 0 ? meleeHitBox.AttackDirection : null, knockback);
-                }
-
-                Destroy(collision.gameObject);
-            }
-            else if (collision.collider.TryGetComponent<Projectile>(out Projectile projectile))
-            {
-                int damage = Mathf.Max(0, projectile.Damage - Random.Range(_ShieldSO.DamageNegationMin, _ShieldSO.DamageNegationMax + 1));
-                float knockback = Mathf.Max(0, projectile.Knockback - _ShieldSO.KnockbackResistance);
-
-                if (damage > 0 || knockback > 0)
-                {
-                    enemy.TakeDamage(damage, knockback > 0 ? projectile.AttackDirection : null, knockback);
-                }
-
-                Destroy(collision.gameObject);
-            }
+            HandleAttack(projectile.Damage, projectile.Knockback, projectile.AttackDirection, collision.gameObject);
         }
+    }
+
+    private void HandleAttack(int baseDamage, float baseKnockback, Vector2 attackDirection, GameObject hitObject)
+    {
+        int damage = _Owner.GetPossibleDamage(baseDamage, isShielding: true);
+        float modifiedKnockback = Mathf.Max(0, baseKnockback - _ShieldSO.KnockbackResistance);
+
+        if (damage > 0 || modifiedKnockback > 0)
+        {
+            _Owner.TakeDamage(damage, modifiedKnockback > 0 ? attackDirection : null, modifiedKnockback);
+        }
+
+        Destroy(hitObject);
     }
 }

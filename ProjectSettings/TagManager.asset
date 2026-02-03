@@ -7,6 +7,7 @@ TagManager:
   - Collision
   - NPC
   - Enemy
+  - Shield
   layers:
   - Default
   - TransparentFX
@@ -18,8 +19,8 @@ TagManager:
   - NPC
   - Enemy
   - Projectile
-  - 
-  - 
+  - Pickup
+  - EnemyParameter
   - 
   - 
   - 
@@ -43,6 +44,12 @@ TagManager:
   m_SortingLayers:
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: UI
+    uniqueID: 2879009715
+    locked: 0
+  - name: Player
+    uniqueID: 1838501301
     locked: 0
   m_RenderingLayers:
   - Default

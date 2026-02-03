@@ -10,7 +10,7 @@ public class Projectile : MonoBehaviour
     private float _AttackTimer;
     private bool _IsInitialized;
     private HashSet<Collider2D> _HitTargets;
-    private Character _Character;
+    private Character _Owner;
     private Character _Target;
 
     private int _Damage;
@@ -41,17 +41,17 @@ public class Projectile : MonoBehaviour
 
     public void Initialize(Vector3 direction, RangedWeaponSO weaponSO, Character projectileOwner)
     {
-        _Character = projectileOwner;
+        _Owner = projectileOwner;
         _Damage = Random.Range(weaponSO.DamageMin, weaponSO.DamageMax + 1) + Random.Range(_ProjectileSO.DamageMin, _ProjectileSO.DamageMax + 1);
         _Knockback = weaponSO.Knockback + _ProjectileSO.Knockback;
         _AttackDirection = direction.normalized;
-        _IsInitialized = true;
+        
         float angle = Mathf.Atan2(_AttackDirection.y, _AttackDirection.x) * Mathf.Rad2Deg;
         transform.rotation = Quaternion.Euler(0, 0, angle);
-
         // Set velocity instead of moving in FixedUpdate
         _Rigidbody.linearVelocity = _AttackDirection * _ProjectileSO.Speed;
 
+        _IsInitialized = true;
         Destroy(gameObject, _ProjectileSO.Lifetime);
     }
 
@@ -67,30 +67,27 @@ public class Projectile : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        Debug.Log($"Bullet hit {collision.gameObject.name} at position {transform.position}");
-        Debug.Log($"Contact point: {collision.GetContact(0).point}");
-
         // Prevent unintended double taps
+        if (!_IsInitialized) return;
         if (!_HitTargets.Add(collision.collider))
         {
             Destroy(gameObject);
             return;
         }
 
-        if (_Character is Player)
+        if (_Owner is Player)
         {
             if (collision.collider.TryGetComponent<Enemy>(out Enemy enemy))
             {
-                enemy.TakeDamage(_Damage, _Knockback > 0 ? _AttackDirection : null, _Knockback);
+                HandleAdversaryHit(enemy);
             }
             
         }
-        else if (_Character is Enemy)
+        else if (_Owner is Enemy)
         {
             if (collision.collider.TryGetComponent<Player>(out Player player))
             {
-                Debug.Log($"Projectile hit player for damage {_Damage} and knockback {_Knockback}");
-                player.TakeDamage(_Damage, _Knockback > 0 ? _AttackDirection : null, _Knockback);
+                HandleAdversaryHit(player);
             }
         }
 
@@ -101,6 +98,16 @@ public class Projectile : MonoBehaviour
         else
         {
             Destroy(gameObject);
+        }
+    }
+
+    private void HandleAdversaryHit(Character adversaryHit)
+    {
+        int damage = adversaryHit.GetPossibleDamage(_Damage, isShielding: false);
+
+        if (damage > 0 || _Knockback < 0)
+        {
+            adversaryHit.TakeDamage(_Damage, _Knockback > 0 ? _AttackDirection : null, _Knockback);
         }
     }
 }

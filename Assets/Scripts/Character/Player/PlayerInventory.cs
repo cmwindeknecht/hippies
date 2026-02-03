@@ -1,29 +1,11 @@
+using System;
 using System.Collections.Generic;
-using UnityEngine;
 
-public class PlayerInventory : MonoBehaviour
+public class PlayerInventory : CharacterInventory
 {
-    // TODO UI / Logic to have a 1-0 means to equip shit
-    //      If an attack is in the 1-0 --- changes the attack to that
-    //      If an item / healing spell / etc --- automatically uses it
-    //      Shit like keys aren't necessary to use, interacting with shit should automatically know if you have the key
-    // TODO remove serializefield, just doign this for testing
-    [SerializeField] private WeaponSO _EquippedWeaponSO;
-    public WeaponSO EquippedWeaponSO => _EquippedWeaponSO;
-    [SerializeField] private ShieldSO _EquippedShieldSO;
-    public ShieldSO EquippedShieldSO => _EquippedShieldSO;
-    // TODO Armor stuff
-
-    public Dictionary<InventoryItemType, List<InventoryItem>> Inventory;
-
-    private void Awake()
+    public override void EquipWeapon(WeaponSO weapon)
     {
-        Inventory = new();
-    }
-
-    public void EquipWeapon(WeaponSO weapon)
-    {
-        if (Inventory.TryGetValue(InventoryItemType.Weapon, out List<InventoryItem> items)) {
+        if (InventoryItems.TryGetValue(InventoryItemType.Weapons, out List<InventoryItem> items)) {
             bool found = false;
             foreach (InventoryItem item in items)
             {
@@ -46,7 +28,7 @@ public class PlayerInventory : MonoBehaviour
 
     public void AddToInventory(ItemSO itemSO)
     {
-        if (Inventory.TryGetValue(itemSO.Type, out List<InventoryItem> inventoryItems))
+        if (InventoryItems.TryGetValue(itemSO.Type, out List<InventoryItem> inventoryItems))
         {
             foreach (InventoryItem inventoryItem in inventoryItems)
             {
@@ -56,13 +38,42 @@ public class PlayerInventory : MonoBehaviour
                     return;
                 }
             }
-            inventoryItems.Add(new InventoryItem(itemSO));
+            inventoryItems.Add(new InventoryItem(itemSO, RemoveFromInventory));
         }
         else
         {
-            List<InventoryItem> newInventoryItems = new();
-            newInventoryItems.Add(new InventoryItem(itemSO));
-            Inventory.Add(itemSO.Type, newInventoryItems);
+            List<InventoryItem> newInventoryItems = new()
+            {
+                new InventoryItem(itemSO, RemoveFromInventory)
+            };
+            InventoryItems.Add(itemSO.Type, newInventoryItems);
+        }
+    }
+
+    public void RemoveFromInventory(ItemSO itemSO)
+    {
+        if (InventoryItems.TryGetValue(itemSO.Type, out List<InventoryItem> inventoryItems))
+        {
+            int? indexFound = null;
+            for (int i = 0; i < inventoryItems.Count; i++)
+            {
+                if (inventoryItems[i].ItemSO.Name.Equals(itemSO.Name))
+                {
+                    indexFound = i; 
+                    break;
+                }
+            }
+
+            if (indexFound == null)
+            {
+                throw new Exception($"Somehow trying to remove item that is not in inventory! item=[{itemSO.Name}]");
+            }
+
+            inventoryItems.RemoveAt(indexFound.Value);
+        }
+        else
+        {
+            throw new Exception($"Somehow trying to remove item that is not in inventory! item=[{itemSO.Name}] type=[{itemSO.Type}]");
         }
     }
 }

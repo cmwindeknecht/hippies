@@ -1,4 +1,5 @@
 using Cysharp.Threading.Tasks;
+using System.Threading;
 using UnityEngine;
 
 public class EnemyDrop : MonoBehaviour
@@ -66,7 +67,7 @@ public class EnemyDrop : MonoBehaviour
         }
     }
 
-    public async UniTaskVoid DropFromEnemy(ItemSO itemSO)
+    public async UniTaskVoid DropFromEnemy(ItemSO itemSO, CancellationToken cancelDropToken)
     {
         _ItemSO = itemSO;
 
@@ -88,7 +89,7 @@ public class EnemyDrop : MonoBehaviour
             float scaleMultiplier = 1f + Mathf.Sin(t * Mathf.PI) * _ApexScale;
             transform.localScale = startScale * scaleMultiplier;
 
-            await UniTask.Yield();
+            await UniTask.Yield(cancelDropToken);
         }
 
         transform.localScale = startScale;

@@ -1,20 +1,14 @@
+using Cysharp.Threading.Tasks;
 using System.Collections.Generic;
+using System.Threading;
 using UnityEngine;
 
-public class EnemyInventory : MonoBehaviour
+public class EnemyInventory : CharacterInventory
 {
-    // TODO UI / Logic to have a 1-0 means to equip shit
-    //      If an attack is in the 1-0 --- changes the attack to that
-    //      If an item / healing spell / etc --- automatically uses it
-    //      Shit like keys aren't necessary to use, interacting with shit should automatically know if you have the key
-    // TODO remove serializefield, just doign this for testing
-    [SerializeField] private WeaponSO _EquippedWeaponSO;
-    public WeaponSO EquippedWeaponSO => _EquippedWeaponSO;
-    // TODO Armor stuff
     [SerializeField] private List<EnemyDropSO> _EnemyDropSOs;
     [SerializeField] private EnemyDrop _EnemyDropPrefab;
 
-    public void EquipWeapon(WeaponSO weapon)
+    public override void EquipWeapon(WeaponSO weapon)
     {
         _EquippedWeaponSO = weapon;
     }
@@ -29,8 +23,10 @@ public class EnemyInventory : MonoBehaviour
                 {
                     return;
                 }
+
                 EnemyDrop enemyDrop = Instantiate(_EnemyDropPrefab, transform.position, Quaternion.identity);
-                enemyDrop.DropFromEnemy(enemyDropSO.ItemSO).Forget();
+                enemyDrop.DropFromEnemy(enemyDropSO.ItemSO, enemyDrop.GetCancellationTokenOnDestroy()).Forget();
+
             }
         }
     }

@@ -5,6 +5,7 @@ public class EnemyWorldCanvas : MonoBehaviour
 {
     [SerializeField] private GameObject _HealthBar;
     [SerializeField] private Image _HealthBarBackground;
+    [SerializeField] private Image _HealthBarOutline;
     [SerializeField] private Image _HealthBarFill;
 
     private Enemy _Enemy;
@@ -22,16 +23,20 @@ public class EnemyWorldCanvas : MonoBehaviour
 
         // Make it the width of the enemy
         float enemyWidth = enemySprite.bounds.size.x;
-        RectTransform rectTransformBackground = _HealthBarBackground.GetComponent<RectTransform>();
-        RectTransform rectTransformFill = _HealthBarFill.GetComponent<RectTransform>();
-        rectTransformBackground.sizeDelta = new Vector2(enemyWidth * _WidthAdjustment, rectTransformBackground.sizeDelta.y);
-        rectTransformFill.sizeDelta = new Vector2(enemyWidth * _WidthAdjustment, rectTransformFill.sizeDelta.y);
+        UpdateWidth(_HealthBarFill, enemyWidth);
+        UpdateWidth(_HealthBarOutline, enemyWidth);
+        UpdateWidth(_HealthBarBackground, enemyWidth);
+    }
 
-        transform.SetParent(null); // Unparent from enemy so it doesn't rotate with the enemy
+    private void UpdateWidth(Image component, float enemyWidth)
+    {
+        RectTransform rectTransform = component.GetComponent<RectTransform>();
+        rectTransform.sizeDelta = new Vector2(enemyWidth * _WidthAdjustment, rectTransform.sizeDelta.y);
     }
 
     void LateUpdate()
     {
+        if (_Enemy == null) return;
         transform.SetPositionAndRotation(_Enemy.transform.position + _Offset, Quaternion.identity);
     }
 
@@ -42,9 +47,9 @@ public class EnemyWorldCanvas : MonoBehaviour
         _Enemy.TakeDamage(0); // TODO hacky way to have a current health bar
     }
 
-    private void _Enemy_OnHealthChanged(object sender, Enemy.HealthChangedEventArgs e)
+    private void _Enemy_OnHealthChanged(object sender, Enemy.DyanmicStatChangeEvent e)
     {
-        UpdateHealth(e.CurrentHealth, e.MaxHealth);
+        UpdateHealth(e.Current, e.Max);
     }
 
     void UpdateHealth(int currentHealth, int maxHealth)
