@@ -38,15 +38,23 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
-        var kb = Keyboard.current;
-        if (kb != null)
-        {
-            Debug.Log($"Up:{kb.upArrowKey.isPressed} Left:{kb.leftArrowKey.isPressed} S:{kb.sKey.isPressed} A:{kb.aKey.isPressed}");
-        }
-
         _MoveValue = _MoveInputAction.ReadValue<Vector2>();
-        _AttackValue = _AttackInputAction.ReadValue<Vector2>();
-        Debug.Log($"Raw Move: {_MoveValue}, Raw Attack: {_AttackValue}, S key: {Keyboard.current.sKey.isPressed}");
+
+        // Get mouse position in world space
+        Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        mouseWorldPos.z = 0;
+
+        // Direction from player to mouse
+        Vector2 attackDirection = (mouseWorldPos - transform.position).normalized;
+
+        if (Input.GetMouseButton(0)) // Left click
+        {
+            _AttackValue = attackDirection;
+        }
+        else
+        {
+            _AttackValue = Vector2.zero;
+        }
 
         UpdateFacingDirection();
     }

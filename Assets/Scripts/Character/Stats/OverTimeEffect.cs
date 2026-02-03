@@ -7,26 +7,19 @@ public class OverTimeEffect
 {
     private int _RemainingAmount = 0;
     private int _RemainingIterations = 0;
-    private float _RemainingTime = 0;
-
     private CancellationTokenSource _CancellationToken;
     private readonly DynamicStat _Stat;
     private readonly Action<int> _SendChangeEvent;
-    private readonly bool _IsDamage;
     private readonly Character _Owner;
 
-    // If the effect is cumulative, then it extends the time/ticks 
-    public OverTimeEffect(Character owner, DynamicStat stat, Action<int> sendChangeEvent, bool isDamage)
+    public OverTimeEffect(Character owner, DynamicStat stat, Action<int> sendChangeEvent)
     {
         _Stat = stat;
         _SendChangeEvent = sendChangeEvent;
-        _IsDamage = isDamage;
         _Owner = owner;
     }
 
-    // If the effect is cumulative, then it extends the time/ticks of the effect
-    // If its not, then it just increases the remaining amount
-    public void Add(int amount, int iterations, float time)
+    public void Add(int amount, int iterations, float time, bool isDecrement)
     {
         if (iterations > 1)
         {
@@ -35,82 +28,83 @@ public class OverTimeEffect
 
             _RemainingAmount += amount;
             _RemainingIterations += iterations;
-            _RemainingTime += time;
 
-            int projectedValue = GetProjectedAmount();
-
+            int projectedValue = GetProjectedAmount(isDecrement);
             _SendChangeEvent(projectedValue);
-            ApplyOverTime(_CancellationToken.Token).Forget();
+
+            float delayBetweenTicks = time / iterations;
+            ApplyOverTime(delayBetweenTicks, isDecrement, _CancellationToken.Token).Forget();
         }
         else
         {
-            PerformEffect(amount);
-            int projectedValue = GetProjectedAmount();
+            PerformEffect(amount, isDecrement);
+            int projectedValue = GetProjectedAmount(isDecrement);
             _SendChangeEvent(projectedValue);
         }
     }
 
-    private async UniTaskVoid ApplyOverTime(CancellationToken cancellationToken)
+    private async UniTaskVoid ApplyOverTime(float delayBetweenTicks, bool isDamage, CancellationToken cancellationToken)
     {
-        float delayBetweenTicks = _RemainingTime / _RemainingIterations;
-
         while (_RemainingAmount > 0 && !cancellationToken.IsCancellationRequested)
         {
             await UniTask.WaitForSeconds(delayBetweenTicks, cancellationToken: cancellationToken);
 
             if (_Owner == null) return;
 
-            int tickAmount = Mathf.CeilToInt((float) _RemainingAmount / _RemainingIterations);
+            int tickAmount = Mathf.CeilToInt((float)_RemainingAmount / _RemainingIterations);
             tickAmount = Mathf.Min(tickAmount, _RemainingAmount);
 
             _RemainingAmount -= tickAmount;
-            PerformEffect(tickAmount);
+            _RemainingIterations--;
 
-            int projectedValue = GetProjectedAmount();
+            PerformEffect(tickAmount, isDamage);
+
+            int projectedValue = GetProjectedAmount(isDamage);
             _SendChangeEvent(projectedValue);
 
-            // Stop conditions
-            if (ShouldStop())
+            if (ShouldStop(isDamage))
             {
                 _RemainingAmount = 0;
+                _RemainingIterations = 0;
                 break;
             }
         }
     }
 
-    private bool ShouldStop()
+    private bool ShouldStop(bool isDamage)
     {
-        return (_IsDamage && _Stat.Current <= 0) || (!_IsDamage && _Stat.Current >= _Stat.Max);
+        return (isDamage && _Stat.Current <= 0) || (!isDamage && _Stat.Current >= _Stat.Max);
     }
 
-    private int GetProjectedAmount()
+    private int GetProjectedAmount(bool isDecrement)
     {
-        if (_IsDamage)
-        {
-            return Mathf.Max(_Stat.Current - _RemainingAmount, 0);
-        }
-        else
-        {
-            return Mathf.Min(_Stat.Current + _RemainingAmount, _Stat.Max);
-        }
+        return _Stat.Current + _RemainingAmount;
+        //if (isDecrement)
+        //{
+        //    return Mathf.Max(_Stat.Current - _RemainingAmount, 0);
+        //}
+        //else
+        //{
+        //    return Mathf.Min(_Stat.Current + _RemainingAmount, _Stat.Max);
+        //}
     }
 
-    private void PerformEffect(int amount)
+    private void PerformEffect(int amount, bool isDecrement)
     {
-        if (_IsDamage)
+        if (isDecrement)
         {
             _Stat.Decrease(amount);
         }
         else
         {
             _Stat.Increase(amount);
-        }   
+        }
     }
 
-    // Use to stop the over time effect, e.g. if you are poisoned and drink and antidote 
     public void Stop()
     {
         _CancellationToken?.Cancel();
         _RemainingAmount = 0;
+        _RemainingIterations = 0;
     }
 }

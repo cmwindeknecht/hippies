@@ -30,30 +30,29 @@ public class Player : Character
     {
         GameManager.Instance.RegisterPlayer(this);
 
-        _OverTimeHealth = new OverTimeEffect(this, _Stats.Health, SendHealthChangeEvent, isDamage: false);
-        _OverTimeEnergy = new OverTimeEffect(this, _Stats.Energy, SendEnergyChangeEvent, isDamage: false);
-        _OverTimeMagic = new OverTimeEffect(this, _Stats.Magic, SendMagicChangeEvent, isDamage: false);
+        _OverTimeHealth = new OverTimeEffect(this, _Stats.Health, SendHealthChangeEvent);
+        _OverTimeEnergy = new OverTimeEffect(this, _Stats.Energy, SendEnergyChangeEvent);
+        _OverTimeMagic = new OverTimeEffect(this, _Stats.Magic, SendMagicChangeEvent);
     }
 
     public void RestoreHealth(int health, int iterations, float time)
     {
-        _OverTimeHealth.Add(health, iterations, time);
+        _OverTimeHealth.Add(health, iterations, time, isDecrement: false);
     }
 
     public void RestoreMagic(int magic, int iterations, float time)
     {
-        _OverTimeMagic.Add(magic, iterations, time);
+        _OverTimeMagic.Add(magic, iterations, time, isDecrement: false);
     }
 
     public void RestoreEnergy(int energy, int iterations, float time)
     {
-        _OverTimeEnergy.Add(energy, iterations, time);
+        _OverTimeEnergy.Add(energy, iterations, time, isDecrement: false);
     }
 
     public override void TakeDamage(int damage, Vector3? attackDirection = null, float knockbackSpeed = 0)
     {
-        _Stats.TakeDamage(damage);
-        SendHealthChangeEvent();
+        _OverTimeHealth.Add(damage, 1, 0f, isDecrement: true);
 
         if (_Stats.Health.Current <= 0)
         {
@@ -69,10 +68,9 @@ public class Player : Character
 
     public override void SpendEnergy(int energy)
     {
-        _Stats.SpendEnergy(energy);
-        SendEnergyChangeEvent();
+        _OverTimeEnergy.Add(energy, 1, 0f, isDecrement: true);
 
-        if (_Stats.Health.Current <= 0)
+        if (_Stats.Energy.Current <= 0)
         {
             SendEnergyDepletedEvent();
         }
@@ -80,10 +78,9 @@ public class Player : Character
 
     public override void SpendMagic(int magic)
     {
-        _Stats.SpendMagic(magic);
-        SendMagicChangeEvent();
+        _OverTimeMagic.Add(magic, 1, 0f, isDecrement: true);
 
-        if (_Stats.Health.Current <= 0)
+        if (_Stats.Magic.Current <= 0)
         {
             SendMagicDepletedEvent();
         }
