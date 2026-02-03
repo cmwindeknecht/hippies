@@ -159,7 +159,7 @@ public class PlayerController : MonoBehaviour
 
     private void MovePlayer()
     {
-        Debug.Log($"Moving: velocity={_LinearVelocity}, moveValue={_MoveValue}, knockback={_Knockback}");
+        //Debug.Log($"Moving: velocity={_LinearVelocity}, moveValue={_MoveValue}, knockback={_Knockback}");
 
         _RigidBody.linearVelocity = _LinearVelocity;
     }

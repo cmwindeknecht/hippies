@@ -19,21 +19,23 @@ public class InventoryItemConsumable : MonoBehaviour
         _Description.text = item.ItemSO.Description;
         _UseButton.onClick.AddListener(() =>
         {
-            foreach (ConsumableEffect effect in item.ItemSO.Effects)
+            if (item.ItemSO is not ItemConsumableSO)
             {
-                if (effect is RestoreHealthEffect)
+                throw new System.Exception("InventoryItemConsumable Setup a non ItemConsumableSO for the on click event!");
+            }
+            ItemConsumableSO itemSO = (ItemConsumableSO)item.ItemSO;
+            foreach (ConsumableEffect effect in itemSO.ConsumableEffects)
+            {
+                try
                 {
-                    try
-                    {
-                        effect.Use(player, item);
-                        item.DecreaseQuantity();
-                        refreshInventory();
-                    }
-                    catch (DynamicStatAlreadyAtMaxException exception)
-                    {
-                        Debug.Log("Player already at max health");
-                        // TODO send event to UI to do something
-                    }
+                    effect.Use(player, item);
+                    item.DecreaseQuantity();
+                    refreshInventory();
+                }
+                catch (DynamicStatAlreadyAtMaxException exception)
+                {
+                    Debug.Log("Player already at max health");
+                    // TODO send event to UI to do something
                 }
             }
         });

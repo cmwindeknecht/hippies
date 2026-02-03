@@ -6,7 +6,8 @@ public enum InventoryItemType
     Weapons,
     Armor,
     Consumable,
-    Others
+    KeyItems,
+    Miscellaneous
 }
 
 public class InventoryItem
@@ -14,7 +15,7 @@ public class InventoryItem
     private ItemSO _ItemSO;
     public ItemSO ItemSO => _ItemSO;
 
-    private Action<ItemSO> _RemoveFromInventory;
+    private readonly Action<ItemSO> _RemoveFromInventory;
 
     private float _Quantity;
     public float Quantity => _Quantity;

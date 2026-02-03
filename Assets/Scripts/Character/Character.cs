@@ -32,6 +32,8 @@ public abstract class Character : MonoBehaviour
     public Vector2 Position => _Rigidbody2D == null ? Vector3.zero : (Vector3)_Rigidbody2D.position;
 
     protected CharacterStats _Stats;
+    public CharacterStats Stats => _Stats;
+
     protected CharacterInventory _Inventory;
     public Dictionary<InventoryItemType, List<InventoryItem>> InventoryItems => _Inventory.InventoryItems;
 

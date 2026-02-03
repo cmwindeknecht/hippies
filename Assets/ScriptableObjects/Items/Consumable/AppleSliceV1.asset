@@ -9,19 +9,24 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 91f83115f0d718c40804472d1a35a1b9, type: 3}
-  m_Name: AppleSlice
+  m_Script: {fileID: 11500000, guid: 3906a062655ceab4e80946b75d751a77, type: 3}
+  m_Name: AppleSliceV1
   m_EditorClassIdentifier: 
   Type: 3
   Name: Apple Slice
-  Description: "Provides the minimum amount of happiness for those that prefer apple. 
-    \n+6 Health on consumption."
+  Description: 'Small piece of an apple
+
+
+    +6 health on consumption'
   Sprite: {fileID: 0}
-  Effects:
+  ConsumableEffects:
   - {fileID: 11400000, guid: a7c5944967c8fab48aa87caedec02958, type: 2}
   HealthRestored: 6
-  HealthIterations: 1
+  HealthIterations: 0
   HealthTotalTime: 0
   MagicRestored: 0
-  MagicIterations: 1
+  MagicIterations: 0
   MagicTotalTime: 0
+  EnergyRestored: 0
+  EnergyIterations: 0
+  EnergyTotalTime: 0
