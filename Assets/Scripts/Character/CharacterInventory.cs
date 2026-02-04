@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+#pragma warning disable CS8632 // The annotation for nullable reference types should only be used in code within a '#nullable' annotations context.
 public abstract class CharacterInventory : MonoBehaviour
 {
     // TODO UI / Logic to have a 1-0 means to equip shit
