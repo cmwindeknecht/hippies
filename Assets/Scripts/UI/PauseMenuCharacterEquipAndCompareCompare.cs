@@ -20,6 +20,9 @@ public class PauseMenuCharacterEquipAndCompareCompare : MonoBehaviour
 
     public void Setup(ArmorSO armorSO, ArmorSO toCompare)
     {
+        _ItemIcon.sprite = armorSO.Sprite;
+        _Name.text = armorSO.Name;
+
         SetupPrefab(_ItemWeightPrefab, armorSO.Weight, toCompare.Weight, true);
 
         SetupPrefab(_FirePrefab, armorSO.FireResistance, toCompare.FireResistance);
@@ -34,6 +37,9 @@ public class PauseMenuCharacterEquipAndCompareCompare : MonoBehaviour
 
     public void Setup(WeaponSO weaponSO, WeaponSO toCompare)
     {
+        _ItemIcon.sprite = weaponSO.Sprite;
+        _Name.text = weaponSO.Name;
+
         SetupPrefab(_ItemWeightPrefab, weaponSO.Weight, toCompare.Weight, true);
 
         if (weaponSO.DamageType.Equals(toCompare.Type)) {

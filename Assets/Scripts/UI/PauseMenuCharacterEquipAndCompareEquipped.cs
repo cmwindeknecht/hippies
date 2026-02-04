@@ -20,6 +20,9 @@ public class PauseMenuCharacterEquipAndCompareEquipped : MonoBehaviour
 
     public void Setup(ArmorSO armorSO)
     {
+        _ItemIcon.sprite = armorSO.Sprite;
+        _Name.text = armorSO.Name;
+
         SetupPrefab(_ItemWeightPrefab, armorSO.Weight);
 
         SetupPrefab(_FirePrefab, armorSO.FireResistance);
@@ -34,6 +37,9 @@ public class PauseMenuCharacterEquipAndCompareEquipped : MonoBehaviour
 
     public void Setup(WeaponSO weaponSO)
     {
+        _ItemIcon.sprite = weaponSO.Sprite;
+        _Name.text = weaponSO.Name;
+
         SetupPrefab(_ItemWeightPrefab, weaponSO.Weight);
 
         WeaponArmorStat prefab = GetPrefabForWeaponDamageType(weaponSO.DamageType);
@@ -49,13 +55,13 @@ public class PauseMenuCharacterEquipAndCompareEquipped : MonoBehaviour
     // Use for defense / weight
     private void SetupPrefab(WeaponArmorStat prefab, float current)
     {
-        prefab.Setup(Color.white, $"{current} (=)");
+        prefab.Setup(Color.white, $"{current}");
     }
 
     // Used for damages
     private void SetupPrefab(WeaponArmorStat prefab, int currentMin, int currentMax)
     {
-        prefab.Setup(Color.white, $"{currentMin} (=)", Color.white, $"{currentMax} (=)");
+        prefab.Setup(Color.white, $"{currentMin}", Color.white, $"{currentMax}");
     }
 
     private WeaponArmorStat GetPrefabForWeaponDamageType(DamageType damageType)

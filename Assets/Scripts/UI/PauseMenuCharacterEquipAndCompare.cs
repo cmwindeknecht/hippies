@@ -1,7 +1,12 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
+// TODO 
+// 1. Stats are all wrong for shit.  No info like weight, agi/str/etc requirement, description, etc.  Clean that up later.
+// 2. Need to have a new slot pop up for ranged shit to change the ranged projectile type
+// 3. 2H weapons don't take up both slots when equipped
 public class PauseMenuEquipAndCompare : MonoBehaviour
 {
     [SerializeField] private PauseMenuCharacterEquipAndCompareEquipped _CompareEquipped;
@@ -11,20 +16,27 @@ public class PauseMenuEquipAndCompare : MonoBehaviour
     private ItemSO _EquippedItemSO;
     private ItemSO _CompareItemSO;
 
-    private PauseMenuCharacterComparableWeapon _ComparablePrefabWeapon;
-    private PauseMenuCharacterComparableArmor _ComparablePrefabArmor;
+    [SerializeField] private PauseMenuCharacterComparableWeapon _ComparablePrefabWeapon;
+    [SerializeField] private PauseMenuCharacterComparableArmor _ComparablePrefabArmor;
 
     private PlayerInventory _Inventory;
+
+    private void OnEnable()
+    {
+        _CompareEquipped.gameObject.SetActive(false);
+        _CompareCompare.gameObject.SetActive(false);
+    }
 
     public void Setup(PlayerInventory inventory)
     {
         _Inventory = inventory;
     }
 
-    // TODO call after event
     public void UpdateEquipped(ItemSO equippedItem)
     {
         _EquippedItemSO = equippedItem;
+        _CompareEquipped.gameObject.SetActive(true);
+
         if (_EquippedItemSO is ArmorSO equippedArmorSO)
         {
             _CompareEquipped.Setup(equippedArmorSO);
@@ -39,6 +51,7 @@ public class PauseMenuEquipAndCompare : MonoBehaviour
         }
 
         _CompareCompare.gameObject.SetActive(false);
+        RefreshCompare();
     }
 
     public void UpdateCompare(ItemSO compareItem)
@@ -85,11 +98,12 @@ public class PauseMenuEquipAndCompare : MonoBehaviour
                 {
                     case InventoryItemType.Weapons:
                         PauseMenuCharacterComparableWeapon comparabaleWeapon = Instantiate(_ComparablePrefabWeapon, _ToCompareContent);
-                        // TODO setup 
+                        comparabaleWeapon.Setup((WeaponSO)item.ItemSO);
                         break;
                     case InventoryItemType.Armor:
+                        if (!((ArmorSO)item.ItemSO).ArmorSlot.Equals(((ArmorSO)_EquippedItemSO).ArmorSlot)) continue;
                         PauseMenuCharacterComparableArmor comparabaleArmor = Instantiate(_ComparablePrefabArmor, _ToCompareContent);
-                        // TODO setup 
+                        comparabaleArmor.Setup((ArmorSO)item.ItemSO);
                         break;
                     default:
                         throw new System.NotImplementedException();

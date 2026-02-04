@@ -1,9 +1,13 @@
+using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 public abstract class PauseMenuCharacterComparableAbstract : MonoBehaviour
 {
+    public static event EventHandler<ItemSO> OnCompareClicked;
+    public static event EventHandler<ItemSO> OnEquipClicked;
+
     [SerializeField] private Image _ItemIcon;
     [SerializeField] protected WeaponArmorStat _ItemWeightPrefab;
     [SerializeField] protected WeaponArmorStat _FirePrefab;
@@ -21,6 +25,8 @@ public abstract class PauseMenuCharacterComparableAbstract : MonoBehaviour
     [SerializeField] private Button _EquipButton;
 
     [SerializeField] private RectTransform _StatContainer;
+
+    public ItemSO ItemSO { get; private set; }
 
     private void Awake()
     {
@@ -41,6 +47,7 @@ public abstract class PauseMenuCharacterComparableAbstract : MonoBehaviour
 
     protected void Setup(ItemSO itemSO)
     {
+        ItemSO = itemSO;
         _ItemNameText.text = itemSO.Name;
 
         _ItemWeightPrefab.gameObject.SetActive(true);
@@ -80,5 +87,16 @@ public abstract class PauseMenuCharacterComparableAbstract : MonoBehaviour
     {
         _CompareButton.gameObject.SetActive(true);
         _EquipButton.gameObject.SetActive(false);
+    }
+
+    // TODO hook these up
+    protected void SendCompareEvent()
+    {
+        OnCompareClicked?.Invoke(this, ItemSO);
+    }
+
+    protected void SendEquipEvent()
+    {
+        OnEquipClicked?.Invoke(this, ItemSO);
     }
 }

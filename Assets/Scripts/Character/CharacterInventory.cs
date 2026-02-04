@@ -1,3 +1,4 @@
+using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -39,9 +40,26 @@ public abstract class CharacterInventory : MonoBehaviour
     [SerializeField] protected ArmorSO _EquippedFeetSO;
     public ArmorSO EquippedFeetSO => _EquippedFeetSO;
 
+    [SerializeField] private List<ItemSO> _StartingInventory; // Mostly for testing purposes - maybe has a use for enemies or loading data?
     public Dictionary<InventoryItemType, List<InventoryItem>> InventoryItems;
     public int ShieldResistance => _EquippedShieldSO != null ? _EquippedShieldSO.PierceResistance : 0;
     public int ArmorRating => GetArmorRating();
+
+    private void Awake()
+    {
+        InventoryItems = new();
+        if (_EquippedHeadSO != null) AddToInventory(_EquippedHeadSO);
+        if (_EquippedShoulderSO != null) AddToInventory(_EquippedShoulderSO);
+        if (_EquippedHandsSO != null) AddToInventory(EquippedHandsSO);
+        if (_EquippedTorsoSO != null) AddToInventory(_EquippedTorsoSO);
+        if (EquippedLegsSO != null) AddToInventory(EquippedLegsSO);
+        if (_EquippedFeetSO != null) AddToInventory(EquippedFeetSO);
+        if (_EquippedShieldSO != null) AddToInventory(EquippedShieldSO);
+        if (_EquippedWeaponOneSO != null) AddToInventory(_EquippedWeaponOneSO);
+        if (_EquippedWeaponTwoSO != null) AddToInventory(EquippedWeaponTwoSO);
+
+        foreach (ItemSO itemSO in _StartingInventory) AddToInventory(itemSO);
+    }
 
     public void SetEquippedWeapon(int slot)
     {
@@ -83,20 +101,6 @@ public abstract class CharacterInventory : MonoBehaviour
             armorRating += _EquippedFeetSO.PierceResistance;
         }
         return armorRating;
-    }
-
-    private void Awake()
-    {
-        InventoryItems = new(); 
-        if (_EquippedHeadSO != null) AddToInventory(_EquippedHeadSO);
-        if ( _EquippedShoulderSO != null) AddToInventory(_EquippedShoulderSO);
-        if (_EquippedHandsSO != null) AddToInventory(EquippedHandsSO);
-        if (_EquippedTorsoSO != null) AddToInventory(_EquippedTorsoSO);
-        if (EquippedLegsSO != null) AddToInventory(EquippedLegsSO);
-        if (_EquippedFeetSO != null) AddToInventory(EquippedFeetSO);
-        if (_EquippedShieldSO != null) AddToInventory(EquippedShieldSO);
-        if (_EquippedWeaponOneSO != null) AddToInventory(_EquippedWeaponOneSO);
-        if (_EquippedWeaponTwoSO != null) AddToInventory(EquippedWeaponTwoSO);
     }
 
     public void AddToInventory(ItemSO itemSO)

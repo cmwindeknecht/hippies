@@ -53,8 +53,7 @@ public class PauseMenuCharacterEquipped : MonoBehaviour, IPointerClickHandler
         if (_ItemSO != null)
         {
             Debug.Log($"Emitting event for ItemSO {_ItemSO.Name}");
-            OnEquippedItemClicked?.Invoke(this, _ItemSO); // TODO listen to these events to populate the details section        
+            OnEquippedItemClicked?.Invoke(this, _ItemSO);   
         }
-        
     }
 }

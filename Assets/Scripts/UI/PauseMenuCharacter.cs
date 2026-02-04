@@ -1,3 +1,5 @@
+using NUnit.Framework;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class PauseMenuCharacter : MonoBehaviour
@@ -38,6 +40,8 @@ public class PauseMenuCharacter : MonoBehaviour
     [Header("EquipmentCompare")]
     [SerializeField] private PauseMenuEquipAndCompare _EquipAndCompare;
 
+    private Player _Player;
+
     public void Setup(Player player)
     {
         _Strength.Setup(player);
@@ -47,14 +51,38 @@ public class PauseMenuCharacter : MonoBehaviour
         _Stamina.Setup(player);
         _Luck.Setup(player);
 
+        _EquipAndCompare.Setup(player.Inventory);
+
         _EquippedHead.Setup(player.Inventory, itemType:InventoryItemType.Armor, armorSlot:ArmorSlot.Head);
+        _EquippedHead.OnEquippedItemClicked += OnEquippedItemClicked;
+
         _EquippedShoulders.Setup(player.Inventory, itemType: InventoryItemType.Armor, armorSlot: ArmorSlot.Shoulder);
+        _EquippedShoulders.OnEquippedItemClicked += OnEquippedItemClicked;
+
         _EquippedHands.Setup(player.Inventory, itemType: InventoryItemType.Armor, armorSlot: ArmorSlot.Hands);
+        _EquippedHands.OnEquippedItemClicked += OnEquippedItemClicked;
+
         _EquippedTorso.Setup(player.Inventory, itemType: InventoryItemType.Armor, armorSlot: ArmorSlot.Torso);
+        _EquippedTorso.OnEquippedItemClicked += OnEquippedItemClicked;
+
         _EquippedLegs.Setup(player.Inventory, itemType: InventoryItemType.Armor, armorSlot: ArmorSlot.Legs);
+        _EquippedLegs.OnEquippedItemClicked += OnEquippedItemClicked;
+
         _EquippedFeet.Setup(player.Inventory, itemType: InventoryItemType.Armor, armorSlot: ArmorSlot.Feet);
+        _EquippedFeet.OnEquippedItemClicked += OnEquippedItemClicked;
+
         _EquippedWeaponOne.Setup(player.Inventory, itemType: InventoryItemType.Weapons, weaponSlot:1);
+        _EquippedWeaponOne.OnEquippedItemClicked += OnEquippedItemClicked;
+
         _EquippedWeaponTwo.Setup(player.Inventory, itemType: InventoryItemType.Weapons, weaponSlot: 2);
+        _EquippedWeaponTwo.OnEquippedItemClicked += OnEquippedItemClicked;
+
         _EquippedShield.Setup(player.Inventory, itemType: InventoryItemType.Armor, armorSlot: ArmorSlot.Shield);
+        _EquippedShield.OnEquippedItemClicked += OnEquippedItemClicked;
+    }
+
+    private void OnEquippedItemClicked(object sender, ItemSO e)
+    {
+        _EquipAndCompare.UpdateEquipped(e);
     }
 }

@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 4715884257516506086}
   - component: {fileID: 6752694018321853453}
   m_Layer: 5
-  m_Name: DamageOneValue
+  m_Name: WeaponTwoValue
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -145,6 +145,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8605662620100110735}
+  - component: {fileID: 3562609845297798650}
   m_Layer: 5
   m_Name: StatImageDisplay
   m_TagString: Untagged
@@ -159,7 +160,7 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6785359113155795756}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -173,6 +174,19 @@ RectTransform:
   m_AnchoredPosition: {x: -20, y: -50}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &3562609845297798650
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6785359113155795756}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6ec87a15f7e22e94fab894c611a3e148, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  StatValue: {fileID: 6752694018321853453}
 --- !u!1 &7695005120854021421
 GameObject:
   m_ObjectHideFlags: 0
@@ -185,7 +199,7 @@ GameObject:
   - component: {fileID: 1217581904986898118}
   - component: {fileID: 2511717525746580226}
   m_Layer: 5
-  m_Name: DamageOneImage
+  m_Name: WeaponTwoImage
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
