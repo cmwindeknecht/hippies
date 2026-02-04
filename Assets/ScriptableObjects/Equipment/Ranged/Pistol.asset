@@ -12,7 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2b74dfa7b65cb9345937a5b1218280da, type: 3}
   m_Name: Pistol
   m_EditorClassIdentifier: 
-  Name: Test Pistol
+  Type: 1
+  Name: 9mm Pistol
+  Description: It fires... so its technically a gun
+  Sprite: {fileID: 0}
+  Weight: 2
   DamageMin: 1
   DamageMax: 5
   Knockback: 1

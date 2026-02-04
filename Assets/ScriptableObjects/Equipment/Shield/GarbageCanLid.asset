@@ -12,6 +12,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: da473377623e0fb47a0edb18fe2dde57, type: 3}
   m_Name: GarbageCanLid
   m_EditorClassIdentifier: 
-  KnockbackResistance: 1
-  DamageNegationMin: 1
-  DamageNegationMax: 2
+  Type: 2
+  Name: Garbage Can Lid
+  Description: Blocks stuff, if that stuff is not very hard
+  Sprite: {fileID: 0}
+  Weight: 1
+  ArmorSlot: 0
+  KnockbackResistance: 3
+  PierceResistance: 5
+  BluntResistance: 5
+  ExplosiveResistance: 0
+  FireResistance: 0
+  IceResistance: 0
+  LightningResistance: 0
+  EarthResistance: 0
+  VoidResistance: 0

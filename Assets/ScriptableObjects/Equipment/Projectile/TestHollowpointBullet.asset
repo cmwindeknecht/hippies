@@ -12,7 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ceb980d02e2780e4bbd2fc2b6704a3bd, type: 3}
   m_Name: TestHollowpointBullet
   m_EditorClassIdentifier: 
-  Name: Test Bullet
+  Type: 5
+  Name: 9mm HollowPoint
+  Description: Small arms ammo that penetrates enemies
+  Sprite: {fileID: 0}
+  Weight: 0.005
   DamageMin: 1
   DamageMax: 1
   Knockback: 1

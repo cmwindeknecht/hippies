@@ -12,7 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ceb980d02e2780e4bbd2fc2b6704a3bd, type: 3}
   m_Name: TestBullet
   m_EditorClassIdentifier: 
-  Name: Test Bullet
+  Type: 5
+  Name: 9mm Bullet
+  Description: Small arms ammo
+  Sprite: {fileID: 0}
+  Weight: 0.01
   DamageMin: 1
   DamageMax: 2
   Knockback: 2

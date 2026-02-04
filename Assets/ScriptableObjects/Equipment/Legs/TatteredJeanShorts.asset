@@ -12,6 +12,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: da473377623e0fb47a0edb18fe2dde57, type: 3}
   m_Name: TatteredJeanShorts
   m_EditorClassIdentifier: 
-  KnockbackResistance: 1
-  DamageResistance: 1
-  ArmorSlot: 0
+  Type: 2
+  Name: Tattered Jean Shorts
+  Description: Would be great in the cold... if someone didn't cut off the bottom
+  Sprite: {fileID: 0}
+  Weight: 1
+  ArmorSlot: 5
+  KnockbackResistance: 2
+  PierceResistance: 3
+  BluntResistance: 1
+  ExplosiveResistance: 0
+  FireResistance: 0
+  IceResistance: 0
+  LightningResistance: 0
+  EarthResistance: 0
+  VoidResistance: 0

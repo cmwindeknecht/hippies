@@ -12,6 +12,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: da473377623e0fb47a0edb18fe2dde57, type: 3}
   m_Name: Birkenstocks
   m_EditorClassIdentifier: 
-  KnockbackResistance: 1
-  DamageResistance: 1
-  ArmorSlot: 0
+  Type: 2
+  Name: Birkenstock Sandals
+  Description: Stinky sandals with the soles worn out
+  Sprite: {fileID: 0}
+  Weight: 0.5
+  ArmorSlot: 6
+  KnockbackResistance: 0
+  PierceResistance: 2
+  BluntResistance: 1
+  ExplosiveResistance: 0
+  FireResistance: 0
+  IceResistance: 0
+  LightningResistance: 0
+  EarthResistance: 0
+  VoidResistance: 0

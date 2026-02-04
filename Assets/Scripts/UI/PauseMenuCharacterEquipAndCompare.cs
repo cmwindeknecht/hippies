@@ -4,17 +4,15 @@ using UnityEngine;
 
 public class PauseMenuEquipAndCompare : MonoBehaviour
 {
-    [SerializeField] private GameObject _EquippedItem;
-    [SerializeField] private GameObject _CompareItem;
+    [SerializeField] private PauseMenuCharacterEquipAndCompareEquipped _CompareEquipped;
+    [SerializeField] private PauseMenuCharacterEquipAndCompareCompare _CompareCompare;
     [SerializeField] private RectTransform _ToCompareContent;
 
     private ItemSO _EquippedItemSO;
     private ItemSO _CompareItemSO;
-    // TODO probably need PauseMenuCharacterEquippedArmor/Weapon and PauseMenuCharacterComparableArmor/Weapon
-    private PauseMenuCharacterEquipped _EquipAndComparePrefabWeapon;
-    private PauseMenuCharacterEquipped _EquipAndComparePrefabArmor;
-    private PauseMenuCharacterComparable _ComparePrefabWeapon;
-    private PauseMenuCharacterComparable _ComparePrefabArmor;
+
+    private PauseMenuCharacterComparableWeapon _ComparablePrefabWeapon;
+    private PauseMenuCharacterComparableArmor _ComparablePrefabArmor;
 
     private PlayerInventory _Inventory;
 
@@ -27,25 +25,46 @@ public class PauseMenuEquipAndCompare : MonoBehaviour
     public void UpdateEquipped(ItemSO equippedItem)
     {
         _EquippedItemSO = equippedItem;
-        // TODO update equipped prefab
+        if (_EquippedItemSO is ArmorSO equippedArmorSO)
+        {
+            _CompareEquipped.Setup(equippedArmorSO);
+        }
+        else if (_EquippedItemSO is WeaponSO equippedWeaponSO)
+        {
+            _CompareEquipped.Setup(equippedWeaponSO);
+        }
+        else
+        {
+            throw new System.Exception($"{equippedItem.Type} type is ineligible for EquipAndCompare!");
+        }
+
+        _CompareCompare.gameObject.SetActive(false);
     }
 
     public void UpdateCompare(ItemSO compareItem)
     {
         _CompareItemSO = compareItem;
-        // TODO update Compare prefab
-        UpdateCompareStats();
-    }
+        _CompareCompare.gameObject.SetActive(true);
 
-    private void UpdateCompareStats()
-    {
-        // TODO show shit like +10 damage or whatever
+        if (_EquippedItemSO is ArmorSO equippedArmorSO && _CompareItemSO is ArmorSO compareArmorSO)
+        {
+            _CompareCompare.Setup(compareArmorSO, equippedArmorSO);
+        }
+        if (_EquippedItemSO is WeaponSO equippedWeaponSO && _CompareItemSO is WeaponSO compareWeaponSO)
+        {
+            _CompareCompare.Setup(compareWeaponSO, equippedWeaponSO);
+        }
+        else
+        {
+            throw new System.Exception($"Equipped {_EquippedItemSO.Type} and Compare {_CompareItemSO.Type} type are ineligible for EquipAndCompare!");
+        }
+
     }
 
     public void RefreshCompare()
     {
         if (_Inventory == null) return;
-        if (_EquippedItem == null) return;
+        if (_EquippedItemSO == null) return;
 
         // Clear existing items
         foreach (Transform child in _ToCompareContent)
@@ -65,11 +84,11 @@ public class PauseMenuEquipAndCompare : MonoBehaviour
                 switch (kvp.Key)
                 {
                     case InventoryItemType.Weapons:
-                        PauseMenuCharacterComparable comparabaleWeapon = Instantiate(_ComparePrefabWeapon, _ToCompareContent);
+                        PauseMenuCharacterComparableWeapon comparabaleWeapon = Instantiate(_ComparablePrefabWeapon, _ToCompareContent);
                         // TODO setup 
                         break;
                     case InventoryItemType.Armor:
-                        PauseMenuCharacterComparable comparabaleArmor = Instantiate(_ComparePrefabArmor, _ToCompareContent);
+                        PauseMenuCharacterComparableArmor comparabaleArmor = Instantiate(_ComparablePrefabArmor, _ToCompareContent);
                         // TODO setup 
                         break;
                     default:

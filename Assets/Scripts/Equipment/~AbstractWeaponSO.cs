@@ -1,14 +1,10 @@
 using UnityEngine;
 
-public enum MeleeDamageType
-{
-    Pierce, // Swords, arrows, etc
-    Blunt // Mauls, bullets, etc
-}
+
 
 public abstract class WeaponSO : AttackSO
 {
-    public MeleeDamageType DamageType;
+    public int HandsRequirement = 1;
 
     public float AttackRate = .25f; // Speed of attack (how fast a gun fires, a sword swings, etc)
     public float AttackCooldown = 1f; // Time between attacks 
