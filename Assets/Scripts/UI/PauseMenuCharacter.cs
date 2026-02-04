@@ -2,6 +2,7 @@ using UnityEngine;
 
 public class PauseMenuCharacter : MonoBehaviour
 {
+    [Header("CharacterStats")]
     [SerializeField] private PauseMenuCharacterStatDisplay _Strength;
     [SerializeField] private PauseMenuCharacterStatDisplay _Agility;
     [SerializeField] private PauseMenuCharacterStatDisplay _Intelligence;
@@ -9,9 +10,11 @@ public class PauseMenuCharacter : MonoBehaviour
     [SerializeField] private PauseMenuCharacterStatDisplay _Stamina;
     [SerializeField] private PauseMenuCharacterStatDisplay _Luck;
 
+    [Header("Derived Stats - Damage")]
     [SerializeField] private PauseMenuCharacterStatDisplay _DamageOne;
     [SerializeField] private PauseMenuCharacterStatDisplay _DamageTwo;
 
+    [Header("Derived Stats - Defense")]
     [SerializeField] private PauseMenuCharacterStatDisplay _BluntDefense;
     [SerializeField] private PauseMenuCharacterStatDisplay _PiercingDefense;
     [SerializeField] private PauseMenuCharacterStatDisplay _ExplosiveDefense;
@@ -21,6 +24,7 @@ public class PauseMenuCharacter : MonoBehaviour
     [SerializeField] private PauseMenuCharacterStatDisplay _EarthDefense;
     [SerializeField] private PauseMenuCharacterStatDisplay _VoidDefense;
 
+    [Header("Equipped Items")]
     [SerializeField] private PauseMenuCharacterEquipped _EquippedHead;
     [SerializeField] private PauseMenuCharacterEquipped _EquippedShoulders;
     [SerializeField] private PauseMenuCharacterEquipped _EquippedHands;
@@ -30,6 +34,9 @@ public class PauseMenuCharacter : MonoBehaviour
     [SerializeField] private PauseMenuCharacterEquipped _EquippedWeaponOne;
     [SerializeField] private PauseMenuCharacterEquipped _EquippedWeaponTwo;
     [SerializeField] private PauseMenuCharacterEquipped _EquippedShield;
+
+    [Header("EquipmentCompare")]
+    [SerializeField] private PauseMenuEquipAndCompare _EquipAndCompare;
 
     public void Setup(Player player)
     {
