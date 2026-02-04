@@ -5,23 +5,7 @@ using UnityEngine;
 public class EnemyInventory : CharacterInventory
 {
     [SerializeField] private List<EnemyDropSO> _EnemyDropSOs;
-    [SerializeField] private EnemyDrop _EnemyDropPrefab;
-
-    public override void EquipWeapon(WeaponSO weapon, int slot = 1)
-    {
-        if (slot == 1)
-        {
-            _EquippedWeaponOneSO = weapon;
-        }
-        else if (slot == 2)
-        {
-            _EquippedWeaponTwoSO = weapon;
-        }
-        else
-        {
-            throw new System.Exception("Unknown Weapon Slot!");
-        }
-    }
+    [SerializeField] private EnemyDrop _EnemyDropPrefab; // TODO surely can somehow make this work with the inventory item SOs to just drop that instead, but for now this is fine
 
     public void DropItems()
     {

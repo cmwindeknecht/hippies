@@ -215,5 +215,22 @@ public abstract class CharacterInventory : MonoBehaviour
         }
     }
 
-    public abstract void EquipWeapon(WeaponSO weapon, int slot = 1);
+    public void EquipArmor(ArmorSO armorSO)
+    {
+        if (armorSO.ArmorSlot.Equals(ArmorSlot.Head)) _EquippedHeadSO = armorSO;
+        else if (armorSO.ArmorSlot.Equals(ArmorSlot.Shoulder)) _EquippedShoulderSO = armorSO;
+        else if (armorSO.ArmorSlot.Equals(ArmorSlot.Hands)) _EquippedHandsSO = armorSO;
+        else if (armorSO.ArmorSlot.Equals(ArmorSlot.Torso)) _EquippedTorsoSO = armorSO;
+        else if (armorSO.ArmorSlot.Equals(ArmorSlot.Legs)) _EquippedLegsSO = armorSO;
+        else if (armorSO.ArmorSlot.Equals(ArmorSlot.Feet)) _EquippedFeetSO = armorSO;
+        else if (armorSO.ArmorSlot.Equals(ArmorSlot.Shield)) _EquippedShieldSO = armorSO;
+        else throw new Exception($"Unknown Armor Slot {armorSO.ArmorSlot}");
+    }
+
+    public void EquipWeapon(WeaponSO weaponSO, int slot = 1)
+    {
+        if (slot == 1) _EquippedWeaponOneSO = weaponSO;
+        else if (slot == 2) _EquippedWeaponTwoSO = weaponSO;
+        else throw new Exception("Unknown Weapon Slot!");
+    }
 }
