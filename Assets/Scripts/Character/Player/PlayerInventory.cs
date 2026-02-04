@@ -3,8 +3,9 @@ using System.Collections.Generic;
 
 public class PlayerInventory : CharacterInventory
 {
-    public override void EquipWeapon(WeaponSO weapon)
+    public override void EquipWeapon(WeaponSO weapon, int slot = 1)
     {
+        // TODO probably don't do this, seems like overkill, just make it a CharacterInventory function the same as Enemy
         if (InventoryItems.TryGetValue(InventoryItemType.Weapons, out List<InventoryItem> items)) {
             bool found = false;
             foreach (InventoryItem item in items)
@@ -22,58 +23,19 @@ public class PlayerInventory : CharacterInventory
             throw new System.Exception("No InventoryItemType.Weapon list found in Inventory!");
         }
 
-        // TODO stat checks and the like
-        _EquippedWeaponSO = weapon;
-    }
-
-    public void AddToInventory(ItemSO itemSO)
-    {
-        if (InventoryItems.TryGetValue(itemSO.Type, out List<InventoryItem> inventoryItems))
+        if (slot == 1)
         {
-            foreach (InventoryItem inventoryItem in inventoryItems)
-            {
-                if (inventoryItem.ItemSO.Name.Equals(itemSO.Name))
-                {
-                    inventoryItem.IncreaseQuantity();
-                    return;
-                }
-            }
-            inventoryItems.Add(new InventoryItem(itemSO, RemoveFromInventory));
+            _EquippedWeaponOneSO = weapon;
+        }
+        else if (slot == 2)
+        {
+            _EquippedWeaponTwoSO = weapon;
         }
         else
         {
-            List<InventoryItem> newInventoryItems = new()
-            {
-                new InventoryItem(itemSO, RemoveFromInventory)
-            };
-            InventoryItems.Add(itemSO.Type, newInventoryItems);
+            throw new Exception("Unknown Weapon Slot!");
         }
     }
 
-    public void RemoveFromInventory(ItemSO itemSO)
-    {
-        if (InventoryItems.TryGetValue(itemSO.Type, out List<InventoryItem> inventoryItems))
-        {
-            int? indexFound = null;
-            for (int i = 0; i < inventoryItems.Count; i++)
-            {
-                if (inventoryItems[i].ItemSO.Name.Equals(itemSO.Name))
-                {
-                    indexFound = i; 
-                    break;
-                }
-            }
-
-            if (indexFound == null)
-            {
-                throw new Exception($"Somehow trying to remove item that is not in inventory! item=[{itemSO.Name}]");
-            }
-
-            inventoryItems.RemoveAt(indexFound.Value);
-        }
-        else
-        {
-            throw new Exception($"Somehow trying to remove item that is not in inventory! item=[{itemSO.Name}] type=[{itemSO.Type}]");
-        }
-    }
+    
 }

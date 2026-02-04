@@ -2,20 +2,30 @@ using UnityEngine;
 
 public enum ArmorSlot
 {
+    Shield,
     Head,
-    Torso,
-    Hands,
     Shoulder,
+    Hands,
+    Torso,
     Legs,
     Feet
 }
 
-[CreateAssetMenu(menuName = "ScriptableObjects/Armor")]
-public class ArmorSO : ScriptableObject
+[CreateAssetMenu(menuName = "ScriptableObjects/Equipment/Armor")]
+public class ArmorSO : ItemSO
 {
-    public float KnockbackResistance = 1f;
-    public int DamageResistance = 1;
     public ArmorSlot ArmorSlot;
+    public float KnockbackResistance = 0f;
 
-    // TODO special resistances like FireDamage or whatever (but needs to be a general thing)
+    // Damage Type Resistance
+    public int PierceResistance = 1;
+    public int BluntResistance = 0;
+    public int ExplosiveResistance = 0;
+
+    // Magic Resistance
+    public int FireResistance = 0;
+    public int IceResistance = 0;
+    public int LightningResistance = 0;
+    public int EarthResistance = 0;
+    public int VoidResistance = 0;
 }

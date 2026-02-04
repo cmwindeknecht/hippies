@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 public abstract class CharacterInventory : MonoBehaviour
@@ -10,8 +9,13 @@ public abstract class CharacterInventory : MonoBehaviour
     //      If an item / healing spell / etc --- automatically uses it
     //      Shit like keys aren't necessary to use, interacting with shit should automatically know if you have the key
     // TODO remove serializefield, just doign this for testing
-    [SerializeField] protected WeaponSO _EquippedWeaponSO;
-    public WeaponSO EquippedWeaponSO => _EquippedWeaponSO;
+    [SerializeField] protected WeaponSO _EquippedWeaponOneSO;
+    public WeaponSO EquippedWeaponOneSO => _EquippedWeaponOneSO;
+
+    [SerializeField] protected WeaponSO _EquippedWeaponTwoSO;
+    public WeaponSO EquippedWeaponTwoSO => _EquippedWeaponTwoSO;
+
+    public WeaponSO CurrentWeapon = null;
 
     [SerializeField] protected ArmorSO _EquippedShieldSO;
     public ArmorSO EquippedShieldSO => _EquippedShieldSO;
@@ -35,44 +39,176 @@ public abstract class CharacterInventory : MonoBehaviour
     public ArmorSO EquippedFeetSO => _EquippedFeetSO;
 
     public Dictionary<InventoryItemType, List<InventoryItem>> InventoryItems;
-    public int ShieldResistance => _EquippedShieldSO != null ? _EquippedShieldSO.DamageResistance : 0;
+    public int ShieldResistance => _EquippedShieldSO != null ? _EquippedShieldSO.PierceResistance : 0;
     public int ArmorRating => GetArmorRating();
-    public int WeaponDamage => Utilities.GetRandomInt(_EquippedWeaponSO.DamageMin, _EquippedWeaponSO.DamageMax);
+
+    public void SetEquippedWeapon(int slot)
+    {
+        if (slot == 1 && _EquippedWeaponOneSO != null)
+        {
+            CurrentWeapon = _EquippedWeaponOneSO;
+        }
+        else if (slot == 2  && _EquippedWeaponTwoSO != null)
+        {
+            CurrentWeapon = _EquippedWeaponTwoSO;
+        }
+    }
 
     private int GetArmorRating()
     {
         int armorRating = 0;
         if (_EquippedHeadSO != null)
         {
-            armorRating += _EquippedHeadSO.DamageResistance;
+            armorRating += _EquippedHeadSO.PierceResistance;
         }
         if (_EquippedShoulderSO != null)
         {
-            armorRating += _EquippedShoulderSO.DamageResistance;
+            armorRating += _EquippedShoulderSO.PierceResistance;
         }
         if (_EquippedTorsoSO != null)
         {
-            armorRating += _EquippedTorsoSO.DamageResistance;
+            armorRating += _EquippedTorsoSO.PierceResistance;
         }
         if (_EquippedHandsSO != null)
         {
-            armorRating += _EquippedHandsSO.DamageResistance;
+            armorRating += _EquippedHandsSO.PierceResistance;
         }
         if (_EquippedLegsSO != null)
         {
-            armorRating += _EquippedLegsSO.DamageResistance;
+            armorRating += _EquippedLegsSO.PierceResistance;
         }
         if (_EquippedFeetSO != null)
         {
-            armorRating += _EquippedFeetSO.DamageResistance;
+            armorRating += _EquippedFeetSO.PierceResistance;
         }
         return armorRating;
     }
 
     private void Awake()
     {
-        InventoryItems = new();
+        InventoryItems = new(); 
+        if (_EquippedHeadSO != null) AddToInventory(_EquippedHeadSO);
+        if ( _EquippedShoulderSO != null) AddToInventory(_EquippedShoulderSO);
+        if (_EquippedHandsSO != null) AddToInventory(EquippedHandsSO);
+        if (_EquippedTorsoSO != null) AddToInventory(_EquippedTorsoSO);
+        if (EquippedLegsSO != null) AddToInventory(EquippedLegsSO);
+        if (_EquippedFeetSO != null) AddToInventory(EquippedFeetSO);
+        if (_EquippedShieldSO != null) AddToInventory(EquippedShieldSO);
+        if (_EquippedWeaponOneSO != null) AddToInventory(_EquippedWeaponOneSO);
+        if (_EquippedWeaponTwoSO != null) AddToInventory(EquippedWeaponTwoSO);
     }
 
-    public abstract void EquipWeapon(WeaponSO weapon);
+    public void AddToInventory(ItemSO itemSO)
+    {
+        if (InventoryItems.TryGetValue(itemSO.Type, out List<InventoryItem> inventoryItems))
+        {
+            foreach (InventoryItem inventoryItem in inventoryItems)
+            {
+                if (inventoryItem.ItemSO.Name.Equals(itemSO.Name))
+                {
+                    inventoryItem.IncreaseQuantity();
+                    return;
+                }
+            }
+            inventoryItems.Add(new InventoryItem(itemSO, RemoveFromInventory));
+        }
+        else
+        {
+            List<InventoryItem> newInventoryItems = new()
+            {
+                new InventoryItem(itemSO, RemoveFromInventory)
+            };
+            InventoryItems.Add(itemSO.Type, newInventoryItems);
+        }
+    }
+
+    public void RemoveFromInventory(ItemSO itemSO)
+    {
+        if (InventoryItems.TryGetValue(itemSO.Type, out List<InventoryItem> inventoryItems))
+        {
+            int? indexFound = null;
+            for (int i = 0; i < inventoryItems.Count; i++)
+            {
+                if (inventoryItems[i].ItemSO.Name.Equals(itemSO.Name))
+                {
+                    indexFound = i;
+                    break;
+                }
+            }
+
+            if (indexFound == null)
+            {
+                throw new Exception($"Somehow trying to remove item that is not in inventory! item=[{itemSO.Name}]");
+            }
+
+            inventoryItems.RemoveAt(indexFound.Value);
+        }
+        else
+        {
+            throw new Exception($"Somehow trying to remove item that is not in inventory! item=[{itemSO.Name}] type=[{itemSO.Type}]");
+        }
+    }
+
+    public ItemSO? TryGetItemFromInventory(InventoryItemType itemType, ArmorSlot? armorSlot, int? weaponSlot)
+    {
+        if (armorSlot == null && weaponSlot == null) throw new Exception("Both armor slot and weapon slot cannot be null!");
+        if (armorSlot != null && weaponSlot != null) throw new Exception("Both armor slot and weapon slot cannot have values!");
+
+        if (itemType.Equals(InventoryItemType.Armor))
+        {
+            if (armorSlot == null) throw new Exception("Item type of armor provided but no armor slot was provided!");
+
+            if (armorSlot.Equals(ArmorSlot.Head))
+            {
+                return _EquippedHeadSO;
+            }
+            else if (armorSlot.Equals(ArmorSlot.Shoulder))
+            {
+                return _EquippedShoulderSO;
+            }
+            else if (armorSlot.Equals(ArmorSlot.Hands))
+            {
+                return _EquippedHandsSO;
+            }
+            else if (armorSlot.Equals(ArmorSlot.Torso))
+            {
+                return _EquippedTorsoSO;
+            }
+            else if (armorSlot.Equals(ArmorSlot.Legs))
+            {
+                return _EquippedLegsSO;
+            }
+            else if (armorSlot.Equals(ArmorSlot.Feet))
+            {
+                return _EquippedFeetSO;
+            }
+            else
+            {
+                return _EquippedShieldSO;
+            }
+        }
+        else if (itemType.Equals(InventoryItemType.Weapons))
+        {
+            if (weaponSlot == null) throw new Exception("Item type of weapons provided but no weapon slot was provided!");
+
+            if (weaponSlot == 1)
+            {
+                return _EquippedWeaponOneSO;
+            }
+            else if (weaponSlot == 2) 
+            { 
+                return _EquippedWeaponTwoSO; 
+            }
+            else
+            {
+                throw new Exception($"Invalid weapon slot provided = {weaponSlot}");
+            }
+        }
+        else
+        {
+            throw new Exception($"Invalid inventory item type to equip = {itemType}");
+        }
+    }
+
+    public abstract void EquipWeapon(WeaponSO weapon, int slot = 1);
 }

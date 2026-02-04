@@ -9,6 +9,18 @@ public class PauseMenuCharacter : MonoBehaviour
     [SerializeField] private PauseMenuCharacterStatDisplay _Stamina;
     [SerializeField] private PauseMenuCharacterStatDisplay _Luck;
 
+    [SerializeField] private PauseMenuCharacterStatDisplay _WeaponOne;
+    [SerializeField] private PauseMenuCharacterStatDisplay _WeaponTwo;
+
+    [SerializeField] private PauseMenuCharacterStatDisplay _BluntDefense;
+    [SerializeField] private PauseMenuCharacterStatDisplay _PiercingDefense;
+    [SerializeField] private PauseMenuCharacterStatDisplay _ExplosiveDefense;
+    [SerializeField] private PauseMenuCharacterStatDisplay _FireDefense;
+    [SerializeField] private PauseMenuCharacterStatDisplay _IceDefense;
+    [SerializeField] private PauseMenuCharacterStatDisplay _LightningDefense;
+    [SerializeField] private PauseMenuCharacterStatDisplay _EarthDefense;
+    [SerializeField] private PauseMenuCharacterStatDisplay _VoidDefense;
+
     public void Setup(Player player)
     {
         _Strength.Setup(player);

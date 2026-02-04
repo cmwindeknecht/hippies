@@ -6,4 +6,5 @@ public abstract class ItemSO : ScriptableObject
     public string Name;
     [TextArea] public string Description;
     public Sprite Sprite;
+    public float Weight = 0f;
 }

@@ -28,7 +28,7 @@ public class EnemyAttackController : MonoBehaviour
     {
         if (_EquippedWeapon == null)
         {
-            WeaponSO weaponSO = _Inventory.EquippedWeaponSO;
+            WeaponSO weaponSO = _Inventory.CurrentWeapon;
             if (weaponSO == null)
             {
                 throw new System.Exception($"There is no weapon equipped --- this should be impossible!");

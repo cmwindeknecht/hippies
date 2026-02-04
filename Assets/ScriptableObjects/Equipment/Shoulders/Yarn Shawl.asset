@@ -10,8 +10,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: da473377623e0fb47a0edb18fe2dde57, type: 3}
-  m_Name: TestShield
+  m_Name: Yarn Shawl
   m_EditorClassIdentifier: 
   KnockbackResistance: 1
-  DamageNegationMin: 1
-  DamageNegationMax: 2
+  DamageResistance: 1
+  ArmorSlot: 0

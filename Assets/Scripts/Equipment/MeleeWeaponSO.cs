@@ -8,7 +8,7 @@ public enum MeleeSwingType
 
 
 
-[CreateAssetMenu( menuName = "ScriptableObjects/Attacks/MeleeWeapon")]
+[CreateAssetMenu( menuName = "ScriptableObjects/Equipment/MeleeWeapon")]
 public class MeleeWeaponSO : WeaponSO
 {
     public float Reach; // How far the hitbox extends
