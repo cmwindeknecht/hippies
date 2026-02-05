@@ -7,6 +7,7 @@ public class Player : Character
     private PlayerController _Controller;
     private PlayerVisual _PlayerVisual;
     private new PlayerInventory _Inventory => (PlayerInventory)base._Inventory;
+    public PlayerInventory Inventory => _Inventory;
 
     public DynamicStat Health => _Stats.Health;
     public DynamicStat Energy => _Stats.Energy;

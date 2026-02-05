@@ -27,23 +27,31 @@ public class DynamicStat
         _Max = max;
     }
 
-    public void Increase(int toIncrease)
+    public void CanIncrease()
     {
         if (_Current.Equals(_Max))
         {
             throw new DynamicStatAlreadyAtMaxException();
-        }  
+        }
+    }
 
+    public void Increase(int toIncrease)
+    {
+        CanIncrease();
         _Current = Mathf.Min(_Current + toIncrease, _Max);
+    }
+
+    public void CanDecrease()
+    {
+        if (_Current.Equals(_Min))
+        {
+            throw new DynamicStatDepletedException();
+        }
     }
 
     public void Decrease(int toDecrease)
     {
         _Current = Mathf.Max(_Current - toDecrease, _Min);
-
-        if (_Current.Equals(_Min))
-        {
-            throw new DynamicStatDepletedException();
-        }
+        CanDecrease();
     }
 }

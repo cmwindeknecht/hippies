@@ -21,7 +21,7 @@ public class PauseMenuInventory : MonoBehaviour
     [SerializeField] private InventoryItemConsumable _ConsumablePrefab;
 
     private Player _Player;
-    private InventoryItemType _ActiveItemType = InventoryItemType.None; // On click, update this
+    private InventoryItemType _ActiveItemType = InventoryItemType.None;
     private Button _LastClicked;
 
     public void Setup(Player player)
@@ -53,7 +53,7 @@ public class PauseMenuInventory : MonoBehaviour
         });
         _OthersButton.onClick.AddListener(() =>
         {
-            _ActiveItemType = InventoryItemType.Others;
+            _ActiveItemType = InventoryItemType.Miscellaneous;
             RefreshInventory();
             _DynamicStats.SetActive(false);
             _LastClicked = _OthersButton;

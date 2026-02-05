@@ -4,6 +4,7 @@ using UnityEngine.InputSystem;
 public class PlayerController : MonoBehaviour
 {
     private PlayerAttackController _AttackController;
+    private PlayerInventory _Inventory;
     private Rigidbody2D _RigidBody;
 
     private InputAction _MoveInputAction;
@@ -31,9 +32,9 @@ public class PlayerController : MonoBehaviour
     {
         _RigidBody = GetComponent<Rigidbody2D>();
         _AttackController = GetComponent<PlayerAttackController>();
+        _Inventory = GetComponent<PlayerInventory>();
 
         _MoveInputAction = InputSystem.actions.FindAction("Move");
-        _AttackInputAction = InputSystem.actions.FindAction("Attack");
     }
 
     void Update()
@@ -47,9 +48,17 @@ public class PlayerController : MonoBehaviour
         // Direction from player to mouse
         Vector2 attackDirection = (mouseWorldPos - transform.position).normalized;
 
-        if (Input.GetMouseButton(0)) // Left click
+        if (Input.GetMouseButton(0) || Input.GetMouseButton(1))
         {
             _AttackValue = attackDirection;
+            if (Input.GetMouseButton(0))
+            {
+                _Inventory.SetEquippedWeapon(1);
+            }
+            else if (Input.GetMouseButton(1))
+            {
+                _Inventory.SetEquippedWeapon(2);
+            }
         }
         else
         {
@@ -159,7 +168,7 @@ public class PlayerController : MonoBehaviour
 
     private void MovePlayer()
     {
-        Debug.Log($"Moving: velocity={_LinearVelocity}, moveValue={_MoveValue}, knockback={_Knockback}");
+        //Debug.Log($"Moving: velocity={_LinearVelocity}, moveValue={_MoveValue}, knockback={_Knockback}");
 
         _RigidBody.linearVelocity = _LinearVelocity;
     }
