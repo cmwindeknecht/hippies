@@ -44,6 +44,8 @@ public class PauseMenuCharacter : MonoBehaviour
 
     public void Setup(Player player)
     {
+        _Player = player;
+
         _Strength.Setup(player);
         _Agility.Setup(player);
         _Intelligence.Setup(player);

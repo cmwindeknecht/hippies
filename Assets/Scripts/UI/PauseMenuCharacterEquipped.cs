@@ -1,4 +1,5 @@
 using System;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -27,9 +28,27 @@ public class PauseMenuCharacterEquipped : MonoBehaviour, IPointerClickHandler
         _Inventory = playerInventory;
         _IventoryItemType = itemType;
         _WeaponSlot = weaponSlot;
+        
     }
 
     private void OnEnable()
+    {
+        UpdateEquipped();
+
+        PlayerInventory.OnEquipmentChange += PlayerInventory_OnEquipmentChange;
+    }
+
+    private void OnDisable()
+    {
+        PlayerInventory.OnEquipmentChange -= PlayerInventory_OnEquipmentChange;
+    }
+
+    private void PlayerInventory_OnEquipmentChange(object sender, PlayerInventory.OnEquipmentChangeArgs e)
+    {
+        UpdateEquipped();
+    }
+
+    private void UpdateEquipped()
     {
         if (_Inventory == null) return;
 
@@ -50,6 +69,7 @@ public class PauseMenuCharacterEquipped : MonoBehaviour, IPointerClickHandler
 
     public void OnPointerClick(PointerEventData eventData)
     {
+        UpdateEquipped();
         if (_ItemSO != null)
         {
             Debug.Log($"Emitting event for ItemSO {_ItemSO.Name}");

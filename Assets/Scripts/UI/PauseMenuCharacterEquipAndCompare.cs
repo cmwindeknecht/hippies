@@ -45,6 +45,15 @@ public class PauseMenuEquipAndCompare : MonoBehaviour
     private void PlayerInventory_OnEquipmentChange(object sender, PlayerInventory.OnEquipmentChangeArgs e)
     {
         UpdateEquipped(e.currentlyEquipped);
+        // TODO should probably just be listening in inventory
+        if (e.currentlyEquipped.Type.Equals(typeof(ArmorSO)))
+        {
+            _Inventory.EquipArmor((ArmorSO)e.currentlyEquipped);
+        }
+        else
+        {
+            _Inventory.EquipWeapon((WeaponSO)e.currentlyEquipped);
+        }
         UpdateCompare(e.previouslyEquipped);
     }
 
