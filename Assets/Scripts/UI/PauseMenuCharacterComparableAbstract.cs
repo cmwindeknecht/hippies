@@ -31,19 +31,15 @@ public abstract class PauseMenuCharacterComparableAbstract : MonoBehaviour
     private void Awake()
     {
         _CompareButton.gameObject.SetActive(true);
-        _EquipButton.gameObject.SetActive(false);
+        _EquipButton.gameObject.SetActive(true);
 
         _CompareButton.onClick.AddListener(() =>
         {
-            _CompareButton.gameObject.SetActive(false);
-            _EquipButton.gameObject.SetActive(true);
             SendCompareEvent();
         });
         _EquipButton.onClick.AddListener(() =>
         {
-            SendEquipEvent();
-            // TODO should update the UI to show the newly equipped item and compare to the one that was just equipped
-            // TODO also - I think I need to remove the equipped from the inventory... and add in the one that was unequipped?  No clue if I need to do this honestly.  
+            SendEquipEvent(); 
         });
     }
 

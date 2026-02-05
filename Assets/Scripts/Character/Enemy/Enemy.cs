@@ -44,7 +44,7 @@ public class Enemy : Character
     public void Setup()
     {
         _Controller = GetComponent<EnemyController>();
-        _Controller.Setup(EnemySO);
+        _Controller.Setup(this, EnemySO);
 
         _Stats = GetComponent<CharacterStats>();
         _Stats.Setup(EnemySO);

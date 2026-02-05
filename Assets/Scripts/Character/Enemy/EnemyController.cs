@@ -7,6 +7,7 @@ using UnityEngine;
 public class EnemyController : MonoBehaviour
 {
     private Player _Player;
+    private Enemy _Enemy;
     private EnemySO _EnemySO;
     private EnemyAttackController _AttackController;
     private Rigidbody2D _RigidBody;
@@ -33,8 +34,9 @@ public class EnemyController : MonoBehaviour
     private float _LastPathIndexTime;
     private const float _MaxStallTime = 3f;
 
-    public void Setup(EnemySO enemySO)
+    public void Setup(Enemy enemy, EnemySO enemySO)
     {
+        _Enemy = enemy;
         _EnemySO = enemySO;
     }
 

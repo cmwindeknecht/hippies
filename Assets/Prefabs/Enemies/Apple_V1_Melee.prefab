@@ -13,6 +13,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 4046646220436816198, guid: 6727da941a5f92a48a611466e7d88e0c, type: 3}
     - target: {fileID: -3107527084736732274, guid: 5aedf06e2bbcdd7469d47c3b3532a7b2, type: 3}
+      propertyPath: _EquippedWeaponOneSO
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: -3107527084736732274, guid: 5aedf06e2bbcdd7469d47c3b3532a7b2, type: 3}
       propertyPath: _EnemyDropSOs.Array.size
       value: 1
       objectReference: {fileID: 0}
@@ -62,7 +66,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 841792200294623627, guid: 5aedf06e2bbcdd7469d47c3b3532a7b2, type: 3}
       propertyPath: m_Name
-      value: AppleV1Melee
+      value: Apple_V1_Melee
       objectReference: {fileID: 0}
     - target: {fileID: 1955508991597522835, guid: 5aedf06e2bbcdd7469d47c3b3532a7b2, type: 3}
       propertyPath: EnemySO

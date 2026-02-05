@@ -61,7 +61,7 @@ public class PlayerAttackController : MonoBehaviour
 
     private void EnsureWeapon()
     {
-        if (_EquippedWeapon == null)
+        if (_EquippedWeapon == null || !_EquippedWeapon.WeaponSO.GetInstanceID().Equals(_Inventory.CurrentWeapon.GetInstanceID()))
         {
             WeaponSO weaponSO = _Inventory.CurrentWeapon;
             if (weaponSO == null)

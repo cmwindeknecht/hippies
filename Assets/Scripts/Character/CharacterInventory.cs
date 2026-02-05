@@ -215,22 +215,62 @@ public abstract class CharacterInventory : MonoBehaviour
         }
     }
 
-    public void EquipArmor(ArmorSO armorSO)
+    public (ArmorSO previouslyEquipped, ArmorSO currentlyEquipped) EquipArmor(ArmorSO armorSO)
     {
-        if (armorSO.ArmorSlot.Equals(ArmorSlot.Head)) _EquippedHeadSO = armorSO;
-        else if (armorSO.ArmorSlot.Equals(ArmorSlot.Shoulder)) _EquippedShoulderSO = armorSO;
-        else if (armorSO.ArmorSlot.Equals(ArmorSlot.Hands)) _EquippedHandsSO = armorSO;
-        else if (armorSO.ArmorSlot.Equals(ArmorSlot.Torso)) _EquippedTorsoSO = armorSO;
-        else if (armorSO.ArmorSlot.Equals(ArmorSlot.Legs)) _EquippedLegsSO = armorSO;
-        else if (armorSO.ArmorSlot.Equals(ArmorSlot.Feet)) _EquippedFeetSO = armorSO;
-        else if (armorSO.ArmorSlot.Equals(ArmorSlot.Shield)) _EquippedShieldSO = armorSO;
+        ArmorSO previouslyEquipped;
+        if (armorSO.ArmorSlot.Equals(ArmorSlot.Head))
+        {
+            previouslyEquipped = _EquippedHeadSO;
+            _EquippedHeadSO = armorSO;
+        }
+        else if (armorSO.ArmorSlot.Equals(ArmorSlot.Shoulder))
+        {
+            previouslyEquipped = _EquippedHeadSO;
+            _EquippedShoulderSO = armorSO;
+        }
+        else if (armorSO.ArmorSlot.Equals(ArmorSlot.Hands))
+        {
+            previouslyEquipped = _EquippedHeadSO;
+            _EquippedHandsSO = armorSO;
+        }
+        else if (armorSO.ArmorSlot.Equals(ArmorSlot.Torso))
+        {
+            previouslyEquipped = _EquippedHeadSO;
+            _EquippedTorsoSO = armorSO;
+        }
+        else if (armorSO.ArmorSlot.Equals(ArmorSlot.Legs))
+        {
+            previouslyEquipped = _EquippedHeadSO;
+            _EquippedLegsSO = armorSO;
+        }
+        else if (armorSO.ArmorSlot.Equals(ArmorSlot.Feet))
+        {
+            previouslyEquipped = _EquippedHeadSO;
+            _EquippedFeetSO = armorSO;
+        }
+        else if (armorSO.ArmorSlot.Equals(ArmorSlot.Shield))
+        {
+            previouslyEquipped = _EquippedHeadSO;
+            _EquippedShieldSO = armorSO;
+        }
         else throw new Exception($"Unknown Armor Slot {armorSO.ArmorSlot}");
+
+        return (previouslyEquipped, armorSO);
     }
 
-    public void EquipWeapon(WeaponSO weaponSO, int slot = 1)
+    public (WeaponSO previouslyEquipped, WeaponSO currentlyEquipped) EquipWeapon(WeaponSO weaponSO, int slot = 1)
     {
-        if (slot == 1) _EquippedWeaponOneSO = weaponSO;
-        else if (slot == 2) _EquippedWeaponTwoSO = weaponSO;
+        WeaponSO previouslyEquipped;
+        if (slot == 1)
+        {
+            previouslyEquipped = _EquippedWeaponOneSO;
+            _EquippedWeaponOneSO = weaponSO;
+        }
+        else if (slot == 2) {
+            previouslyEquipped = _EquippedWeaponTwoSO;
+            _EquippedWeaponTwoSO = weaponSO;
+        }
         else throw new Exception("Unknown Weapon Slot!");
+        return (previouslyEquipped, weaponSO);
     }
 }

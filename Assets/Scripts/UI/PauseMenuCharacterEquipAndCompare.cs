@@ -25,6 +25,27 @@ public class PauseMenuEquipAndCompare : MonoBehaviour
     {
         _CompareEquipped.gameObject.SetActive(false);
         _CompareCompare.gameObject.SetActive(false);
+        RefreshCompare();
+
+        PlayerInventory.OnEquipmentChange += PlayerInventory_OnEquipmentChange;
+        PauseMenuCharacterComparableAbstract.OnCompareClicked += PauseMenuCharacterComparableAbstract_OnCompareClicked;
+    }
+
+    private void OnDisable()
+    {
+        PlayerInventory.OnEquipmentChange -= PlayerInventory_OnEquipmentChange;
+        PauseMenuCharacterComparableAbstract.OnCompareClicked -= PauseMenuCharacterComparableAbstract_OnCompareClicked;
+    }
+
+    private void PauseMenuCharacterComparableAbstract_OnCompareClicked(object sender, ItemSO e)
+    {
+        UpdateCompare(e);
+    }
+
+    private void PlayerInventory_OnEquipmentChange(object sender, PlayerInventory.OnEquipmentChangeArgs e)
+    {
+        UpdateEquipped(e.currentlyEquipped);
+        UpdateCompare(e.previouslyEquipped);
     }
 
     public void Setup(PlayerInventory inventory)
@@ -63,7 +84,7 @@ public class PauseMenuEquipAndCompare : MonoBehaviour
         {
             _CompareCompare.Setup(compareArmorSO, equippedArmorSO);
         }
-        if (_EquippedItemSO is WeaponSO equippedWeaponSO && _CompareItemSO is WeaponSO compareWeaponSO)
+        else if (_EquippedItemSO is WeaponSO equippedWeaponSO && _CompareItemSO is WeaponSO compareWeaponSO)
         {
             _CompareCompare.Setup(compareWeaponSO, equippedWeaponSO);
         }
@@ -76,14 +97,13 @@ public class PauseMenuEquipAndCompare : MonoBehaviour
 
     public void RefreshCompare()
     {
-        if (_Inventory == null) return;
-        if (_EquippedItemSO == null) return;
-
-        // Clear existing items
         foreach (Transform child in _ToCompareContent)
         {
             Destroy(child.gameObject);
         }
+
+        if (_Inventory == null) return;
+        if (_EquippedItemSO == null) return;
 
         Dictionary<InventoryItemType, List<InventoryItem>> inventory = _Inventory.InventoryItems;
         foreach (KeyValuePair<InventoryItemType, List<InventoryItem>> kvp in inventory)
@@ -92,8 +112,39 @@ public class PauseMenuEquipAndCompare : MonoBehaviour
 
             List<InventoryItem> sortedItems = kvp.Value.OrderBy(p => p.ItemSO.Name).ToList();
 
+            bool armorFound = false, weaponOneFound = false, weaponTwoFound = false;
             foreach (InventoryItem item in sortedItems)
             {
+                if (!armorFound && _EquippedItemSO is ArmorSO)
+                {
+                    if (item.ItemSO.GetInstanceID().Equals(_EquippedItemSO.GetInstanceID()))
+                    {
+                        armorFound = true;
+                        continue;
+                    }
+                }
+                if ((!weaponOneFound || !weaponTwoFound) && _EquippedItemSO is WeaponSO)
+                {
+                    if (_Inventory.EquippedWeaponOneSO == null)
+                    {
+                        weaponOneFound = true;
+                    }
+                    if (_Inventory.EquippedWeaponTwoSO == null)
+                    {
+                        weaponTwoFound = true;
+                    }
+                    
+                    if (!weaponOneFound && item.ItemSO.GetInstanceID().Equals(_Inventory.EquippedWeaponOneSO.GetInstanceID())) {
+                        weaponOneFound = true;
+                        continue;
+                    }
+                    else if (!weaponTwoFound && item.ItemSO.GetInstanceID().Equals(_Inventory.EquippedWeaponTwoSO.GetInstanceID()))
+                    {
+                        weaponTwoFound = true;
+                        continue;
+                    }
+                }
+
                 switch (kvp.Key)
                 {
                     case InventoryItemType.Weapons:

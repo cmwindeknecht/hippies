@@ -26,8 +26,11 @@ public class EnemyAttackController : MonoBehaviour
 
     private void EnsureWeapon()
     {
-        if (_EquippedWeapon == null)
+        if (_EquippedWeapon == null || !_EquippedWeapon.WeaponSO.GetInstanceID().Equals(_Inventory.CurrentWeapon.GetInstanceID()))
         {
+            // TODO if I want enemies to have multiple weapons I need to pass this in 
+            _Inventory.SetEquippedWeapon(1);
+
             WeaponSO weaponSO = _Inventory.CurrentWeapon;
             if (weaponSO == null)
             {
@@ -51,6 +54,7 @@ public class EnemyAttackController : MonoBehaviour
                 throw new System.Exception($"Unknown weaponSO to of {weaponSO.name}");
             }
 
+            
             _EquippedWeapon.Initialize(weaponSO, _Enemy.EnemySO.AttackCooldown);
         }
     }
