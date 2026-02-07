@@ -6,7 +6,7 @@ public class MeleeHitBox : MonoBehaviour
     private MeleeWeaponSO _WeaponSO;
     public DamageType? DamageType => _WeaponSO.DamageType;
     public List<ElementalDamage> ElementalDamageTypes => _WeaponSO.ElementalDamages;
-    private Character _Owner;
+    public Character Owner { get; private set; }
 
     private Rigidbody2D _Rigidbody;
     
@@ -31,7 +31,7 @@ public class MeleeHitBox : MonoBehaviour
         if (!_IsInitialized) return;
 
         // Destroy if the owner dies
-        if (_Owner == null)
+        if (Owner == null)
         {
             Destroy(gameObject);
             return;
@@ -56,7 +56,7 @@ public class MeleeHitBox : MonoBehaviour
             return;
         }
 
-        if (_Owner is Player)
+        if (Owner is Player)
         {
             if (collision.TryGetComponent<Enemy>(out Enemy enemy))
             {
@@ -64,7 +64,7 @@ public class MeleeHitBox : MonoBehaviour
             }
 
         }
-        else if (_Owner is Enemy)
+        else if (Owner is Enemy)
         {
             if (collision.TryGetComponent<Player>(out Player player))
             {
@@ -75,7 +75,7 @@ public class MeleeHitBox : MonoBehaviour
 
     public void Initialize(Character owner, Vector3 attackDirection, MeleeWeaponSO weaponSO)
     {
-        _Owner = owner;
+        Owner = owner;
         _WeaponSO = weaponSO;
         _AttackDirection = attackDirection.normalized;
         _IsInitialized = true;        
@@ -100,7 +100,7 @@ public class MeleeHitBox : MonoBehaviour
 
         if (damage > 0 || knockback < 0)
         {
-            adversaryHit.TakeDamage(damage, knockback > 0 ? _AttackDirection : null, knockback);
+            adversaryHit.TakeDamage(damage, adversaryHit, knockback > 0 ? _AttackDirection : null, knockback);
         }
     }
 
@@ -112,7 +112,7 @@ public class MeleeHitBox : MonoBehaviour
         float angle = Mathf.Lerp(90f, -90f, normalizedDuration) + Mathf.Atan2(_AttackDirection.y, _AttackDirection.x) * Mathf.Rad2Deg;
         float radians = angle * Mathf.Deg2Rad;
         Vector3 direction = new(Mathf.Cos(radians), Mathf.Sin(radians), 0f);
-        _Rigidbody.MovePosition((Vector3) _Owner.Position + direction * _WeaponSO.Reach);
+        _Rigidbody.MovePosition((Vector3) Owner.Position + direction * _WeaponSO.Reach);
         if (normalizedDuration >= 1f)
         {
             Destroy(gameObject);

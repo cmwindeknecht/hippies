@@ -43,22 +43,22 @@ public class Shield : MonoBehaviour
         // TODO maybe all of this logic should be in the Projectile/Hitbox code --- otherwise its weird as they check for player/enemy on enter, they should check if shield then if enemy or player
         if (collision.collider.TryGetComponent<MeleeHitBox>(out MeleeHitBox meleeHitBox))
         {
-            HandleAttack(meleeHitBox.GetDamage(), meleeHitBox.GetKnockBack(), meleeHitBox.AttackDirection, collision.gameObject, meleeHitBox.DamageType, meleeHitBox.ElementalDamageTypes);
+            HandleAttack(meleeHitBox.GetDamage(), meleeHitBox.GetKnockBack(), meleeHitBox.AttackDirection, meleeHitBox.gameObject, meleeHitBox.DamageType, meleeHitBox.ElementalDamageTypes, meleeHitBox.Owner);
         }
         else if (collision.collider.TryGetComponent<Projectile>(out Projectile projectile))
         {
-            HandleAttack(projectile.GetDamage(), projectile.GetKnockBack(), projectile.AttackDirection, collision.gameObject, projectile.DamageType, projectile.ElementalDamageTypes);
+            HandleAttack(projectile.GetDamage(), projectile.GetKnockBack(), projectile.AttackDirection, projectile.gameObject, projectile.DamageType, projectile.ElementalDamageTypes, projectile.Owner);
         }
     }
 
-    private void HandleAttack(int baseDamage, float baseKnockback, Vector2 attackDirection, GameObject hitObject, DamageType? damageType, List<ElementalDamage> elementalDamageTypes)
+    private void HandleAttack(int baseDamage, float baseKnockback, Vector2 attackDirection, GameObject hitObject, DamageType? damageType, List<ElementalDamage> elementalDamageTypes, Character attacker)
     {
         int damage = _Owner.GetPossibleDamage(baseDamage, damageType, elementalDamageTypes, isShielding: true);
         float modifiedKnockback = Mathf.Max(0, baseKnockback - _ShieldSO.KnockbackResistance);
 
         if (damage > 0 || modifiedKnockback > 0)
         {
-            _Owner.TakeDamage(damage, modifiedKnockback > 0 ? attackDirection : null, modifiedKnockback);
+            _Owner.TakeDamage(damage, attacker, modifiedKnockback > 0 ? attackDirection : null, modifiedKnockback);
         }
 
         Destroy(hitObject);

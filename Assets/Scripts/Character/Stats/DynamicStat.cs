@@ -4,14 +4,12 @@ public enum DynamicStatName
 {
     Health,
     Energy,
-    Magic,
-    Intelligence,
-    Luck
+    Magic
 }
 
 public class DynamicStat
 {
-    private DynamicStatName _Name;
+    private readonly DynamicStatName _Name;
     public DynamicStatName Name => _Name;
     private int _Current;
     public int Current => _Current;

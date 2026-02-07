@@ -37,7 +37,7 @@ public abstract class Character : MonoBehaviour
     protected CharacterInventory _Inventory;
     public Dictionary<InventoryItemType, List<InventoryItem>> InventoryItems => _Inventory.InventoryItems;
 
-    public abstract void TakeDamage(int damage, Vector3? attackDirection = null, float knockbackSpeed = 0);
+    public abstract void TakeDamage(int damage, Character attacker, Vector3? attackDirection = null, float knockbackSpeed = 0);
     public abstract void SpendEnergy(int energy);
     public abstract void SpendMagic(int magic);
 

@@ -9,8 +9,8 @@ public class Projectile : MonoBehaviour
     public DamageType? DamageType => _ProjectileSO.DamageType;
     public List<ElementalDamage> ElementalDamageTypes => _ProjectileSO.ElementalDamages.Union(_RangedWeaponSO.ElementalDamages).ToList();
 
-    private Character _Owner;
-    private Character _Target;
+    public Character Owner { get; private set; }
+    public Character _Target {  get; private set; }
 
     private Rigidbody2D _Rigidbody;
 
@@ -41,7 +41,7 @@ public class Projectile : MonoBehaviour
 
     public void Initialize(Vector3 direction, RangedWeaponSO weaponSO, Character projectileOwner)
     {
-        _Owner = projectileOwner;
+        Owner = projectileOwner;
         _RangedWeaponSO = weaponSO;
 
         _AttackDirection = direction.normalized;
@@ -77,7 +77,7 @@ public class Projectile : MonoBehaviour
             return;
         }
 
-        if (_Owner is Player)
+        if (Owner is Player)
         {
             if (collision.collider.TryGetComponent<Enemy>(out Enemy enemy))
             {
@@ -85,7 +85,7 @@ public class Projectile : MonoBehaviour
             }
             
         }
-        else if (_Owner is Enemy)
+        else if (Owner is Enemy)
         {
             if (collision.collider.TryGetComponent<Player>(out Player player))
             {
@@ -122,7 +122,7 @@ public class Projectile : MonoBehaviour
 
         if (damage > 0 || knockback < 0)
         {
-            adversaryHit.TakeDamage(damage, knockback > 0 ? _AttackDirection : null, knockback);
+            adversaryHit.TakeDamage(damage, adversaryHit, knockback > 0 ? _AttackDirection : null, knockback);
         }
     }
 }

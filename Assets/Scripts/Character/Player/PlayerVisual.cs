@@ -42,8 +42,8 @@ public class PlayerVisual : MonoBehaviour
         if (_Animator == null) throw new System.Exception("No Animator Component on PlayerVisual!");
         if (_Controller == null) return;
 
-        Debug.Log($"Setting MoveValue: {_Controller.MoveValue.x}, MoveY: {_Controller.MoveValue.y}");
-        Debug.Log($"Setting FacingValue: {_Controller.FacingDirection.x}, MoveY: {_Controller.FacingDirection.y}");
+        //Debug.Log($"Setting MoveValue: {_Controller.MoveValue.x}, MoveY: {_Controller.MoveValue.y}");
+        //Debug.Log($"Setting FacingValue: {_Controller.FacingDirection.x}, MoveY: {_Controller.FacingDirection.y}");
 
         _Animator.SetBool("IsWalking", _Controller.MoveValue != Vector2.zero);
         _Animator.SetFloat("MoveX", _Controller.FacingDirection.x);

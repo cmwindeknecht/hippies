@@ -51,7 +51,7 @@ public class Player : Character
         _OverTimeEnergy.Add(energy, iterations, time, isDecrement: false);
     }
 
-    public override void TakeDamage(int damage, Vector3? attackDirection = null, float knockbackSpeed = 0)
+    public override void TakeDamage(int damage, Character attacker, Vector3? attackDirection = null, float knockbackSpeed = 0)
     {
         _OverTimeHealth.Add(damage, 1, 0f, isDecrement: true);
 
@@ -61,6 +61,9 @@ public class Player : Character
             Destroy(gameObject);
         }
 
+        // Only gain experience on non-death damages
+        _Stats.Vitality.IncreaseExperience(ExperienceCalculator.GetDamageTakenExperience(damage));
+
         if (attackDirection != null)
         {
             _Controller.Knockback(attackDirection.Value, knockbackSpeed);
@@ -69,7 +72,13 @@ public class Player : Character
 
     public override void SpendEnergy(int energy)
     {
+        if (_Stats.Energy.Current <= 0)
+        {
+            throw new DynamicStatAlreadyAtMaxException();
+        }
+
         _OverTimeEnergy.Add(energy, 1, 0f, isDecrement: true);
+        _Stats.Stamina.IncreaseExperience(ExperienceCalculator.GetStaminaActionExperience(energy));
 
         if (_Stats.Energy.Current <= 0)
         {
@@ -79,7 +88,13 @@ public class Player : Character
 
     public override void SpendMagic(int magic)
     {
+        if (_Stats.Magic.Current <= 0)
+        {
+            throw new DynamicStatAlreadyAtMaxException();
+        }
+
         _OverTimeMagic.Add(magic, 1, 0f, isDecrement: true);
+        _Stats.Intelligence.IncreaseExperience(ExperienceCalculator.GetSpellCastExperience(magic));
 
         if (_Stats.Magic.Current <= 0)
         {
@@ -90,5 +105,19 @@ public class Player : Character
     public void AddToInventory(ItemSO itemSO)
     {
         _Inventory.AddToInventory(itemSO);
+    }
+
+    // Used on enemy death, finishing a quest, etc
+    //   levelCompare; for enemies = their level, for quests = recommended level, etc
+    public void GetExperienceBoost(int baseExperience, int levelCompare)
+    {
+        int experienceGained = ExperienceCalculator.GetScaledExperienceBoost(levelCompare, _Stats.Level.CurrentLevel, baseExperience);
+        _Stats.Strength.IncreaseExperience(experienceGained);
+        _Stats.Agility.IncreaseExperience(experienceGained);
+        _Stats.Stamina.IncreaseExperience(experienceGained);
+        _Stats.Vitality.IncreaseExperience(experienceGained);
+        _Stats.Intelligence.IncreaseExperience(experienceGained);
+        // TODO need to put a "proc" function or whatever on this stat, and when your luck fires, it gets experience
+        _Stats.Luck.IncreaseExperience(experienceGained);
     }
 }

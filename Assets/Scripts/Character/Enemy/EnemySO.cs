@@ -14,4 +14,14 @@ public class EnemySO : ScriptableObject
     public float AttackCooldown = 2f; // Time between attack attempts
     public int BurstCount = 1; // Shots per burst (1 = single shot, 3 = triple burst)
     public float BurstDelay = 0.2f; // Time between shots in a burst
+
+    public int Level = 1;
+    public int Strength = 1;
+    public int Agility = 1;
+    public int Vitality = 1;
+    public int Stamina = 1;
+    public int Intelligence = 1;
+    public int Luck = 1;
+
+    public int ExperienceOnDeath = 1; // Experience gained across all stats on death (so if its the default, you get 1xp for strength, stamina, etc)
 }

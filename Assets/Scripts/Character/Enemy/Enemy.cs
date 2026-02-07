@@ -77,7 +77,7 @@ public class Enemy : Character
         }
     }
 
-    public override void TakeDamage(int damage, Vector3? attackDirection = null, float knockbackSpeed = 0)
+    public override void TakeDamage(int damage, Character attacker, Vector3? attackDirection = null, float knockbackSpeed = 0)
     {
         // TODO need to hook this up properly
         _Stats.TakeDamage(damage);
@@ -92,6 +92,12 @@ public class Enemy : Character
 
         if (_Stats.Health.Current <= 0)
         {
+            // TODO
+            //   Step 1: call player to gain experience on death
+            //   Step 2: small incremental experience gains based on attacks and shit in the melee hit box / projectile code
+
+            _Player.GetExperienceBoost(EnemySO.ExperienceOnDeath, _Stats.Level.CurrentLevel);
+
             SendDeathEvent();
             _Inventory.DropItems();
             Destroy(gameObject);
