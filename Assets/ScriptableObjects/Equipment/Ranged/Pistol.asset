@@ -17,10 +17,14 @@ MonoBehaviour:
   Description: It fires... so its technically a gun
   Sprite: {fileID: 0}
   Weight: 2
-  DamageMin: 1
-  DamageMax: 5
-  Knockback: 1
   DamageType: 0
+  ElementalDamageType: 0
+  DamageMin: 5
+  DamageMax: 10
+  ElementalMin: 0
+  ElementalMax: 0
+  Knockback: 1
+  HandsRequirement: 1
   AttackRate: 0.25
   AttackCooldown: 1
   StrengthRequirement: 1

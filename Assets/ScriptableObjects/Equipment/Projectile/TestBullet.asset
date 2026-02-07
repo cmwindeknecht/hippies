@@ -17,8 +17,12 @@ MonoBehaviour:
   Description: Small arms ammo
   Sprite: {fileID: 0}
   Weight: 0.01
-  DamageMin: 1
-  DamageMax: 2
+  DamageType: 0
+  ElementalDamageType: 0
+  DamageMin: 2
+  DamageMax: 5
+  ElementalMin: 0
+  ElementalMax: 0
   Knockback: 2
   Speed: 10
   Lifetime: 5
