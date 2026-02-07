@@ -13,14 +13,18 @@ MonoBehaviour:
   m_Name: Dagger
   m_EditorClassIdentifier: 
   Type: 1
-  Name: Short Sword
+  Name: Dagger
   Description: Sword is generous...
   Sprite: {fileID: 0}
   Weight: 1
-  DamageMin: 1
-  DamageMax: 4
-  Knockback: 1
   DamageType: 0
+  ElementalDamageType: 0
+  DamageMin: 3
+  DamageMax: 5
+  ElementalMin: 0
+  ElementalMax: 0
+  Knockback: 1
+  HandsRequirement: 1
   AttackRate: 0.25
   AttackCooldown: 1
   StrengthRequirement: 1

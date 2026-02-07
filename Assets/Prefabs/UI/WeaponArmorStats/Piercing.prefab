@@ -20,6 +20,34 @@ PrefabInstance:
       propertyPath: m_Color.r
       value: 0.3962264
       objectReference: {fileID: 0}
+    - target: {fileID: 1803092695667224988, guid: 021aa59e5e42d1a47996612082d945b0, type: 3}
+      propertyPath: m_text
+      value: 11
+      objectReference: {fileID: 0}
+    - target: {fileID: 3655758446547088843, guid: 021aa59e5e42d1a47996612082d945b0, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4517840108158479448, guid: 021aa59e5e42d1a47996612082d945b0, type: 3}
+      propertyPath: m_text
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 5521211430094349726, guid: 021aa59e5e42d1a47996612082d945b0, type: 3}
+      propertyPath: Value
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5521211430094349726, guid: 021aa59e5e42d1a47996612082d945b0, type: 3}
+      propertyPath: MaxValue
+      value: 11
+      objectReference: {fileID: 0}
+    - target: {fileID: 5521211430094349726, guid: 021aa59e5e42d1a47996612082d945b0, type: 3}
+      propertyPath: MinValue
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 7312673218975385641, guid: 021aa59e5e42d1a47996612082d945b0, type: 3}
+      propertyPath: m_text
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 8366101105196954905, guid: 021aa59e5e42d1a47996612082d945b0, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5

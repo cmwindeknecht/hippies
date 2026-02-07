@@ -97,8 +97,10 @@ public class PlayerController : MonoBehaviour
             _ShouldZeroOut = true;
         }
 
+       
+
         GetInputVelocity();
-        SetRotation();
+        //SetRotation();
         MovePlayer();
 
         // Not going to have a jump (I think --- maybe?) but leaving this here for sneak or whatever

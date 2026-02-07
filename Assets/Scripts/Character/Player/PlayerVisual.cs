@@ -2,6 +2,17 @@ using UnityEngine;
 
 public class PlayerVisual : MonoBehaviour
 {
+    [SerializeField] private PlayerVisualChild _Head;
+    [SerializeField] private PlayerVisualChild _Torso;
+    [SerializeField] private PlayerVisualChild _RightArmUpper;
+    [SerializeField] private PlayerVisualChild _RightArmLower;
+    [SerializeField] private PlayerVisualChild _LeftArmUpper;
+    [SerializeField] private PlayerVisualChild _LeftArmLower;
+    [SerializeField] private PlayerVisualChild _RightLegUpper;
+    [SerializeField] private PlayerVisualChild _RightLegLower;
+    [SerializeField] private PlayerVisualChild _LeftLegUpper;
+    [SerializeField] private PlayerVisualChild _LeftLegLower;
+
     private PlayerController _Controller;
     private Animator _Animator;
 
@@ -9,6 +20,21 @@ public class PlayerVisual : MonoBehaviour
     {
         _Controller = controller;
         _Animator = GetComponent<Animator>();
+
+        _Head.Setup(controller);
+        _Torso.Setup(controller);
+
+        _RightArmUpper.Setup(controller);
+        _RightArmLower.Setup(controller);
+
+        _LeftArmUpper.Setup(controller);
+        _LeftArmLower.Setup(controller);
+
+        _RightLegUpper.Setup(controller);
+        _RightLegLower.Setup(controller);
+
+        _LeftLegUpper.Setup(controller);
+        _LeftLegLower.Setup(controller);
     }
 
     public void Update()
@@ -16,8 +42,8 @@ public class PlayerVisual : MonoBehaviour
         if (_Animator == null) throw new System.Exception("No Animator Component on PlayerVisual!");
         if (_Controller == null) return;
 
-        //Debug.Log($"Setting MoveValue: {_Controller.MoveValue.x}, MoveY: {_Controller.MoveValue.y}");
-        //Debug.Log($"Setting FacingValue: {_Controller.FacingDirection.x}, MoveY: {_Controller.FacingDirection.y}");
+        Debug.Log($"Setting MoveValue: {_Controller.MoveValue.x}, MoveY: {_Controller.MoveValue.y}");
+        Debug.Log($"Setting FacingValue: {_Controller.FacingDirection.x}, MoveY: {_Controller.FacingDirection.y}");
 
         _Animator.SetBool("IsWalking", _Controller.MoveValue != Vector2.zero);
         _Animator.SetFloat("MoveX", _Controller.FacingDirection.x);
