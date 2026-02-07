@@ -43,17 +43,17 @@ public class Shield : MonoBehaviour
         // TODO maybe all of this logic should be in the Projectile/Hitbox code --- otherwise its weird as they check for player/enemy on enter, they should check if shield then if enemy or player
         if (collision.collider.TryGetComponent<MeleeHitBox>(out MeleeHitBox meleeHitBox))
         {
-            HandleAttack(meleeHitBox.Damage, meleeHitBox.Knockback, meleeHitBox.AttackDirection, collision.gameObject);
+            HandleAttack(meleeHitBox.GetDamage(), meleeHitBox.GetKnockBack(), meleeHitBox.AttackDirection, collision.gameObject, meleeHitBox.DamageType, meleeHitBox.ElementalDamageTypes);
         }
         else if (collision.collider.TryGetComponent<Projectile>(out Projectile projectile))
         {
-            HandleAttack(projectile.Damage, projectile.Knockback, projectile.AttackDirection, collision.gameObject);
+            HandleAttack(projectile.GetDamage(), projectile.GetKnockBack(), projectile.AttackDirection, collision.gameObject, projectile.DamageType, projectile.ElementalDamageTypes);
         }
     }
 
-    private void HandleAttack(int baseDamage, float baseKnockback, Vector2 attackDirection, GameObject hitObject)
+    private void HandleAttack(int baseDamage, float baseKnockback, Vector2 attackDirection, GameObject hitObject, DamageType? damageType, List<ElementalDamage> elementalDamageTypes)
     {
-        int damage = _Owner.GetPossibleDamage(baseDamage, isShielding: true);
+        int damage = _Owner.GetPossibleDamage(baseDamage, damageType, elementalDamageTypes, isShielding: true);
         float modifiedKnockback = Mathf.Max(0, baseKnockback - _ShieldSO.KnockbackResistance);
 
         if (damage > 0 || modifiedKnockback > 0)

@@ -41,10 +41,10 @@ public abstract class Character : MonoBehaviour
     public abstract void SpendEnergy(int energy);
     public abstract void SpendMagic(int magic);
 
-    public int GetPossibleDamage(int possibleDamage, bool isShielding)
+    public int GetPossibleDamage(int possibleDamage, DamageType? damageType, List<ElementalDamage> elementalDamageTypes, bool isShielding)
     {
-        if (isShielding) possibleDamage -= _Inventory.ShieldResistance;
-        return Mathf.Max(possibleDamage - _Inventory.ArmorRating, 0);
+        if (isShielding) possibleDamage -= _Inventory.GetShieldResistance(damageType, elementalDamageTypes);
+        return Mathf.Max(possibleDamage - _Inventory.GetArmorResistance(damageType, elementalDamageTypes));
     }
 
     protected void SendHealthChangeEvent(int overTimeHealth = 0)

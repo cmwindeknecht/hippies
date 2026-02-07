@@ -45,10 +45,13 @@ public class PauseMenuCharacterEquipAndCompareEquipped : MonoBehaviour
         WeaponArmorStat prefab = GetPrefabForWeaponDamageType(weaponSO.DamageType);
         SetupPrefab(prefab, weaponSO.DamageMin, weaponSO.DamageMax);
 
-        WeaponArmorStat? elementalPrefab = GetPrefabForElementalDamageType(weaponSO.ElementalDamageType);
-        if (elementalPrefab != null)
+        foreach (ElementalDamage elementalDamage in weaponSO.ElementalDamages)
         {
-            SetupPrefab(elementalPrefab, weaponSO.ElementalMin, weaponSO.ElementalMax);
+            WeaponArmorStat? elementalPrefab = GetPrefabForElementalDamageType(elementalDamage.Type);
+            if (elementalPrefab != null)
+            {
+                SetupPrefab(elementalPrefab, elementalDamage.DamageMin, elementalDamage.DamageMax);
+            }
         }
     }
 

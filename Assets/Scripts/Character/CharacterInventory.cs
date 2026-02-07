@@ -42,8 +42,6 @@ public abstract class CharacterInventory : MonoBehaviour
 
     [SerializeField] private List<ItemSO> _StartingInventory; // Mostly for testing purposes - maybe has a use for enemies or loading data?
     public Dictionary<InventoryItemType, List<InventoryItem>> InventoryItems;
-    public int ShieldResistance => _EquippedShieldSO != null ? _EquippedShieldSO.PierceResistance : 0;
-    public int ArmorRating => GetArmorRating();
 
     private void Awake()
     {
@@ -73,34 +71,79 @@ public abstract class CharacterInventory : MonoBehaviour
         }
     }
 
-    private int GetArmorRating()
+    // TODO probably should cache this and then reset it on equip of new piece of armor, but its fine for now
+    public int GetArmorResistance(DamageType? attackDamageType, List<ElementalDamage> attackElementalDamages)
     {
         int armorRating = 0;
-        if (_EquippedHeadSO != null)
-        {
-            armorRating += _EquippedHeadSO.PierceResistance;
-        }
-        if (_EquippedShoulderSO != null)
-        {
-            armorRating += _EquippedShoulderSO.PierceResistance;
-        }
-        if (_EquippedTorsoSO != null)
-        {
-            armorRating += _EquippedTorsoSO.PierceResistance;
-        }
-        if (_EquippedHandsSO != null)
-        {
-            armorRating += _EquippedHandsSO.PierceResistance;
-        }
-        if (_EquippedLegsSO != null)
-        {
-            armorRating += _EquippedLegsSO.PierceResistance;
-        }
-        if (_EquippedFeetSO != null)
-        {
-            armorRating += _EquippedFeetSO.PierceResistance;
-        }
+
+        armorRating += GetResistance(_EquippedHeadSO, attackDamageType);
+        armorRating += GetResistance(_EquippedHeadSO, attackElementalDamages);
+
+        armorRating += GetResistance(_EquippedShoulderSO, attackDamageType);
+        armorRating += GetResistance(_EquippedShoulderSO, attackElementalDamages);
+
+        armorRating += GetResistance(_EquippedHandsSO, attackDamageType);
+        armorRating += GetResistance(_EquippedHandsSO, attackElementalDamages);
+
+        armorRating += GetResistance(_EquippedTorsoSO, attackDamageType);
+        armorRating += GetResistance(_EquippedTorsoSO, attackElementalDamages);
+
+        armorRating += GetResistance(_EquippedLegsSO, attackDamageType);
+        armorRating += GetResistance(_EquippedLegsSO, attackElementalDamages);
+
+        armorRating += GetResistance(_EquippedFeetSO, attackDamageType);
+        armorRating += GetResistance(_EquippedFeetSO, attackElementalDamages);
+
         return armorRating;
+    }
+
+    public int GetShieldResistance(DamageType? attackDamageType, List<ElementalDamage> attackElementalDamages)
+    {
+        int resistance = GetResistance(_EquippedShieldSO, attackDamageType);
+        resistance += GetResistance(_EquippedShieldSO, attackElementalDamages);
+        return resistance;
+    }
+
+    private int GetResistance(ArmorSO? armorSO, DamageType? damageType)
+    {
+        if (armorSO == null) return 0;
+        if (damageType == null) return 0;
+
+        return damageType switch
+        {
+            DamageType.Pierce => armorSO.PierceResistance,
+            DamageType.Blunt => armorSO.BluntResistance,
+            DamageType.Explosive => armorSO.ExplosiveResistance,
+            _ => throw new NotImplementedException()
+        };
+    }
+
+    private int GetResistance(ArmorSO? armorSO, List<ElementalDamage> elementalDamageTypes)
+    {
+        if (armorSO == null) return 0;
+
+        int elementalResistance = 0;
+        foreach(ElementalDamage elementalDamageType in elementalDamageTypes)
+        {
+            elementalResistance += GetResistance(armorSO, elementalDamageType);
+        }
+
+        return elementalResistance;
+    }
+
+    private int GetResistance(ArmorSO? armorSO, ElementalDamage elementalDamage)
+    {
+        if (armorSO == null) return 0;
+
+        return elementalDamage.Type switch
+        {
+            ElementalDamageType.Ice => armorSO.IceResistance,
+            ElementalDamageType.Fire => armorSO.FireResistance,
+            ElementalDamageType.Lightning => armorSO.LightningResistance,
+            ElementalDamageType.Earth => armorSO.EarthResistance,
+            ElementalDamageType.Void => EquippedShieldSO.VoidResistance,
+            _ => throw new NotImplementedException()
+        };
     }
 
     public void AddToInventory(ItemSO itemSO)

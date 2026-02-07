@@ -1,3 +1,7 @@
+using NUnit.Framework;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -55,28 +59,50 @@ public class PauseMenuCharacterEquipAndCompareCompare : MonoBehaviour
             SetupPrefab(prefabCurrent, 0, 0, toCompare.DamageMin, toCompare.DamageMax);
         }
 
-        if (weaponSO.ElementalDamageType.Equals(toCompare.ElementalDamageType))
+
+        var weaponOneElementalEffects = weaponSO.ElementalDamages.ToDictionary(e => e.Type, e => e);
+        var weaponTwoElementalEffects = toCompare.ElementalDamages.ToDictionary(e => e.Type, e => e);
+        List<ElementalDamageType> elementalEffectsUnion = weaponOneElementalEffects.Keys.Union(weaponTwoElementalEffects.Keys).ToList();
+
+        foreach (ElementalDamageType type in elementalEffectsUnion)
         {
-            WeaponArmorStat? prefab = GetPrefabForElementalDamageType(weaponSO.ElementalDamageType);
+            weaponOneElementalEffects.TryGetValue(type, out var effect1);
+            weaponTwoElementalEffects.TryGetValue(type, out var effect2);
+
+            var currentMin = effect1?.DamageMin ?? 0;
+            var currentMax = effect1?.DamageMax ?? 0;
+            var newMin = effect2?.DamageMin ?? 0;
+            var newMax = effect2?.DamageMax ?? 0;
+
+            WeaponArmorStat? prefab = GetPrefabForElementalDamageType(type);
             if (prefab != null)
             {
-                SetupPrefab(prefab, weaponSO.ElementalMin, weaponSO.ElementalMax, toCompare.ElementalMin, toCompare.ElementalMax);
+                SetupPrefab(prefab, currentMin, currentMax, newMin, newMax);
             }
         }
-        else
-        {
-            WeaponArmorStat? prefabCurrent = GetPrefabForElementalDamageType(weaponSO.ElementalDamageType);
-            if (prefabCurrent != null)
-            {
-                SetupPrefab(prefabCurrent, weaponSO.ElementalMin, weaponSO.ElementalMax, 0, 0);
-            }
 
-            WeaponArmorStat? prefabToCompare = GetPrefabForElementalDamageType(toCompare.ElementalDamageType);
-            if (prefabToCompare != null)
-            {
-                SetupPrefab(prefabToCompare, 0, 0, toCompare.ElementalMin, toCompare.ElementalMax);
-            }
-        }
+        //if (weaponSO.ElementalDamageType.Equals(toCompare.ElementalDamageType))
+        //{
+        //    WeaponArmorStat? prefab = GetPrefabForElementalDamageType(weaponSO.ElementalDamageType);
+        //    if (prefab != null)
+        //    {
+        //        SetupPrefab(prefab, weaponSO.ElementalMin, weaponSO.ElementalMax, toCompare.ElementalMin, toCompare.ElementalMax);
+        //    }
+        //}
+        //else
+        //{
+        //    WeaponArmorStat? prefabCurrent = GetPrefabForElementalDamageType(weaponSO.ElementalDamageType);
+        //    if (prefabCurrent != null)
+        //    {
+        //        SetupPrefab(prefabCurrent, weaponSO.ElementalMin, weaponSO.ElementalMax, 0, 0);
+        //    }
+
+        //    WeaponArmorStat? prefabToCompare = GetPrefabForElementalDamageType(toCompare.ElementalDamageType);
+        //    if (prefabToCompare != null)
+        //    {
+        //        SetupPrefab(prefabToCompare, 0, 0, toCompare.ElementalMin, toCompare.ElementalMax);
+        //    }
+        //}
     }
 
     // Used for damage resistance / weight (and moreIsWorse only read for weight)

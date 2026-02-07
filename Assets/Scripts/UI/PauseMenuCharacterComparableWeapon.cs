@@ -19,14 +19,17 @@ public class PauseMenuCharacterComparableWeapon : PauseMenuCharacterComparableAb
             case DamageType.Explosive: SetupBlunt(weaponSO.DamageMin, weaponSO.DamageMax); break;
         }
 
-        switch (weaponSO.ElementalDamageType)
+        foreach (ElementalDamage elementalDamage in weaponSO.ElementalDamages)
         {
-            case ElementalDamageType.None: break;
-            case ElementalDamageType.Fire: SetupFire(weaponSO.ElementalMin, weaponSO.ElementalMax); break;
-            case ElementalDamageType.Ice: SetupFire(weaponSO.ElementalMin, weaponSO.ElementalMax); break;
-            case ElementalDamageType.Lightning: SetupFire(weaponSO.ElementalMin, weaponSO.ElementalMax); break;
-            case ElementalDamageType.Earth: SetupFire(weaponSO.ElementalMin, weaponSO.ElementalMax); break;
-            case ElementalDamageType.Void: SetupFire(weaponSO.ElementalMin, weaponSO.ElementalMax); break;
+            switch (elementalDamage.Type)
+            {
+                case ElementalDamageType.None: break;
+                case ElementalDamageType.Fire: SetupFire(elementalDamage.DamageMin, elementalDamage.DamageMax); break;
+                case ElementalDamageType.Ice: SetupIce(elementalDamage.DamageMin, elementalDamage.DamageMax); break;
+                case ElementalDamageType.Lightning: SetupLightning(elementalDamage.DamageMin, elementalDamage.DamageMax); break;
+                case ElementalDamageType.Earth: SetupEarth(elementalDamage.DamageMin, elementalDamage.DamageMax); break;
+                case ElementalDamageType.Void: SetupVoid(elementalDamage.DamageMin, elementalDamage.DamageMax); break;
+            }
         }
     }
 }
