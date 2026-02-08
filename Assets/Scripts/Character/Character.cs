@@ -37,27 +37,27 @@ public abstract class Character : MonoBehaviour
     protected CharacterInventory _Inventory;
     public Dictionary<InventoryItemType, List<InventoryItem>> InventoryItems => _Inventory.InventoryItems;
 
-    public abstract void TakeDamage(int damage, Vector3? attackDirection = null, float knockbackSpeed = 0);
+    public abstract void TakeDamage(int damage, Character attacker, Vector3? attackDirection = null, float knockbackSpeed = 0);
     public abstract void SpendEnergy(int energy);
     public abstract void SpendMagic(int magic);
 
-    public int GetPossibleDamage(int possibleDamage, bool isShielding)
+    public int GetPossibleDamage(int possibleDamage, DamageType? damageType, List<ElementalDamage> elementalDamageTypes, bool isShielding)
     {
-        if (isShielding) possibleDamage -= _Inventory.ShieldResistance;
-        return Mathf.Max(possibleDamage - _Inventory.ArmorRating, 0);
+        if (isShielding) possibleDamage -= _Inventory.GetShieldResistance(damageType, elementalDamageTypes);
+        return Mathf.Max(possibleDamage - _Inventory.GetArmorResistance(damageType, elementalDamageTypes));
     }
 
-    protected void SendHealthChangeEvent(int overTimeHealth = 0)
+    public void SendHealthChangeEvent(int overTimeHealth = 0)
     {
         OnHealthChanged?.Invoke(this, new DyanmicStatChangeEvent { Current = _Stats.Health.Current, Max = _Stats.Health.Max, OverTime = overTimeHealth });
     }
 
-    protected void SendEnergyChangeEvent(int overTimeEnergy = 0)
+    public void SendEnergyChangeEvent(int overTimeEnergy = 0)
     {
         OnEnergyChanged?.Invoke(this, new DyanmicStatChangeEvent { Current = _Stats.Energy.Current, Max = _Stats.Energy.Max, OverTime = overTimeEnergy });
     }
 
-    protected void SendMagicChangeEvent(int overTimeMagic = 0)
+    public void SendMagicChangeEvent(int overTimeMagic = 0)
     {
         OnMagicChanged?.Invoke(this, new DyanmicStatChangeEvent { Current = _Stats.Magic.Current, Max = _Stats.Magic.Max, OverTime = overTimeMagic });
     }

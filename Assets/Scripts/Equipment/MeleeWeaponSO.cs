@@ -6,8 +6,6 @@ public enum MeleeSwingType
     Swing // Arc
 }
 
-
-
 [CreateAssetMenu( menuName = "ScriptableObjects/Equipment/MeleeWeapon")]
 public class MeleeWeaponSO : WeaponSO
 {

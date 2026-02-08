@@ -1,11 +1,19 @@
 using System;
 
-public class DynamicStatAlreadyAtMaxException : Exception
+public class DynamicStatAtMaxException : Exception
 {
-    public DynamicStatAlreadyAtMaxException() : base() { }
+    public DynamicStatName Name {  get; private set; }
+    public DynamicStatAtMaxException(DynamicStatName name) : base() 
+    { 
+        Name = name;
+    }
 }
 
 public class DynamicStatDepletedException : Exception
 {
-    public DynamicStatDepletedException() : base() { }
+    public DynamicStatName Name { get; private set; }
+    public DynamicStatDepletedException(DynamicStatName name) : base()
+    {
+        Name = name;
+    }
 }

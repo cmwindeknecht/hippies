@@ -8,7 +8,6 @@ public class PlayerController : MonoBehaviour
     private Rigidbody2D _RigidBody;
 
     private InputAction _MoveInputAction;
-    private InputAction _AttackInputAction;
 
     private Vector2 _MoveValue = Vector2.zero;
     public Vector2 MoveValue => _MoveValue;
@@ -21,7 +20,7 @@ public class PlayerController : MonoBehaviour
 
     private Vector2 _LinearVelocity = Vector2.zero;
 
-    private bool _ShouldZeroOut = true; // Plan is to make this false when knockback/environment modifies velocity
+    private bool _ShouldZeroOut = true; // True when environment/knockback effects the player
     private const float _BaseSpeed = 6f;
     private Vector2 _Knockback;
 

@@ -12,6 +12,9 @@ public class EnemyAttackController : MonoBehaviour
 
     [SerializeField] private GameObject _MeleeHitboxPrefab;
 
+    private const float MELEE_COST_PER_WEAPON_WEIGHT = .5f;
+    private const float RANGED_ENERGY_COST_BY_WEIGHT = .25f;
+
     void Awake()
     {
         _Inventory = GetComponent<EnemyInventory>();
@@ -99,16 +102,67 @@ public class EnemyAttackController : MonoBehaviour
 
     private void SpawnMeleeHitBox(Vector3 attackDirection, MeleeWeaponSO meleeWeaponSO)
     {
+        int energyCost = GetMeleeEnergyCost(meleeWeaponSO);
+        if (!_Enemy.Stats.Energy.CanSpend(energyCost))
+        {
+            // TODO send event if enemy so they get a "tired" icon of some sort
+            return;
+        } 
+        else
+        {
+            _Enemy.Stats.Energy.DecreaseCurrent(energyCost);
+        }
+
+            
         GameObject hitBoxInstance = Instantiate(_MeleeHitboxPrefab, transform.position, Quaternion.identity);
         MeleeHitBox meleeHitBox = hitBoxInstance.GetComponent<MeleeHitBox>();
         meleeHitBox.Initialize(_Enemy, attackDirection.normalized, meleeWeaponSO);
     }
 
+    private int GetMeleeEnergyCost(MeleeWeaponSO meleeWeaponSO)
+    {
+        return Mathf.Max(1, (int)(MELEE_COST_PER_WEAPON_WEIGHT * meleeWeaponSO.Weight));
+    }
+
     private void SpawnProjectile(Vector3 attackDirection, RangedWeaponSO rangedWeaponSO)
     {
-        Vector3 spawnPos = transform.position + attackDirection.normalized * 1.1f; // spawn in front of the player in the direction of the attack
+        int energyCost = GetRangedEnergyCost(rangedWeaponSO);
+        if (!_Enemy.Stats.Energy.CanSpend(energyCost))
+        {
+            // TODO send event if enemy so they get a "tired" icon of some sort
+            return;
+        }
+        else
+        {
+            _Enemy.Stats.Energy.DecreaseCurrent(energyCost);
+        }
+
+        Vector3 spawnPos = transform.position + attackDirection.normalized * 1.1f; // spawn in front of the enemy in the direction of the attack
         Projectile projectile = Instantiate(rangedWeaponSO.ProjectilePrefab, spawnPos, Quaternion.identity);
         projectile.Initialize(attackDirection.normalized, rangedWeaponSO, _Enemy);
+    }
+
+    private int GetRangedEnergyCost(RangedWeaponSO rangedWeaponSO)
+    {
+        return Mathf.Max(1, (int)(RANGED_ENERGY_COST_BY_WEIGHT * (rangedWeaponSO.Weight))); // TODO need access to the projectile so on the ranged weapon, add it to the weapon weight for calculations
+    }
+
+    private void SpawnProjectile(Vector3 attackDirection, MagicAttackSO magicAttackSO)
+    {
+        if (!_Enemy.Stats.Magic.CanSpend(magicAttackSO.ManaCost))
+        {
+            // TODO send event if enemy so they get a "out of mana" icon of some sort
+            return;
+        }
+        else
+        {
+            _Enemy.Stats.Magic.DecreaseCurrent(magicAttackSO.ManaCost);
+        }
+
+        // TODO this doesn't work for current prefab shit --- should probably have a different projectile anyways (or maybe not, we'll see)
+        //Vector3 spawnPos = transform.position + attackDirection.normalized * 1.1f; // spawn in front of the enemy in the direction of the attack
+        //Projectile projectile = Instantiate(magicAttackSO.ProjectilePrefab, spawnPos, Quaternion.identity);
+        //projectile.Initialize(attackDirection.normalized, magicAttackSO, _Enemy);
     }
 
     // Ensure that if the weapon is slower than the burst delay of the enemy, the weapon wins out (it is what determines Attack() true/false)

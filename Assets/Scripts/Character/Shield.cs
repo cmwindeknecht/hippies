@@ -9,6 +9,8 @@ public class Shield : MonoBehaviour
     private bool _IsInitialized = false;
     private HashSet<Collider2D> _HitTargets;
 
+    private const float STAMINA_COST_PER_DAMAGE = .25f;
+
     private void Awake()
     {
         _HitTargets = new();
@@ -43,24 +45,39 @@ public class Shield : MonoBehaviour
         // TODO maybe all of this logic should be in the Projectile/Hitbox code --- otherwise its weird as they check for player/enemy on enter, they should check if shield then if enemy or player
         if (collision.collider.TryGetComponent<MeleeHitBox>(out MeleeHitBox meleeHitBox))
         {
-            HandleAttack(meleeHitBox.Damage, meleeHitBox.Knockback, meleeHitBox.AttackDirection, collision.gameObject);
+            HandleAttack(meleeHitBox.GetDamage(), meleeHitBox.GetKnockBack(), meleeHitBox.AttackDirection, meleeHitBox.gameObject, meleeHitBox.DamageType, meleeHitBox.ElementalDamageTypes, meleeHitBox.Owner);
         }
         else if (collision.collider.TryGetComponent<Projectile>(out Projectile projectile))
         {
-            HandleAttack(projectile.Damage, projectile.Knockback, projectile.AttackDirection, collision.gameObject);
+            HandleAttack(projectile.GetDamage(), projectile.GetKnockBack(), projectile.AttackDirection, projectile.gameObject, projectile.DamageType, projectile.ElementalDamageTypes, projectile.Owner);
         }
     }
 
-    private void HandleAttack(int baseDamage, float baseKnockback, Vector2 attackDirection, GameObject hitObject)
+    private void HandleAttack(int baseDamage, float baseKnockback, Vector2 attackDirection, GameObject hitObject, DamageType? damageType, List<ElementalDamage> elementalDamageTypes, Character attacker)
     {
-        int damage = _Owner.GetPossibleDamage(baseDamage, isShielding: true);
+        int damage = _Owner.GetPossibleDamage(baseDamage, damageType, elementalDamageTypes, isShielding: true);
         float modifiedKnockback = Mathf.Max(0, baseKnockback - _ShieldSO.KnockbackResistance);
 
         if (damage > 0 || modifiedKnockback > 0)
         {
-            _Owner.TakeDamage(damage, modifiedKnockback > 0 ? attackDirection : null, modifiedKnockback);
+            _Owner.TakeDamage(damage, attacker, modifiedKnockback > 0 ? attackDirection : null, modifiedKnockback);
+
+            int damageBlocked = baseDamage - damage;
+            int energyCost = GetEnergySpentToBlock(damageBlocked);
+
+            _Owner.SpendEnergy(energyCost); 
+
+            if (_Owner is Player player)
+            {
+                player.GainExperienceOnShieldBlock(energyCost, damageBlocked);
+            }
         }
 
         Destroy(hitObject);
+    }
+
+    private int GetEnergySpentToBlock(int damageBlocked)
+    {
+        return Mathf.Max(1, (int)(STAMINA_COST_PER_DAMAGE * damageBlocked));
     }
 }

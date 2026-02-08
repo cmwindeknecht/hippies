@@ -46,14 +46,19 @@ public class PauseMenuEquipAndCompare : MonoBehaviour
     {
         UpdateEquipped(e.currentlyEquipped);
         // TODO should probably just be listening in inventory
-        if (e.currentlyEquipped.Type.Equals(typeof(ArmorSO)))
+        if (e.currentlyEquipped is ArmorSO currentlyEquippedArmor)
         {
-            _Inventory.EquipArmor((ArmorSO)e.currentlyEquipped);
+            _Inventory.EquipArmor(currentlyEquippedArmor);
+        }
+        else if (e.currentlyEquipped is WeaponSO currentlyEquippedWeapon)
+        {
+            _Inventory.EquipWeapon(currentlyEquippedWeapon);
         }
         else
         {
-            _Inventory.EquipWeapon((WeaponSO)e.currentlyEquipped);
+            throw new Exception($"Non Armor/Weapon type on equipment change {e.currentlyEquipped}");
         }
+        
         UpdateCompare(e.previouslyEquipped);
     }
 

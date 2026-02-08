@@ -16,7 +16,7 @@ public class PauseMenuCharacterStatDisplay : MonoBehaviour
     {
         if (_Player != null)
         {
-            StatValue.text = $"{_Player.Stats.Strength.Current}";
+            StatValue.text = $"{_Player.Stats.Strength.CurrentLevel}";
         }
     }
 }

@@ -23,10 +23,14 @@ public class OverTimeEffect
     //   Possible behavior instead --- Keep healing regardless afterwards.  Just remove the CanPerformEffect and ShouldStop (and handle the exception)
     public void Add(int amount, int iterations, float time, bool isDecrement)
     {
+        //if (!CanPerformEffect(isDecrement))
+        //{
+        //    if (isDecrement) throw new DynamicStatDepletedException(_Stat.Name);
+        //    else throw new DynamicStatAtMaxException(_Stat.Name);
+        //}
+
         if (iterations > 1)
         {
-            CanPerformEffect(isDecrement);
-
             _CancellationToken?.Cancel();
             _CancellationToken = new CancellationTokenSource();
 
@@ -78,7 +82,8 @@ public class OverTimeEffect
 
     private bool ShouldStop(bool isDecrement)
     {
-        return (isDecrement && _Stat.Current <= 0) || (!isDecrement && _Stat.Current >= _Stat.Max);
+        return CanPerformEffect(isDecrement);
+        //return (isDecrement && _Stat.Current <= 0) || (!isDecrement && _Stat.Current >= _Stat.Max);
     }
 
     private int GetProjectedAmount(bool isDecrement)
@@ -101,15 +106,15 @@ public class OverTimeEffect
         //}
     }
 
-    private void CanPerformEffect(bool isDecrement)
+    private bool CanPerformEffect(bool isDecrement)
     {
         if (isDecrement)
         {
-            _Stat.CanDecrease();
+            return _Stat.IsAtMin();
         }
         else
         {
-            _Stat.CanIncrease();
+            return _Stat.IsAtMax();
         }
     }
 
@@ -117,11 +122,11 @@ public class OverTimeEffect
     {
         if (isDecrement)
         {
-            _Stat.Decrease(amount);
+            _Stat.DecreaseCurrent(amount);
         }
         else
         {
-            _Stat.Increase(amount);
+            _Stat.IncreaseCurrent(amount);
         }
     }
 

@@ -32,9 +32,9 @@ public class InventoryItemConsumable : MonoBehaviour
                     item.DecreaseQuantity();
                     refreshInventory();
                 }
-                catch (DynamicStatAlreadyAtMaxException exception)
+                catch (DynamicStatAtMaxException exception)
                 {
-                    Debug.Log("Player already at max health");
+                    Debug.Log($"Player already at max health - {exception}");
                     // TODO send event to UI to do something
                 }
             }

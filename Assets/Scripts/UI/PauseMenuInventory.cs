@@ -98,7 +98,8 @@ public class PauseMenuInventory : MonoBehaviour
                         consumable.Setup(item, _Player, RefreshInventory);
                         break;
                     default:
-                        throw new System.NotImplementedException();
+                        Debug.Log($"No Prefab for item type {kvp.Key}");
+                        break;
                 }
             }
         }
