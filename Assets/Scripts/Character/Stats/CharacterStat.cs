@@ -12,14 +12,14 @@ public enum CharacterStatName
     Stamina,
     Intelligence,
     Luck,
-    Level
+    Level,
+    Spirit
 }
 
 public class CharacterStat
 {
     public event EventHandler<int> OnStatLevelUp;
-    public event EventHandler<int> OnPlayerLevelUp;
-
+    
     private readonly CharacterStatName _Name;
     public CharacterStatName Name => _Name;
 
@@ -43,17 +43,6 @@ public class CharacterStat
         _CurrentLevel = currentLevel;
         _CurrentExperience = currentExperience;
         _RequiredExperience = ExperienceCalculator.GetRequiredExperienceByLevel(_CurrentLevel);
-    }
-
-    // TODO should really make another class like LevelStat because this literally only applies to the Level CharacterStat
-    public void CalculateCurrentLevel(List<int> statLevels)
-    {
-        int newLevel = (int)statLevels.Average();
-        if (newLevel > _CurrentLevel)
-        {
-            _CurrentLevel = newLevel;
-            OnPlayerLevelUp?.Invoke(this, _CurrentLevel);
-        }
     }
 
     public void IncreaseExperience(int amountToIncrease)

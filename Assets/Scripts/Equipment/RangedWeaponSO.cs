@@ -11,6 +11,6 @@ public enum RangedWeaponType
 public class RangedWeaponSO : WeaponSO
 {
     public float Range; // How far the projectiles travel, 0 = infinite (think everything is infinite?)
-    public Projectile ProjectilePrefab;
+    public Projectile ProjectilePrefab; // TODO this does not work --- need to pass in the ProjectileSO
     public int BulletCost; // 1 for single shot, 2 for 2 bullets, 5 or whatever for shotguns, etc
 }

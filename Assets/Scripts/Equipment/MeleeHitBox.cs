@@ -96,11 +96,17 @@ public class MeleeHitBox : MonoBehaviour
     private void HandleAdversaryHit(Character adversaryHit)
     {
         int damage = adversaryHit.GetPossibleDamage(GetDamage(), _WeaponSO.DamageType, _WeaponSO.ElementalDamages, isShielding: false);
+        // TODO did critical hit occur
         float knockback = GetKnockBack();
 
         if (damage > 0 || knockback < 0)
         {
             adversaryHit.TakeDamage(damage, adversaryHit, knockback > 0 ? _AttackDirection : null, knockback);
+            if (Owner is Player player)
+            {
+                // TODO need to refactor all kinds of shit for elemental damage, but since its not implemented at all right now, I'm ignoring it
+                player.GainExperienceOnMelee(_WeaponSO, damage, 0);
+            }
         }
     }
 
@@ -124,6 +130,4 @@ public class MeleeHitBox : MonoBehaviour
         // TODO factor in agility in weapon speed, etc
         return weaponSO.AttackRate;
     }
-
-
 }

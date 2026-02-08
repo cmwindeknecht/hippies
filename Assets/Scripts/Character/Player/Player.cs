@@ -14,16 +14,22 @@ public class Player : Character
     public DynamicStat Energy => _Stats.Energy;
     public DynamicStat Magic => _Stats.Magic;
     private OverTimeEffect _OverTimeHealth;
+    public OverTimeEffect OverTimeHealth => _OverTimeHealth;
     private OverTimeEffect _OverTimeEnergy;
+    public OverTimeEffect OverTimeEnergy => _OverTimeEnergy;
     private OverTimeEffect _OverTimeMagic;
+    public OverTimeEffect OverTimeMagic => _OverTimeMagic;
 
     private void Awake()
     {
+        _Rigidbody2D = GetComponent<Rigidbody2D>();
+
         _Controller = GetComponent<PlayerController>();
         base._Inventory = GetComponent<PlayerInventory>();
-        _Stats = GetComponent<CharacterStats>();
-        _Rigidbody2D = GetComponent<Rigidbody2D>();
         
+        _Stats = GetComponent<CharacterStats>();
+        _Stats.Setup(this);
+
         _PlayerVisual = GetComponentInChildren<PlayerVisual>();
         _PlayerVisual.Setup(_Controller);
     }
@@ -63,7 +69,7 @@ public class Player : Character
         }
 
         // Only gain experience on non-death damages
-        _Stats.Vitality.IncreaseExperience(ExperienceCalculator.GetDamageTakenExperience(damage));
+        _Stats.Vitality.IncreaseExperience(ExperienceCalculator.GetDamageTakenExperience(damage, _Stats.Luck));
 
         if (attackDirection != null)
         {
@@ -73,15 +79,15 @@ public class Player : Character
 
     public override void SpendEnergy(int energy)
     {
-        if (_Stats.Energy.Current <= 0)
+        if (!_Stats.Energy.CanSpend(energy))
         {
-            throw new DynamicStatAlreadyAtMaxException();
+            throw new DynamicStatDepletedException(_Stats.Energy.Name);
         }
 
         _OverTimeEnergy.Add(energy, 1, 0f, isDecrement: true);
-        _Stats.Stamina.IncreaseExperience(ExperienceCalculator.GetStaminaActionExperience(energy));
+        _Stats.Stamina.IncreaseExperience(ExperienceCalculator.GetEnergyUsedExperience(energy, _Stats.Luck));
 
-        if (_Stats.Energy.Current <= 0)
+        if (_Stats.Energy.IsAtMin())
         {
             SendEnergyDepletedEvent();
         }
@@ -89,15 +95,15 @@ public class Player : Character
 
     public override void SpendMagic(int magic)
     {
-        if (_Stats.Magic.Current <= 0)
+        if (!_Stats.Magic.CanSpend(magic))
         {
-            throw new DynamicStatAlreadyAtMaxException();
+            throw new DynamicStatDepletedException(_Stats.Magic.Name);
         }
 
         _OverTimeMagic.Add(magic, 1, 0f, isDecrement: true);
-        _Stats.Intelligence.IncreaseExperience(ExperienceCalculator.GetSpellCastExperience(magic));
+        _Stats.Intelligence.IncreaseExperience(ExperienceCalculator.GetMeleeDamageDoneExperience(magic, _Stats.Luck));
 
-        if (_Stats.Magic.Current <= 0)
+        if (_Stats.Magic.IsAtMin())
         {
             SendMagicDepletedEvent();
         }
@@ -108,17 +114,82 @@ public class Player : Character
         _Inventory.AddToInventory(itemSO);
     }
 
-    // Used on enemy death, finishing a quest, etc
-    //   levelCompare; for enemies = their level, for quests = recommended level, etc
+    // Used on enemy death, finishing a quest (levelCompare; for enemies = the enemy level, for quests = recommended level to do the quest)
     public void GetExperienceBoost(int baseExperience, int levelCompare)
     {
-        int experienceGained = ExperienceCalculator.GetScaledExperienceBoost(levelCompare, _Stats.Level.CurrentLevel, baseExperience);
+        int experienceGained = ExperienceCalculator.GetScaledExperienceBoost(levelCompare, _Stats.Level.Current, baseExperience);
         _Stats.Strength.IncreaseExperience(experienceGained);
         _Stats.Agility.IncreaseExperience(experienceGained);
         _Stats.Stamina.IncreaseExperience(experienceGained);
         _Stats.Vitality.IncreaseExperience(experienceGained);
         _Stats.Intelligence.IncreaseExperience(experienceGained);
-        // TODO need to put a "proc" function or whatever on this stat, and when your luck fires, it gets experience
         _Stats.Luck.IncreaseExperience(experienceGained);
+    }
+
+    public void GainExperienceOnMelee(MeleeWeaponSO meleeWeaponSO, int physicalDamage, int elementalDamage)
+    {
+        if (physicalDamage == 0 && elementalDamage == 0) return;
+
+        if (physicalDamage > 0)
+        {
+            int physicalExperience = ExperienceCalculator.GetMeleeDamageDoneExperience(physicalDamage, _Stats.Luck);
+
+            if (meleeWeaponSO.DamageType.Equals(DamageType.Pierce))
+            {
+                _Stats.Agility.IncreaseExperience(physicalExperience);
+            }
+            if (meleeWeaponSO.DamageType.Equals(DamageType.Blunt))
+            {
+                _Stats.Strength.IncreaseExperience(physicalExperience);
+            }
+            if (meleeWeaponSO.DamageType.Equals(DamageType.Explosive))
+            {
+                Stats.Luck.IncreaseExperience(physicalExperience);
+            }
+        }
+        
+        if (elementalDamage > 0)
+        {
+            int elementalExperience = ExperienceCalculator.GetElementalDamageDoneExperience(elementalDamage, _Stats.Luck);
+            _Stats.Intelligence.IncreaseExperience(elementalExperience);
+        }
+    }
+
+    public void GainExperienceOnRanged(ProjectileSO projectileSO, int physicalDamage, int elementalDamage)
+    {
+        if (physicalDamage == 0 && elementalDamage == 0) return;
+
+        if (physicalDamage > 0)
+        {
+            int physicalExperience = ExperienceCalculator.GetRangedDamageDoneExperience(physicalDamage, _Stats.Luck);
+            _Stats.Agility.IncreaseExperience((int)(physicalExperience * .5f)); // Half damage experience is for the bow
+
+            // The other half experience is based on the projectile type
+            if (projectileSO.DamageType.Equals(DamageType.Pierce))
+            {
+                _Stats.Agility.IncreaseExperience((int)(physicalExperience * .5f));
+            }
+            if (projectileSO.DamageType.Equals(DamageType.Blunt))
+            {
+                _Stats.Strength.IncreaseExperience((int)(physicalExperience * .5f));
+            }
+            if (projectileSO.DamageType.Equals(DamageType.Explosive))
+            {
+                Stats.Luck.IncreaseExperience((int)(physicalExperience * .5f));
+            }
+        }
+
+        if (elementalDamage > 0)
+        {
+            int elementalExperience = ExperienceCalculator.GetElementalDamageDoneExperience(elementalDamage, _Stats.Luck);
+            _Stats.Agility.IncreaseExperience((int)(elementalExperience * .5f));
+            _Stats.Intelligence.IncreaseExperience((int)(elementalExperience * .5f));
+        }
+    }
+
+    public void GainExperienceOnShieldBlock(int energyCost, int damageBlocked)
+    {
+        _Stats.Stamina.IncreaseExperience(ExperienceCalculator.GetEnergyUsedExperience(energyCost, _Stats.Luck));
+        _Stats.Stamina.IncreaseExperience(ExperienceCalculator.GetDamageBlockedExperience(damageBlocked, _Stats.Luck));
     }
 }

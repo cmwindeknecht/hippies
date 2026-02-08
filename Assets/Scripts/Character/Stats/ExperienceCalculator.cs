@@ -13,11 +13,22 @@ public class ExperienceCalculator
 
     // Every action has a base experience gain of 5 and it gets modified in GetExperienceGained
     public const int _ExperiencePerAction = 3;
-    private const float SPELL_XP_PER_MANA = 0.5f;
-    private const float DAMAGE_XP_MULTIPLIER = 1.0f;
-    private const float DAMAGE_TAKEN_MULTIPLIER = 0.8f;
-    private const float STAMINA_XP_PER_POINT = 0.3f;
 
+    private const float SPELL_COST_XP_MULTIPLIER = 0.5f;
+    private const float SPELL_DAMAGE_XP_MULTIPLIER = 0.5f;
+
+    private const float STAMINA_COST_XP_MULTIPLIER = 0.05f;
+
+    private const float MELEE_DAMAGE_XP_MULTIPLIER = 0.75f;
+    private const float RANGED_DAMAGE_XP_MULTIPLIER = 0.75f;
+    private const float ELEMENTAL_DAMAGE_XP_MULTIPLIER = .1f;
+    
+    private const float DAMAGE_TAKEN_MULTIPLIER = 0.25f;
+    private const float DAMAGE_BLOCKED_MULTIPLIER = 0.1f;
+
+    private const float LUCK_AUTO_MULITPLIER = .01f;
+    private const float LUCK_PROCCED_MULITPLIER = 1.5f;
+    
     // On level up (and instantiation) get the amount of XP required to increase a stat
     public static int GetRequiredExperienceByLevel(int level)
     {
@@ -41,25 +52,81 @@ public class ExperienceCalculator
         else return (int)(baseXP * modifier);
     }
 
-
-    public static int GetSpellCastExperience(int manaCost)
+    // TODO if these do the same thing by the time I get to release --- make a single function that takes in the multiplier as an argument
+    // Exp for Strength and/or Agility (physical damage)
+    public static int GetMeleeDamageDoneExperience(float damageDealt, CharacterStat luckStat)
     {
-        return (int)(manaCost * SPELL_XP_PER_MANA);
+        int experience = Mathf.Max(1, (int)(damageDealt * MELEE_DAMAGE_XP_MULTIPLIER));
+        luckStat.IncreaseExperience(LuckAutoExperience(experience));
+        return experience;
     }
 
-    public static int GetDamageDoneExperience(float damageDealt)
+    // Exp for Agility (physical damage)
+    public static int GetRangedDamageDoneExperience(float damageDealt, CharacterStat luckStat)
     {
-        // Scale by damage and optionally weapon tier
-        return (int)(damageDealt * DAMAGE_XP_MULTIPLIER);
+        int experience = Mathf.Max(1, (int)(damageDealt * RANGED_DAMAGE_XP_MULTIPLIER));
+        luckStat.IncreaseExperience(LuckAutoExperience(experience));
+        return experience;
     }
 
-    public static int GetDamageTakenExperience(float damageTaken)
+    // Intelligence (magic damage)
+    public static int GetSpellDamageDoneExperience(float damageDealt, CharacterStat luckStat)
     {
-        return (int)(damageTaken * DAMAGE_TAKEN_MULTIPLIER);
+        int experience = Mathf.Max(1, (int)(damageDealt * SPELL_DAMAGE_XP_MULTIPLIER));
+        luckStat.IncreaseExperience(LuckAutoExperience(experience));
+        return experience;
     }
 
-    public static int GetStaminaActionExperience(int staminaCost)
+    // Intelligence (elemental damage from physical type attack (melee/ranged))
+    public static int GetElementalDamageDoneExperience(float damageDealt, CharacterStat luckStat)
     {
-        return (int)(staminaCost * STAMINA_XP_PER_POINT);
+        int experience = Mathf.Max(1, (int)(damageDealt * ELEMENTAL_DAMAGE_XP_MULTIPLIER));
+        luckStat.IncreaseExperience(LuckAutoExperience(experience));
+        return experience;
+    }
+
+    // Exp for Vitality (physical damage) or Intelligence (magic damage)
+    public static int GetDamageTakenExperience(float damageTaken, CharacterStat luckStat)
+    {
+        int experience = Mathf.Max(1, (int)(damageTaken * DAMAGE_TAKEN_MULTIPLIER));
+        luckStat.IncreaseExperience(LuckAutoExperience(experience));
+        return experience;
+    }
+
+    // Exp for Stamina on Shield use
+    public static int GetDamageBlockedExperience(float damageTaken, CharacterStat luckStat)
+    {
+        int experience = Mathf.Max(1, (int)(damageTaken * DAMAGE_BLOCKED_MULTIPLIER));
+        luckStat.IncreaseExperience(LuckAutoExperience(experience));
+        return experience;
+    }
+
+    // Intelligence (mana spent)
+    public static int GetSpellCastExperience(int manaCost, CharacterStat luckStat)
+    {
+        int experience = Mathf.Max(1, (int)(manaCost * SPELL_COST_XP_MULTIPLIER));
+        luckStat.IncreaseExperience(LuckAutoExperience(experience));
+        return experience;
+    }
+
+    // Stamina (stamina spent) --- e.g. Shielding, sprinting, sneaking
+    public static int GetEnergyUsedExperience(int staminaCost, CharacterStat luckStat)
+    {
+        int experience = Mathf.Max(1, (int)(staminaCost * STAMINA_COST_XP_MULTIPLIER));
+        luckStat.IncreaseExperience(LuckAutoExperience(experience));
+        return experience;
+    }
+
+    // Whenever lock procs / triggers, it is increased by the amount of experience assoicated with that action cost
+    //      Critical hits = damage experience, critical blocks = damage blocked, etc
+    public static int LuckProccedExperience(int experience)
+    {
+        return Mathf.Max(1, (int)(experience * LUCK_PROCCED_MULITPLIER));
+    }
+
+    // Should be called after every experience gain
+    private static int LuckAutoExperience(int experience)
+    {
+        return Mathf.Max(1, (int)(experience * LUCK_AUTO_MULITPLIER));
     }
 }

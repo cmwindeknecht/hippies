@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -14,6 +15,9 @@ public class PlayerAttackController : MonoBehaviour
 
     private InputAction _ShieldInputAction;
     private bool _IsShielding = false;
+
+    private const float MELEE_COST_PER_WEAPON_WEIGHT = .5f;
+    private const float RANGED_ENERGY_COST_BY_WEIGHT = .25f;
 
     private void Awake()
     {
@@ -125,14 +129,24 @@ public class PlayerAttackController : MonoBehaviour
     private bool TryAttackByType(Vector3 targetPosition)
     {
         Vector3 attackDirection = new Vector3(targetPosition.x, targetPosition.y, 0).normalized;
-        if (_EquippedWeapon is RangedWeapon)
+        if (_EquippedWeapon is RangedWeapon rangedWeapon)
         {
+            int energyCost = GetRangedEnergyCost((RangedWeaponSO)_EquippedWeapon.WeaponSO);
+            if (!_Player.Stats.Energy.CanSpend(energyCost))
+            {
+                // TODO send event if player to make UI flash the energy to notify the player can't do shit
+                return false;
+            }
+
             if (_EquippedWeapon.Attack())
             {
+                _Player.SpendEnergy(energyCost);
+
                 RangedWeaponSO rangedWeaponSO = _EquippedWeapon.WeaponSO as RangedWeaponSO;
                 Vector3 spawnPos = transform.position + attackDirection.normalized * 1.1f; // spawn in front of the player in the direction of the attack
                 Projectile projectile = Instantiate(rangedWeaponSO.ProjectilePrefab, spawnPos, Quaternion.identity);
                 projectile.Initialize(attackDirection.normalized, rangedWeaponSO, _Player);
+
                 return true;
             }
             return false;
@@ -140,12 +154,20 @@ public class PlayerAttackController : MonoBehaviour
 
         if (_EquippedWeapon is MeleeWeapon)
         {
+            int energyCost = GetMeleeEnergyCost((MeleeWeaponSO)_EquippedWeapon.WeaponSO);
+            if (!_Player.Stats.Energy.CanSpend(energyCost))
+            {
+                // TODO send event if player to make UI flash the energy to notify the player can't do shit
+                return false;
+            }
+
             if (_EquippedWeapon.Attack())
             {
+                _Player.SpendEnergy(energyCost);
+
                 MeleeWeaponSO meleeWeaponSO = _EquippedWeapon.WeaponSO as MeleeWeaponSO;
                 GameObject hitBoxInstance = Instantiate(_MeleeHitboxPrefab, transform.position, Quaternion.identity);
                 MeleeHitBox meleeHitBox = hitBoxInstance.GetComponent<MeleeHitBox>();
-                // TODO just pass in the weapon SO I think
                 meleeHitBox.Initialize(_Player, attackDirection.normalized, meleeWeaponSO);
 
                 return true;
@@ -155,23 +177,31 @@ public class PlayerAttackController : MonoBehaviour
 
         if (_EquippedWeapon is MagicAttack)
         {
-            return _EquippedWeapon.Attack();
+            if (!_Player.Stats.Magic.CanSpend(((MagicAttackSO)_EquippedWeapon.WeaponSO).ManaCost))
+            {
+                // TODO send event if player to make UI flash the magic to notify the player can't do shit
+                return false;
+            }
+
+            if (_EquippedWeapon.Attack())
+            {
+                _Player.Stats.SpendMagic(((MagicAttackSO)_EquippedWeapon.WeaponSO).ManaCost);
+
+                throw new NotImplementedException();
+            }
+            return false;
         }
 
         throw new System.Exception($"Unknown attack type for weapon type {_EquippedWeapon.WeaponSO.Name}");
     }
 
-    // TODO Proper way to do this but not now
-    //private Vector3 GetBulletSpawnPosition()
-    //{
-    //    Collider2D playerCol = GetComponent<Collider2D>();
-    //    Collider2D projCol = projectilePrefab.GetComponent<Collider2D>();
+    private int GetMeleeEnergyCost(MeleeWeaponSO meleeWeaponSO)
+    {
+        return Mathf.Max(1, (int)(MELEE_COST_PER_WEAPON_WEIGHT * meleeWeaponSO.Weight));
+    }
 
-    //    float playerRadius = playerCol.bounds.extents.magnitude;
-    //    float projRadius = projCol.bounds.extents.magnitude;
-
-    //    float spawnOffset = playerRadius + projRadius + 0.05f;
-
-    //    Vector3 spawnPos = transform.position + (Vector3)attackDir.normalized * spawnOffset;
-    //}
+    private int GetRangedEnergyCost(RangedWeaponSO rangedWeaponSO)
+    {
+        return Mathf.Max(1, (int)(RANGED_ENERGY_COST_BY_WEIGHT * (rangedWeaponSO.Weight))); // TODO need access to the projectile so on the ranged weapon, add it to the weapon weight for calculations
+    }
 }

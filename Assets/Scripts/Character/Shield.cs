@@ -9,6 +9,8 @@ public class Shield : MonoBehaviour
     private bool _IsInitialized = false;
     private HashSet<Collider2D> _HitTargets;
 
+    private const float STAMINA_COST_PER_DAMAGE = .25f;
+
     private void Awake()
     {
         _HitTargets = new();
@@ -59,8 +61,23 @@ public class Shield : MonoBehaviour
         if (damage > 0 || modifiedKnockback > 0)
         {
             _Owner.TakeDamage(damage, attacker, modifiedKnockback > 0 ? attackDirection : null, modifiedKnockback);
+
+            int damageBlocked = baseDamage - damage;
+            int energyCost = GetEnergySpentToBlock(damageBlocked);
+
+            _Owner.SpendEnergy(energyCost); 
+
+            if (_Owner is Player player)
+            {
+                player.GainExperienceOnShieldBlock(energyCost, damageBlocked);
+            }
         }
 
         Destroy(hitObject);
+    }
+
+    private int GetEnergySpentToBlock(int damageBlocked)
+    {
+        return Mathf.Max(1, (int)(STAMINA_COST_PER_DAMAGE * damageBlocked));
     }
 }

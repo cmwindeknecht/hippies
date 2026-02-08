@@ -22,6 +22,8 @@ public class Projectile : MonoBehaviour
     private Vector3 _AttackDirection;
     public Vector3 AttackDirection => _AttackDirection;
 
+    
+
     private void Awake()
     {
         _Rigidbody = GetComponent<Rigidbody2D>();
@@ -123,6 +125,11 @@ public class Projectile : MonoBehaviour
         if (damage > 0 || knockback < 0)
         {
             adversaryHit.TakeDamage(damage, adversaryHit, knockback > 0 ? _AttackDirection : null, knockback);
+            if (Owner is Player player)
+            {
+                // TODO need to refactor all kinds of shit for elemental damage, but since its not implemented at all right now, I'm ignoring it
+                player.GainExperienceOnRanged(_ProjectileSO, damage, 0);
+            }
         }
     }
 }

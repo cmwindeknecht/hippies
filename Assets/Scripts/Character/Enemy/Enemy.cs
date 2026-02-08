@@ -47,7 +47,7 @@ public class Enemy : Character
         _Controller.Setup(this, EnemySO);
 
         _Stats = GetComponent<CharacterStats>();
-        _Stats.Setup(EnemySO);
+        _Stats.Setup(this, EnemySO);
 
         base._Inventory = GetComponent<EnemyInventory>();
         base._Inventory.EquipWeapon(EnemySO.WeaponSO);
@@ -83,20 +83,15 @@ public class Enemy : Character
         _Stats.TakeDamage(damage);
         SendHealthChangeEvent();
 
-        // TODO due to the hack for the UI
         if (_Stats.Health.Current < _Stats.Health.Max)
         {
             NotifyNearbyEnemies();
             _Controller.NotifiedToChasePlayer().Forget(); // Notify self to chase enemy
         }
 
-        if (_Stats.Health.Current <= 0)
+        if (_Stats.Health.IsAtMin())
         {
-            // TODO
-            //   Step 1: call player to gain experience on death
-            //   Step 2: small incremental experience gains based on attacks and shit in the melee hit box / projectile code
-
-            _Player.GetExperienceBoost(EnemySO.ExperienceOnDeath, _Stats.Level.CurrentLevel);
+            _Player.GetExperienceBoost(EnemySO.ExperienceOnDeath, _Stats.Level.Current);
 
             SendDeathEvent();
             _Inventory.DropItems();
@@ -111,11 +106,29 @@ public class Enemy : Character
 
     public override void SpendEnergy(int energy)
     {
-        throw new NotImplementedException();
+        if (_Stats.Energy.IsAtMin())
+        {
+            // TODO prevent energy spending --- really need to clean all of this up
+            //  1. Throw exception when trying to spend energy/magic
+            //  2. if no exception, keep going
+            return;
+        }
+
+        _Stats.SpendEnergy(energy);
+        SendEnergyChangeEvent();
     }
 
     public override void SpendMagic(int magic)
     {
-        throw new NotImplementedException();
+        if (_Stats.Magic.IsAtMin())
+        {
+            // TODO prevent energy spending --- really need to clean all of this up
+            //  1. Throw exception when trying to spend energy/magic
+            //  2. if no exception, keep going
+            return;
+        }
+
+        _Stats.SpendMagic(magic);
+        SendEnergyChangeEvent();
     }
 }
