@@ -44,10 +44,28 @@ public class PlayerAttackController : MonoBehaviour
             if (_EquippedShield == null) return;
 
             _Shield.gameObject.SetActive(true);
+            SetRotationAngle();
         }
         else
         {
             _Shield.gameObject.SetActive(false);
+        }
+    }
+
+    private void SetRotationAngle()
+    {
+        if (_Player.FacingDirection != Vector2.zero)
+        {
+            float angle = Mathf.Atan2(_Player.FacingDirection.y, _Player.FacingDirection.x) * Mathf.Rad2Deg;
+            float snappedAngle = Mathf.Round(angle / 45f) * 45f;
+
+            // Rotate the shield to face the direction
+            _Shield.transform.rotation = Quaternion.Euler(0, 0, snappedAngle);
+
+            // Position it in front of the player
+            float distance = .5f;
+            Vector3 offset = _Player.FacingDirection.normalized * distance;
+            _Shield.transform.position = transform.position + offset;
         }
     }
 

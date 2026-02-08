@@ -5,6 +5,7 @@ public class Player : Character
     public CharacterType CharacterType = CharacterType.Player;
 
     private PlayerController _Controller;
+    public Vector2 FacingDirection => _Controller.FacingDirection;
     private PlayerVisual _PlayerVisual;
     private new PlayerInventory _Inventory => (PlayerInventory)base._Inventory;
     public PlayerInventory Inventory => _Inventory;

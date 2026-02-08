@@ -88,6 +88,7 @@ public class CharacterStats : MonoBehaviour
         }
         catch (DynamicStatDepletedException exception)
         {
+            // TODO handle this differently based on player / enemy (and split this fuckin file for each) --- enemy is expected to die, player is not / has UI and game play effects
             Debug.Log($"DynamicStatDepletedException after TakeDamage - {exception}");
             // TODO play the relevant animation (death or something in the UI or whatever)
         }
